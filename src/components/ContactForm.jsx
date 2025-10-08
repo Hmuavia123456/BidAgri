@@ -1,0 +1,114 @@
+"use client";
+
+import { useState } from "react";
+
+const initialForm = {
+  name: "",
+  email: "",
+  message: "",
+};
+
+export default function ContactForm() {
+  const [formData, setFormData] = useState(initialForm);
+  const [touched, setTouched] = useState({});
+
+  const errors = {
+    name: formData.name.trim() ? "" : "Please enter your name.",
+    email: /^\S+@\S+\.\S+$/.test(formData.email)
+      ? ""
+      : "Enter a valid email address.",
+    message: formData.message.trim().length >= 10
+      ? ""
+      : "Message should be at least 10 characters.",
+  };
+
+  const isFormValid = Object.values(errors).every((error) => error === "");
+
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleBlur = (event) => {
+    const { name } = event.target;
+    setTouched((prev) => ({ ...prev, [name]: true }));
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    setTouched({ name: true, email: true, message: true });
+  };
+
+  return (
+    <form
+      className="space-y-6 rounded-2xl border border-green-100 bg-green-50/60 p-6 md:p-8 shadow-sm"
+      onSubmit={handleSubmit}
+      noValidate
+    >
+      <div>
+        <label htmlFor="name" className="block text-sm font-medium text-[#14532D]">
+          Name
+        </label>
+        <input
+          id="name"
+          name="name"
+          type="text"
+          value={formData.name}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          className="mt-2 w-full rounded-lg border border-green-200 bg-white px-4 py-2 text-sm focus:border-[#16A34A] focus:outline-none focus:ring-2 focus:ring-[#16A34A]/30"
+          placeholder="Jane Doe"
+        />
+        {touched.name && errors.name && (
+          <p className="mt-2 text-xs text-red-600">{errors.name}</p>
+        )}
+      </div>
+
+      <div>
+        <label htmlFor="email" className="block text-sm font-medium text-[#14532D]">
+          Email
+        </label>
+        <input
+          id="email"
+          name="email"
+          type="email"
+          value={formData.email}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          className="mt-2 w-full rounded-lg border border-green-200 bg-white px-4 py-2 text-sm focus:border-[#16A34A] focus:outline-none focus:ring-2 focus:ring-[#16A34A]/30"
+          placeholder="hello@company.com"
+        />
+        {touched.email && errors.email && (
+          <p className="mt-2 text-xs text-red-600">{errors.email}</p>
+        )}
+      </div>
+
+      <div>
+        <label htmlFor="message" className="block text-sm font-medium text-[#14532D]">
+          Message
+        </label>
+        <textarea
+          id="message"
+          name="message"
+          value={formData.message}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          rows={5}
+          className="mt-2 w-full rounded-lg border border-green-200 bg-white px-4 py-2 text-sm focus:border-[#16A34A] focus:outline-none focus:ring-2 focus:ring-[#16A34A]/30"
+          placeholder="Share a brief overview of your inquiry..."
+        />
+        {touched.message && errors.message && (
+          <p className="mt-2 text-xs text-red-600">{errors.message}</p>
+        )}
+      </div>
+
+      <button
+        type="submit"
+        className="inline-flex w-full items-center justify-center rounded-lg bg-[#16A34A] px-4 py-2 text-sm font-semibold text-white transition-colors duration-200 disabled:cursor-not-allowed disabled:bg-gray-300"
+        disabled={!isFormValid}
+      >
+        Send Message
+      </button>
+    </form>
+  );
+}

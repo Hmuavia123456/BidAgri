@@ -2,7 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import Lottie from "react-lottie-player";
+import { Player } from "@lottiefiles/react-lottie-player";
+import { FileText, Leaf, Mail, MapPin, Phone, User } from "lucide-react";
 
 const initialFormState = {
   fullName: "",
@@ -20,6 +21,44 @@ const floatingIconTransition = {
   repeatType: "mirror",
   ease: "easeInOut",
 };
+
+const fieldConfigs = [
+  {
+    name: "fullName",
+    label: "Full Name",
+    type: "text",
+    placeholder: "Enter your full name",
+    icon: User,
+  },
+  {
+    name: "cropType",
+    label: "Crop Type",
+    type: "text",
+    placeholder: "What are you growing?",
+    icon: Leaf,
+  },
+  {
+    name: "location",
+    label: "Province/City",
+    type: "text",
+    placeholder: "Where is your farm located?",
+    icon: MapPin,
+  },
+  {
+    name: "phone",
+    label: "Contact Number",
+    type: "tel",
+    placeholder: "03XXXXXXXXX",
+    icon: Phone,
+  },
+  {
+    name: "email",
+    label: "Email",
+    type: "email",
+    placeholder: "Enter your email",
+    icon: Mail,
+  },
+];
 
 export default function EnhancedFarmerRegistrationForm() {
   const [formData, setFormData] = useState(initialFormState);
@@ -91,7 +130,7 @@ export default function EnhancedFarmerRegistrationForm() {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.8, ease: "easeOut" }}
-      className="relative"
+      className="relative mx-auto max-w-4xl px-4"
     >
       <AnimatePresence>
         {showToast && (
@@ -103,11 +142,11 @@ export default function EnhancedFarmerRegistrationForm() {
             className="absolute top-0 left-1/2 z-20 w-full max-w-sm -translate-x-1/2 -translate-y-[110%]"
           >
             <div className="flex items-center gap-3 rounded-2xl bg-white/95 p-4 shadow-2xl ring-1 ring-emerald-200">
-              <Lottie
-                play
-                loop={false}
-                style={{ width: 60, height: 60 }}
-                src="https://lottie.host/f0c59911-6c68-4fba-83df-8856792fb8b4/RrsLVdN6rS.json"
+              <Player
+                autoplay
+                loop
+                src="/animations/farmer-success.json"
+                style={{ height: "150px", width: "150px" }}
               />
               <p className="text-sm font-semibold text-green-700">
                 🎉 Registration submitted successfully! Our team will contact you soon.
@@ -118,11 +157,11 @@ export default function EnhancedFarmerRegistrationForm() {
       </AnimatePresence>
 
       <motion.div
-        initial={{ opacity: 0, scale: 0.98 }}
+        initial={{ opacity: 0, scale: 0.97 }}
         whileInView={{ opacity: 1, scale: 1 }}
         viewport={{ once: true }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        className="bg-white p-8 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500"
+        className="rounded-3xl bg-gradient-to-br from-white via-[#f1fdf4] to-[#e6f7eb] p-6 md:p-8 shadow-[0_20px_60px_-25px_rgba(22,163,74,0.45)] ring-1 ring-white/40 backdrop-blur-sm transition-shadow duration-500 hover:shadow-[0_28px_80px_-30px_rgba(22,163,74,0.55)]"
       >
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -135,28 +174,31 @@ export default function EnhancedFarmerRegistrationForm() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="text-3xl md:text-4xl font-bold text-green-800 text-center mb-8"
+            className="mb-8 text-center text-3xl font-bold text-emerald-900 md:text-4xl"
           >
             Farmer Registration
           </motion.h2>
-          <motion.div className="flex justify-around mb-6 text-green-700 font-semibold text-base md:text-lg">
+          <motion.div className="mb-8 flex flex-wrap items-center justify-center gap-6 text-sm font-semibold text-emerald-700 md:text-base">
             <motion.span
               animate={floatingIconKeyframes}
               transition={floatingIconTransition}
+              className="flex items-center gap-2"
             >
-              👤 Profile
+              <User className="h-4 w-4 text-[#16a34a]" /> Profile
             </motion.span>
             <motion.span
               animate={floatingIconKeyframes}
               transition={{ ...floatingIconTransition, delay: 0.2 }}
+              className="flex items-center gap-2"
             >
-              🌾 Produce
+              <Leaf className="h-4 w-4 text-[#16a34a]" /> Produce
             </motion.span>
             <motion.span
               animate={floatingIconKeyframes}
               transition={{ ...floatingIconTransition, delay: 0.4 }}
+              className="flex items-center gap-2"
             >
-              📍 Location &amp; Photos
+              <MapPin className="h-4 w-4 text-[#16a34a]" /> Location &amp; Photos
             </motion.span>
           </motion.div>
         </motion.div>
@@ -167,78 +209,65 @@ export default function EnhancedFarmerRegistrationForm() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="space-y-5"
+          className="space-y-8"
         >
-          {[{
-            name: "fullName",
-            label: "👤 Full Name",
-            type: "text",
-            placeholder: "Enter your full name",
-          },
-          {
-            name: "cropType",
-            label: "🌾 Crop Type",
-            type: "text",
-            placeholder: "What are you growing?",
-          },
-          {
-            name: "location",
-            label: "📍 Province/City",
-            type: "text",
-            placeholder: "Where is your farm located?",
-          },
-          {
-            name: "phone",
-            label: "📞 Contact Number",
-            type: "tel",
-            placeholder: "03XXXXXXXXX",
-          },
-          {
-            name: "email",
-            label: "📧 Email",
-            type: "email",
-            placeholder: "Enter your email",
-          }].map((field) => (
-            <div key={field.name}>
-              <label className="block text-sm font-semibold text-gray-700 mb-1 flex items-center gap-2">
-                {field.label}
+          <div className="grid gap-5 md:grid-cols-2">
+            {fieldConfigs.map((field) => {
+              const Icon = field.icon;
+              return (
+                <motion.div
+                  key={field.name}
+                  whileHover={{ scale: 1.01 }}
+                  transition={{ duration: 0.2 }}
+                  className="group flex flex-col"
+                >
+                  <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-emerald-900/80">
+                    <Icon className="h-4 w-4 text-[#16a34a] transition-transform duration-300 group-hover:scale-110 group-hover:text-[#22c55e]" />
+                    {field.label}
+                  </label>
+                <motion.input
+                  name={field.name}
+                  type={field.type}
+                  value={formData[field.name]}
+                  onChange={handleChange}
+                  placeholder={field.placeholder}
+                  whileFocus={{ scale: 1.005 }}
+                  className="w-full rounded-2xl bg-white/90 px-4 py-3 text-emerald-900 shadow-sm outline-none transition-all duration-300 ring-1 ring-transparent hover:ring-[#16a34a]/40 focus:bg-white focus:ring-2 focus:ring-[#22c55e]/70"
+                />
+                {errors[field.name] && (
+                  <p className="mt-1 text-sm text-rose-500">{errors[field.name]}</p>
+                )}
+                </motion.div>
+              );
+            })}
+            <motion.div
+              whileHover={{ scale: 1.01 }}
+              transition={{ duration: 0.2 }}
+              className="group md:col-span-2"
+            >
+              <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-emerald-900/80">
+                <FileText className="h-4 w-4 text-[#16a34a] transition-transform duration-300 group-hover:scale-110 group-hover:text-[#22c55e]" />
+                Message
               </label>
-              <input
-                name={field.name}
-                type={field.type}
-                value={formData[field.name]}
+              <motion.textarea
+                name="message"
+                value={formData.message}
                 onChange={handleChange}
-                placeholder={field.placeholder}
-                className="w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-green-400 transition-all duration-300 shadow-sm hover:border-green-300"
+                placeholder="Share details about your harvest, quantity, or preferred buyers."
+                rows={4}
+                whileFocus={{ scale: 1.005 }}
+                className="w-full rounded-2xl bg-white/90 px-4 py-3 text-emerald-900 shadow-sm outline-none transition-all duration-300 ring-1 ring-transparent hover:ring-[#16a34a]/40 focus:bg-white focus:ring-2 focus:ring-[#22c55e]/70"
               />
-              {errors[field.name] && (
-                <p className="mt-1 text-sm text-red-500">{errors[field.name]}</p>
-              )}
-            </div>
-          ))}
-
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1 flex items-center gap-2">
-              📝 Message
-            </label>
-            <textarea
-              name="message"
-              value={formData.message}
-              onChange={handleChange}
-              placeholder="Share details about your harvest, quantity, or preferred buyers."
-              rows={4}
-              className="w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-green-400 transition-all duration-300 shadow-sm hover:border-green-300"
-            />
+            </motion.div>
           </div>
 
           <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            animate={{ opacity: [0.9, 1, 0.9] }}
-            transition={{ duration: 2, repeat: Infinity, repeatType: "reverse" }}
+            whileHover={{ scale: 1.05, y: -2 }}
+            whileTap={{ scale: 0.97 }}
+            transition={{ type: "spring", stiffness: 240, damping: 14 }}
             type="submit"
             disabled={isSubmitting || !isFormValid}
-            className="mt-6 w-full bg-gradient-to-r from-green-600 to-emerald-500 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-75"
+            className="w-full rounded-2xl bg-gradient-to-r from-[#16a34a] via-[#1ecb5f] to-[#22c55e] px-6 py-3 text-base font-semibold text-white shadow-[0_15px_35px_-20px_rgba(22,163,74,0.9)] transition-all duration-300 hover:from-[#18b34f] hover:via-[#24d369] hover:to-[#30d977] hover:shadow-[0_25px_45px_-25px_rgba(34,197,94,0.75)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/80 disabled:cursor-not-allowed disabled:opacity-75"
           >
             {isSubmitting ? "Submitting..." : "Submit Registration"}
           </motion.button>

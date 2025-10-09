@@ -14,8 +14,7 @@ export default function FarmersPage() {
     {
       name: "Ali Raza",
       location: "Multan, Punjab",
-      image:
-        "https://images.unsplash.com/photo-1605810230434-7631ac76ec81?auto=format&fit=crop&w=300&q=80",
+      image: "/images/ali-raza.jpg",
       quote:
         "BidAgri helped me sell my wheat directly to buyers at a fair price. Payments were instant and secure!",
       rating: 5,
@@ -23,8 +22,7 @@ export default function FarmersPage() {
     {
       name: "Sajid Mehmood",
       location: "Okara, Punjab",
-      image:
-        "https://images.unsplash.com/photo-1573497019419-6c39e1789a34?auto=format&fit=crop&w=300&q=80",
+      image: "/images/sajid-mehmood.jpg",
       quote:
         "Through BidAgri, I expanded my market reach beyond my local mandi. Highly recommended!",
       rating: 4,
@@ -32,8 +30,7 @@ export default function FarmersPage() {
     {
       name: "Tariq Khan",
       location: "Hyderabad, Sindh",
-      image:
-        "https://images.unsplash.com/photo-1603415526960-f7e0328c63b1?auto=format&fit=crop&w=300&q=80",
+      image: "/images/tariq-khan.jpg",
       quote:
         "A transparent and reliable platform for farmers — it’s changed how I do business.",
       rating: 5,
@@ -273,8 +270,6 @@ export default function FarmersPage() {
           </div>
         </div>
       </section>
-
-      <div className="h-px w-full bg-gradient-to-r from-transparent via-green-400 to-transparent my-12" />
 
       <section className="bg-gradient-to-b from-green-50 to-emerald-100 py-20">
         <div className="max-w-3xl mx-auto px-6 sm:px-8">

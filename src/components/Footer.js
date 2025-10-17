@@ -27,6 +27,7 @@ const quickLinks = [
   { label: "Farmers", href: "/farmers" },
   { label: "Buyers", href: "/buyers" },
   { label: "Products", href: "/products" },
+  { label: "Checkout", href: "/checkout" },
   { label: "Contact", href: "/contact" },
 ];
 
@@ -70,12 +71,12 @@ export default function Footer() {
   return (
     <footer
       ref={footerRef}
-      className={`relative overflow-hidden bg-gradient-to-br from-[#14532D] to-[#1B4332] px-10 py-16 text-[#F1F5F9] transition-all duration-700 ease-out md:px-20 ${
+      className={`relative overflow-hidden bg-white px-10 py-16 text-[var(--footer-fg)] transition-all duration-700 ease-out md:px-20 ${
         isVisible ? "opacity-100 translate-y-0" : "translate-y-8 opacity-0"
       }`}
-    >
+      >
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(34,197,94,0.15),_transparent_55%)]"></div>
+        <div className="absolute inset-0"></div>
         {sparklePositions.map(({ top, left, size, delay }, index) => (
           <span
             key={`sparkle-${index}`}
@@ -93,15 +94,15 @@ export default function Footer() {
             }`}
             style={{ transitionDelay: "0.1s" }}
           >
-            <div className="flex items-center gap-3">
-              <span className="text-4xl font-extrabold tracking-wide text-white drop-shadow-[0_0_12px_rgba(34,197,94,0.75)]">
-                BidAgri
-              </span>
-              <span className="leaf" aria-hidden="true">
-                🌿
-              </span>
-            </div>
-            <p className="max-w-sm text-base text-[#E2E8F0]">
+          <div className="flex items-center gap-3">
+            <span className="text-4xl font-extrabold tracking-wide text-[var(--footer-heading)] drop-shadow-[0_0_12px_rgba(var(--footer-accent-rgb),0.65)]">
+              BidAgri
+            </span>
+            <span className="leaf" aria-hidden="true">
+              🌿
+            </span>
+          </div>
+            <p className="max-w-sm text-base text-[color:var(--footer-muted)]">
               Empowering Farmers Through Digital Connections.
             </p>
           </div>
@@ -112,7 +113,7 @@ export default function Footer() {
             }`}
             style={{ transitionDelay: "0.25s" }}
           >
-            <h3 className="text-lg font-semibold text-white">Quick Links</h3>
+            <h3 className="text-lg font-semibold text-[var(--footer-heading)]">Quick Links</h3>
             <ul className="mt-5 space-y-3 text-sm">
               {quickLinks.map(({ label, href }) => (
                 <li key={label}>
@@ -130,7 +131,7 @@ export default function Footer() {
             }`}
             style={{ transitionDelay: "0.4s" }}
           >
-            <h3 className="text-lg font-semibold text-white">Stay Connected</h3>
+            <h3 className="text-lg font-semibold text-[var(--footer-heading)]">Stay Connected</h3>
             <div className="mt-5 flex items-center gap-4">
               {socialLinks.map(({ name, href, Icon }) => (
                 <Link
@@ -147,14 +148,14 @@ export default function Footer() {
         </div>
 
         <div
-          className={`h-px w-full bg-[#22C55E] shadow-[0_0_12px_2px_rgba(34,197,94,0.6)] transition-all duration-700 ${
+          className={`h-px w-full bg-[color:var(--footer-border)] shadow-[0_0_12px_2px_rgba(var(--footer-accent-rgb),0.45)] transition-all duration-700 ${
             isVisible ? "opacity-100" : "opacity-0"
           }`}
           style={{ transitionDelay: "0.6s" }}
         />
 
         <div
-          className={`text-center text-sm text-[#F1F5F9] transition-all duration-700 ${
+          className={`text-center text-sm text-[var(--footer-fg)] transition-all duration-700 ${
             isVisible ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
           }`}
           style={{ transitionDelay: "0.75s" }}
@@ -176,7 +177,7 @@ export default function Footer() {
           display: inline-flex;
           align-items: center;
           gap: 0.25rem;
-          color: #ffffff;
+          color: var(--footer-link);
           font-weight: 500;
           transition: transform 0.3s ease, color 0.3s ease;
         }
@@ -188,14 +189,14 @@ export default function Footer() {
           bottom: -4px;
           width: 100%;
           height: 2px;
-          background: linear-gradient(90deg, rgba(34, 197, 94, 0.9), transparent 65%);
+          background: linear-gradient(90deg, rgba(var(--footer-accent-rgb), 0.9), transparent 65%);
           transform: scaleX(0);
           transform-origin: left;
           transition: transform 0.3s ease;
         }
 
         .footer-link:hover {
-          color: #bbf7d0;
+          color: var(--footer-link-hover);
           transform: scale(1.05);
         }
 
@@ -211,22 +212,22 @@ export default function Footer() {
           justify-content: center;
           align-items: center;
           border-radius: 9999px;
-          border: 2px solid rgba(255, 255, 255, 0.8);
-          color: #ffffff;
+          border: 2px solid var(--footer-icon-border);
+          color: var(--footer-icon-color);
           transition: transform 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease;
         }
 
         .social-icon:hover {
           transform: scale(1.12) rotate(-4deg);
-          border-color: #22c55e;
-          box-shadow: 0 0 18px rgba(34, 197, 94, 0.45);
-          color: #bbf7d0;
+          border-color: var(--footer-accent);
+          box-shadow: 0 0 18px rgba(var(--footer-accent-rgb), 0.45);
+          color: var(--footer-link-hover);
         }
 
         .sparkle {
           position: absolute;
           border-radius: 9999px;
-          background: radial-gradient(circle, rgba(226, 252, 214, 0.95), rgba(34, 197, 94, 0));
+          background: radial-gradient(circle, rgba(226, 252, 214, 0.95), rgba(var(--footer-accent-rgb), 0));
           opacity: 0;
           animation: sparkle 6s ease-in-out infinite;
         }
@@ -258,6 +259,12 @@ export default function Footer() {
             opacity: 0;
             transform: scale(0.9) translateY(-20px);
           }
+        }
+
+        /* Respect OS-level reduced motion only */
+        @media (prefers-reduced-motion: reduce) {
+          .leaf { animation: none !important; }
+          .sparkle { animation: none !important; }
         }
       `}</style>
     </footer>

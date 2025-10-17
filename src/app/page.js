@@ -2,6 +2,10 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { getCategories } from "@/data/categoryUtils";
+import Image from "next/image";
+import HeroSection from "@/components/HeroSection";
+import ImageWithFallback from "@/components/ImageWithFallback";
 
 export default function Home() {
   const categories = [
@@ -81,78 +85,56 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="flex min-h-screen flex-col overflow-x-hidden bg-white text-gray-900">
-      <section className="relative isolate flex min-h-screen w-full max-w-none items-center justify-center overflow-hidden px-4 py-16 text-white lg:px-8">
-        <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1524592094714-0f0654e20314?auto=format&fit=crop&w=1600&q=80')] bg-cover bg-center" />
-          <div className="absolute inset-0 bg-green-900/60" />
-        </div>
-
-        <div className="relative z-10 flex w-full flex-col items-center gap-6 text-center md:w-4/5 lg:w-2/3 xl:w-1/2">
-          <p className="text-sm uppercase tracking-[0.35em] text-lime-200 animate-fade-in-down sm:text-base">
-            Fresh from the fields
-          </p>
-          <h1 className="text-4xl font-bold leading-tight animate-fade-in-up sm:text-5xl md:text-6xl">
-            Buy Directly from the Farmer
-          </h1>
-          <p className="text-base font-light text-lime-100/90 animate-fade-in-up animate-delay-200 sm:text-lg md:text-xl">
-            Empowering farmers and connecting them directly to buyers.
-          </p>
-          <Link
-            href="#products"
-            className="inline-flex items-center justify-center rounded-full bg-lime-400 px-8 py-3 font-semibold text-green-950 shadow-lg shadow-lime-500/40 transition-all duration-300 hover:bg-lime-300 hover:shadow-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lime-200 animate-fade-in-up animate-delay-300"
-          >
-            Explore Products
-          </Link>
-        </div>
-
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-green-950/40 to-green-950/70" aria-hidden />
-      </section>
+    <div className="flex min-h-screen flex-col overflow-x-hidden bg-white text-[color:var(--foreground)] -mt-20">
+      <HeroSection />
 
       <section
         id="products"
-        className="relative flex w-full max-w-none items-center justify-center overflow-hidden bg-gradient-to-r from-lime-50 via-white to-lime-100 px-4 py-16 text-green-900 lg:px-8"
+        className="relative flex w-full max-w-none items-center justify-center overflow-hidden bg-white px-4 py-16 text-[color:var(--foreground)] lg:px-8 scroll-mt-20"
       >
         <div className="relative z-10 flex w-full max-w-6xl flex-col items-center gap-12 md:flex-row md:items-stretch">
-          <div className="relative w-full overflow-hidden rounded-3xl bg-white shadow-lg shadow-lime-500/10 transition-all duration-700 md:w-1/2 animate-fade-in-left">
-            <img
-              src="https://images.unsplash.com/photo-1524592094714-0f0654e20314?q=80&w=1280&auto=format&fit=crop"
-              alt="Farmer and buyer shaking hands in a green field"
-              className="h-full w-full object-cover"
-              loading="lazy"
+          <div className="relative w-full overflow-hidden rounded-3xl bg-white shadow-lg shadow-[rgba(var(--leaf-rgb),0.1)] transition-all duration-700 md:w-1/2 animate-fade-in-left aspect-video">
+            <Image
+              src="https://images.unsplash.com/photo-1621788240870-ecd5a58ac8e3?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=687"
+              alt="Farmer reviewing harvest with buyer, symbolizing trustful farm-to-market connections"
+              fill
+              sizes="(max-width: 768px) 100vw, 50vw"
+              className="object-cover"
+              placeholder="blur"
+              blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAICAgICAgICAgIDAwMDBAQEBAQEBAgIBAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgP/2wCEAAQEBAQIBAgICAwICAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwP/wAARCAAQABADASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAgP/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCkAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/2Q=="
             />
             <div className="absolute inset-0 bg-gradient-to-t from-green-900/30 to-transparent" aria-hidden="true" />
           </div>
 
-          <div className="flex w-full flex-col gap-10 rounded-3xl bg-white/80 p-8 backdrop-blur-sm shadow-lg shadow-lime-500/10 md:w-1/2 animate-fade-in-right">
+          <div className="flex w-full flex-col gap-10 rounded-3xl bg-white p-8 shadow-lg shadow-[rgba(var(--leaf-rgb),0.1)] md:w-1/2 animate-fade-in-right">
             <div>
-              <h2 className="text-3xl font-bold text-[#16A34A] text-center sm:text-4xl md:text-5xl">
+              <h2 className="text-3xl font-bold text-[color:var(--primary)] text-center sm:text-4xl md:text-5xl">
                 Bridging the Gap Between Farmers and Buyers
               </h2>
-              <p className="mt-4 text-base text-green-800/80 text-center sm:text-lg">
+              <p className="mt-4 text-base text-[color:var(--muted)] text-center sm:text-lg">
                 Building transparent connections rooted in trust and opportunity.
               </p>
             </div>
 
             <div className="grid gap-8 md:grid-cols-2">
-              <div className="rounded-2xl bg-gradient-to-br from-lime-50 to-white p-6 shadow-sm shadow-lime-500/10">
-                <h3 className="text-xl font-semibold text-green-900">Empowering Farmers</h3>
-                <p className="mt-2 text-sm text-green-700">
+              <div className="rounded-2xl bg-white p-6 shadow-sm shadow-[rgba(var(--leaf-rgb),0.1)]">
+                <h3 className="text-xl font-semibold text-[color:var(--foreground)]">Empowering Farmers</h3>
+                <p className="mt-2 text-sm text-[color:var(--muted)]">
                   BidAgri enables farmers to sell directly, set their own prices, and access fair markets without middlemen.
                 </p>
-                <ul className="mt-4 space-y-3 text-sm text-green-800">
+                <ul className="mt-4 space-y-3 text-sm text-[color:var(--foreground)]">
                   {[
                     "Transparent pricing",
                     "Direct payments",
                     "Market expansion",
                   ].map((item) => (
                     <li key={item} className="flex items-center gap-3">
-                      <span className="flex h-9 w-9 items-center justify-center rounded-full bg-lime-100">
+                      <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[color:var(--surface-2)]">
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           viewBox="0 0 20 20"
                           fill="currentColor"
-                          className="h-5 w-5 text-lime-600"
+                          className="h-5 w-5 text-[color:var(--leaf)]"
                           aria-hidden="true"
                         >
                           <path
@@ -168,24 +150,24 @@ export default function Home() {
                 </ul>
               </div>
 
-              <div className="rounded-2xl bg-gradient-to-br from-white to-lime-50 p-6 shadow-sm shadow-lime-500/10">
-                <h3 className="text-xl font-semibold text-green-900">Trusted Buying Experience</h3>
-                <p className="mt-2 text-sm text-green-700">
+              <div className="rounded-2xl bg-gradient-to-br from-[color:var(--surface)] to-[color:var(--surface-2)] p-6 shadow-sm shadow-[rgba(var(--leaf-rgb),0.1)]">
+                <h3 className="text-xl font-semibold text-[color:var(--foreground)]">Trusted Buying Experience</h3>
+                <p className="mt-2 text-sm text-[color:var(--muted)]">
                   Buyers get fresh produce, verified quality, and a direct link to the source.
                 </p>
-                <ul className="mt-4 space-y-3 text-sm text-green-800">
+                <ul className="mt-4 space-y-3 text-sm text-[color:var(--foreground)]">
                   {[
                     "Verified quality",
                     "Competitive prices",
                     "Reliable logistics",
                   ].map((item) => (
                     <li key={item} className="flex items-center gap-3">
-                      <span className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100">
+                      <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[color:var(--surface-2)]">
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           viewBox="0 0 20 20"
                           fill="currentColor"
-                          className="h-5 w-5 text-emerald-600"
+                          className="h-5 w-5 text-[color:var(--leaf)]"
                           aria-hidden="true"
                         >
                           <path
@@ -204,17 +186,34 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-green-200/20 via-transparent to-lime-300/20" aria-hidden="true" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-[rgba(var(--leaf-rgb),0.2)] via-transparent to-[rgba(var(--accent-rgb),0.2)]" aria-hidden="true" />
       </section>
 
       <section className="flex w-full max-w-none flex-col items-center bg-white px-4 py-16 lg:px-8">
         <div className="w-full max-w-4xl text-center">
-          <h2 className="text-3xl font-bold text-[#16A34A] sm:text-4xl md:text-5xl">
+          <h2 className="text-3xl font-bold text-[color:var(--primary)] sm:text-4xl md:text-5xl">
             Our Fresh Categories
           </h2>
-          <p className="mt-4 text-base text-green-800/80 sm:text-lg">
+          <p className="mt-4 text-base text-[color:var(--muted)] sm:text-lg">
             Discover BidAgri’s premium assortment freshly curated for buyers seeking trusted farm-to-market partners.
           </p>
+        </div>
+
+        {/* Quick entry links to popular subcategories */}
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
+          {getCategories()
+            .slice(0, 4)
+            .flatMap((cat) => (cat.subcategories || []).slice(0, 2).map((sub) => (
+              <Link
+                key={`${cat.slug}-${sub.slug}`}
+                href={`/products/${cat.slug}/${sub.slug}`}
+                prefetch
+                className="inline-flex items-center gap-2 rounded-full bg-[color:var(--surface-2)] px-3 py-1.5 text-sm text-[color:var(--leaf)] ring-1 ring-[color:var(--surface-2)] hover:bg-[color:var(--surface-2)] focus:outline-none focus:ring-2 focus:ring-[color:var(--leaf)]"
+              >
+                <span aria-hidden>{sub.icon}</span>
+                {cat.name}: {sub.name}
+              </Link>
+            )))}
         </div>
 
         <div
@@ -227,22 +226,24 @@ export default function Home() {
             <article
               key={category.title}
               tabIndex={0}
-              className="group relative overflow-hidden rounded-2xl bg-white p-4 shadow-lg transition duration-300 ease-in-out hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-lime-400/60 focus-visible:scale-105"
+              className="group relative overflow-hidden rounded-2xl bg-[color:var(--surface)] p-4 shadow-lg transition duration-300 ease-in-out hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-[color:var(--accent)]/60 focus-visible:scale-105"
               aria-label={`${category.title} category card`}
             >
               <span className="sr-only">{`${category.title}: ${category.description}`}</span>
               <div className="relative h-72 w-full overflow-hidden rounded-2xl">
-                <img
+                <ImageWithFallback
                   src={category.image}
                   alt={`${category.title} category`}
-                  className="h-72 w-full rounded-2xl object-cover transition-transform duration-300 ease-in-out group-hover:scale-105 group-focus-visible:scale-105"
-                  loading={category.title === "Grains" ? "eager" : "lazy"}
+                  fallbackSrc="/images/placeholder-produce.jpg"
+                  fill
+                  sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 25vw"
+                  className="rounded-2xl object-cover transition-transform duration-300 ease-in-out group-hover:scale-105 group-focus-visible:scale-105"
                 />
-                <div className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl bg-green-700 bg-opacity-40 opacity-0 transition duration-300 ease-in-out group-hover:opacity-100 group-focus-visible:opacity-100">
-                  <h3 className="translate-y-1 text-2xl font-semibold text-white opacity-0 transition duration-300 ease-in-out group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:opacity-100 sm:text-3xl">
+                <div className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl bg-[rgba(var(--primary-rgb),0.6)] opacity-0 transition duration-300 ease-in-out group-hover:opacity-100 group-focus-visible:opacity-100">
+                  <h3 className="translate-y-1 text-2xl font-semibold text-[color:var(--surface)] opacity-0 transition duration-300 ease-in-out group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:opacity-100 sm:text-3xl">
                     {category.title}
                   </h3>
-                  <p className="mt-3 w-full translate-y-1 px-4 text-center text-sm text-lime-50/90 opacity-0 transition duration-300 ease-in-out group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:opacity-100 sm:text-base">
+                  <p className="mt-3 w-full translate-y-1 px-4 text-center text-sm text-[color:var(--surface)]/90 opacity-0 transition duration-300 ease-in-out group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:opacity-100 sm:text-base">
                     {category.description}
                   </p>
                 </div>
@@ -252,7 +253,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="relative my-0 flex w-full max-w-none items-center justify-center overflow-hidden bg-gradient-to-br from-[#E8F5E9] to-[#D1FAE5] py-12 md:py-16">
+      <section className="relative my-0 flex w-full max-w-none items-center justify-center overflow-hidden bg-white py-12 md:py-16">
         <div className="w-full px-4 md:px-6">
           <div
             ref={ctaRef}
@@ -260,24 +261,24 @@ export default function Home() {
               ctaVisible ? "opacity-100 translate-y-0" : "translate-y-10 opacity-0"
             }`}
           >
-            <div className="mx-auto flex max-w-3xl flex-col items-center gap-4 rounded-2xl bg-white/70 p-6 text-center shadow-xl ring-1 ring-black/5 backdrop-blur md:gap-5 md:p-8 lg:max-w-2xl">
-              <h2 className="flex items-center justify-center text-3xl font-bold tracking-tight text-green-900 md:text-4xl">
+            <div className="mx-auto flex max-w-3xl flex-col items-center gap-4 rounded-2xl bg-[color:var(--surface)]/70 p-6 text-center shadow-xl ring-1 ring-black/5 backdrop-blur md:gap-5 md:p-8 lg:max-w-2xl">
+              <h2 className="flex items-center justify-center text-3xl font-bold tracking-tight text-[color:var(--foreground)] md:text-4xl">
                 <span aria-hidden="true" className="mr-2 inline-flex h-6 w-6 items-center justify-center align-middle opacity-90">🌿</span>
                 Join BidAgri Today
               </h2>
-              <p className="max-w-2xl text-center text-sm leading-relaxed text-gray-700 md:text-base">
+              <p className="max-w-2xl text-center text-sm leading-relaxed text-[color:var(--muted)] md:text-base">
                 Be part of a growing digital revolution that connects farmers and buyers directly. Empower yourself with transparent, fair, and efficient trade.
               </p>
               <div className="flex flex-col items-center gap-4 md:flex-row">
                 <Link
-                  href="/signup"
-                  className="inline-flex items-center justify-center rounded-full bg-green-600 px-6 py-2.5 text-sm text-white shadow-lg transition-all duration-300 hover:scale-105 hover:bg-green-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-700 md:text-base"
+                  href="/buyers#register"
+                  className="inline-flex items-center justify-center rounded-full bg-[color:var(--primary)] px-6 py-2.5 text-sm text-[color:var(--surface)] shadow-lg transition-all duration-300 hover:scale-105 hover:bg-[color:var(--leaf)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--leaf)] md:text-base"
                 >
                   Get Started
                 </Link>
                 <Link
                   href="/how-it-works"
-                  className="text-sm text-green-700 underline-offset-4 transition-colors duration-200 hover:text-green-800 hover:underline"
+                  className="text-sm text-[color:var(--leaf)] underline-offset-4 transition-colors duration-200 hover:text-[color:var(--primary)] hover:underline"
                 >
                   Learn more about how BidAgri works
                 </Link>

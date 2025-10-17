@@ -9,9 +9,10 @@ const links = [
   { href: "/products", label: "Products" },
   { href: "/farmers", label: "Farmers" },
   { href: "/buyers", label: "Buyers" },
+  { href: "/checkout", label: "Checkout" },
   { href: "/contact", label: "Contact" },
   { href: "/auth/login", label: "Login" },
-  { href: "/auth/signup", label: "Sign Up" },
+  { href: "/buyers#register", label: "Register" },
 ];
 
 export default function Navbar() {
@@ -20,19 +21,21 @@ export default function Navbar() {
 
   const isActive = (href) => (href === "/" ? pathname === href : pathname?.startsWith(href));
 
+  // Removed reduce motion toggle and storage. Animations now respect OS-level preferences only.
+
   return (
-    <header className="w-full fixed top-0 z-50 bg-white shadow-md">
-      <nav className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-4 font-sans sm:px-6">
+    <header className="w-full fixed top-0 z-[60] bg-white/80 backdrop-blur shadow-none supports-[backdrop-filter]:bg-white/80">
+      <nav className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-4 font-sans sm:px-6" role="navigation" aria-label="Primary">
         <Link
           href="/"
-          className="inline-flex items-center text-2xl font-bold tracking-tight text-[#16A34A]"
+          className="inline-flex items-center text-2xl font-bold tracking-tight text-[color:var(--leaf)] drop-shadow-sm"
         >
           BidAgri
         </Link>
 
         <button
           type="button"
-          className="inline-flex items-center justify-center rounded-md p-2 text-gray-600 transition-colors duration-200 hover:text-[#16A34A] focus:outline-none focus:ring-2 focus:ring-[#16A34A] focus:ring-offset-2 lg:hidden"
+          className="inline-flex items-center justify-center rounded-md p-2 text-[color:var(--muted)] transition-colors duration-200 hover:text-[color:var(--leaf)] focus:outline-none focus:ring-2 focus:ring-[color:var(--leaf)] focus:ring-offset-2 lg:hidden"
           aria-label="Toggle navigation"
           aria-expanded={isOpen}
           aria-controls="mobile-nav"
@@ -63,24 +66,25 @@ export default function Navbar() {
             <Link
               key={href}
               href={href}
-              className={`border-b-2 pb-1 text-sm font-semibold transition-colors duration-300 hover:text-green-600 ${
+              className={`border-b-2 pb-1 text-sm font-semibold transition-colors duration-300 ease-in-out hover:text-[color:var(--leaf)] ${
                 isActive(href)
-                  ? "border-green-600 text-green-600"
-                  : "border-transparent text-gray-700"
+                  ? "border-[color:var(--leaf)] text-[color:var(--foreground)]"
+                  : "border-transparent text-[color:var(--foreground)]"
               }`}
             >
               {label}
             </Link>
           ))}
+          {/* Reduce motion toggle removed */}
         </div>
       </nav>
 
       <div
         id="mobile-nav"
-        className={`lg:hidden overflow-hidden border-t border-gray-100 bg-white shadow-sm transition-all duration-200 ease-out ${
+        className={`lg:hidden overflow-hidden bg-white/90 backdrop-blur shadow-sm transition-all duration-200 ease-out ${
           isOpen
-            ? "max-h-64 opacity-100"
-            : "pointer-events-none max-h-0 opacity-0"
+            ? "border-t border-[color:var(--accent)]/30 max-h-64 opacity-100"
+            : "border-t-0 pointer-events-none max-h-0 opacity-0"
         }`}
       >
         <div className="space-y-2 px-4 py-3 sm:px-6">
@@ -88,18 +92,20 @@ export default function Navbar() {
             <Link
               key={href}
               href={href}
-              className={`block rounded-md px-3 py-2 text-base font-medium transition-colors duration-300 border-b-2 ${
+              className={`block rounded-md px-3 py-2 text-base font-medium transition-colors duration-300 ease-in-out border-b-2 ${
                 isActive(href)
-                  ? "border-green-600 text-green-600"
-                  : "border-transparent text-gray-700 hover:text-green-600"
+                  ? "border-[color:var(--leaf)] text-[color:var(--foreground)]"
+                  : "border-transparent text-[color:var(--foreground)] hover:text-[color:var(--leaf)]"
               }`}
               onClick={() => setIsOpen(false)}
             >
               {label}
             </Link>
           ))}
+          {/* Reduce motion toggle removed from mobile menu */}
         </div>
       </div>
+      {/* Removed notifications panel */}
     </header>
   );
 }

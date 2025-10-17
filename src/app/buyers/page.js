@@ -4,32 +4,33 @@ export const metadata = {
     "Buy fresh, verified produce directly from farmers with transparent pricing and secure bidding.",
 };
 
+import BuyerRegistrationForm from "@/components/BuyerRegistrationForm";
+
 export default function BuyersPage() {
   return (
-    <section className="w-full min-h-screen bg-gray-50 pt-24 pb-16">
-      <div className="max-w-6xl mx-auto px-4 md:px-8 space-y-10">
-        <header className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-          <div className="space-y-5">
-            <h1 className="text-3xl md:text-4xl font-extrabold text-green-900">
+    <section className="w-full min-h-screen bg-white pt-24 pb-16">
+      <div className="max-w-6xl mx-auto px-4 md:px-8 space-y-14">
+        <header className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+          <div className="space-y-6">
+            <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight text-[color:var(--primary)]">
               Buy Direct. Save More.
             </h1>
-            <p className="text-gray-600 text-lg">
+            <p className="text-[color:var(--muted)] text-lg leading-relaxed">
               Experience a transparent and efficient agriculture marketplace where verified farmers and buyers connect directly. Source high-quality produce, negotiate real-time bids, and secure reliable deliveries — all through BidAgri.
             </p>
-            <p className="text-gray-600">
-              BidAgri helps procurement teams shorten their sourcing cycle, secure fresh produce,
-              and collaborate seamlessly with verified farmers.
+            <p className="text-[color:var(--muted)] leading-relaxed">
+              BidAgri helps procurement teams shorten their sourcing cycle, secure fresh produce, and collaborate seamlessly with verified farmers.
             </p>
             <div className="flex flex-wrap items-center gap-3">
               <a
                 href="/products"
-                className="rounded-full bg-green-600 text-white px-6 py-2.5 hover:bg-green-700 transition shadow"
+                className="rounded-full bg-[color:var(--primary)] text-[color:var(--surface)] px-6 py-2.5 transition focus:outline-none focus:ring-2 focus:ring-[color:var(--accent)] hover:shadow-[0_8px_24px_rgba(var(--primary-rgb),0.25)]"
               >
                 Explore Products
               </a>
               <a
                 href="/contact"
-                className="rounded-full bg-white text-green-700 px-6 py-2.5 ring-1 ring-green-200 hover:bg-green-50 transition"
+                className="rounded-full bg-[color:var(--surface)] text-[color:var(--leaf)] px-6 py-2.5 ring-1 ring-[color:var(--supporting)] hover:bg-[color:var(--surface-2)] transition focus:outline-none focus:ring-2 focus:ring-[color:var(--leaf)]/30"
               >
                 Talk to Us
               </a>
@@ -39,7 +40,7 @@ export default function BuyersPage() {
             <img
               src="https://images.unsplash.com/photo-1661152732390-10cef97a1476?q=80&w=764&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
               alt="Buyers and farmers trading fresh produce in a local agriculture market"
-              className="w-full aspect-[4/3] rounded-2xl object-cover shadow-lg"
+              className="w-full aspect-[4/3] rounded-2xl object-cover shadow-lg ring-1 ring-[color:var(--supporting)]/40"
               loading="eager"
               decoding="async"
             />
@@ -47,9 +48,9 @@ export default function BuyersPage() {
         </header>
 
         <section>
-          <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-4">
-            Why buy on BidAgri?
-          </h2>
+            <h2 className="text-xl md:text-2xl font-bold text-[color:var(--foreground)] mb-4">
+              Why buy on BidAgri?
+            </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
               {
@@ -71,17 +72,17 @@ export default function BuyersPage() {
             ].map((b, i) => (
               <div
                 key={i}
-                className="rounded-2xl bg-white p-5 shadow hover:shadow-md transition"
+                className="rounded-2xl bg-gradient-to-b from-[color:var(--surface)] to-[color:var(--surface-2)] p-5 shadow-sm ring-1 ring-[color:var(--supporting)]/40 hover:shadow-md transition"
               >
-                <div className="text-green-600 font-semibold">{b.title}</div>
-                <p className="text-gray-600 mt-1">{b.desc}</p>
+                <div className="text-[color:var(--leaf)] font-semibold tracking-tight">{b.title}</div>
+                <p className="text-[color:var(--muted)] mt-1">{b.desc}</p>
               </div>
             ))}
           </div>
         </section>
 
         <section>
-          <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-4">
+          <h2 className="text-xl md:text-2xl font-bold text-[color:var(--foreground)] mb-4">
             How it works
           </h2>
           <ol className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -105,10 +106,10 @@ export default function BuyersPage() {
                 href: "/contact",
               },
             ].map((s, i) => (
-              <li key={i} className="rounded-2xl bg-white p-6 shadow flex flex-col gap-3">
-                <div className="text-green-700 font-bold">{`${s.number}) ${s.title}`}</div>
-                <p className="text-gray-600">{s.desc}</p>
-                <a href={s.href} className="text-green-700 font-semibold hover:underline">
+              <li key={i} className="rounded-2xl bg-gradient-to-b from-[color:var(--surface)] to-[color:var(--surface-2)] p-6 shadow-sm ring-1 ring-[color:var(--supporting)]/40 flex flex-col gap-3">
+                <div className="text-[color:var(--leaf)] font-bold tracking-tight">{`${s.number}) ${s.title}`}</div>
+                <p className="text-[color:var(--muted)]">{s.desc}</p>
+                <a href={s.href} className="text-[color:var(--leaf)] font-semibold hover:underline focus:outline-none focus:ring-2 focus:ring-[color:var(--leaf)]/30">
                   Learn more
                 </a>
               </li>
@@ -116,9 +117,9 @@ export default function BuyersPage() {
           </ol>
         </section>
 
-        <section className="rounded-2xl bg-white shadow p-6">
-          <h2 className="text-xl md:text-2xl font-bold text-gray-900">Built for trust</h2>
-          <ul className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-gray-600">
+        <section className="rounded-2xl bg-white shadow-sm p-6 ring-1 ring-[color:var(--supporting)]/40">
+          <h2 className="text-xl md:text-2xl font-bold text-[color:var(--foreground)]">Built for trust</h2>
+          <ul className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-[color:var(--muted)]">
             <li>• Secure bidding (demo) and protected data</li>
             <li>• Clear origin: city, province, and farmer profile</li>
             <li>• Quality verification options (manual/AI – coming soon)</li>
@@ -127,7 +128,7 @@ export default function BuyersPage() {
         </section>
 
         <section>
-          <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-4">FAQs</h2>
+          <h2 className="text-xl md:text-2xl font-bold text-[color:var(--foreground)] mb-4">FAQs</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {[
               {
@@ -147,9 +148,9 @@ export default function BuyersPage() {
                 a: "Pickup or delivery via partners (demo).",
               },
             ].map((f, i) => (
-              <div key={i} className="rounded-2xl bg-white p-5 shadow">
-                <div className="font-semibold text-gray-900">{f.q}</div>
-                <p className="text-gray-600 mt-1 leading-relaxed">{f.a}</p>
+              <div key={i} className="rounded-2xl bg-gradient-to-b from-[color:var(--surface)] to-[color:var(--surface-2)] p-5 shadow-sm ring-1 ring-[color:var(--supporting)]/40">
+                <div className="font-semibold text-[color:var(--foreground)]">{f.q}</div>
+                <p className="text-[color:var(--muted)] mt-1 leading-relaxed">{f.a}</p>
               </div>
             ))}
           </div>
@@ -157,7 +158,7 @@ export default function BuyersPage() {
 
         <section className="py-12 bg-white">
           <div className="max-w-6xl mx-auto px-4 md:px-8 text-center space-y-8">
-            <h3 className="text-lg md:text-xl font-semibold text-gray-900">
+            <h3 className="text-lg md:text-xl font-semibold text-[color:var(--foreground)]">
               Trusted by leading organizations and agricultural partners
             </h3>
             <div className="flex flex-wrap items-center justify-center gap-10 opacity-90 hover:opacity-100 transition-all duration-300">
@@ -197,26 +198,35 @@ export default function BuyersPage() {
         </section>
 
         <section className="text-center">
-          <div className="inline-flex flex-col items-center gap-3 rounded-2xl bg-gradient-to-r from-green-50 to-emerald-50 px-8 py-8 ring-1 ring-green-100 shadow">
-            <h2 className="text-xl md:text-2xl font-bold text-green-900">Ready to source directly?</h2>
-            <p className="text-gray-600">
+          <div className="inline-flex flex-col items-center gap-3 rounded-2xl bg-gradient-to-r from-[color:var(--surface-2)] to-[color:var(--surface)] px-8 py-8 ring-1 ring-[color:var(--supporting)]/40 shadow-sm">
+            <h2 className="text-xl md:text-2xl font-bold text-[color:var(--foreground)]">Ready to source directly?</h2>
+            <p className="text-[color:var(--muted)]">
               Explore verified listings and place bids with confidence.
             </p>
             <div className="flex items-center gap-3">
               <a
                 href="/products"
-                className="rounded-full bg-green-600 text-white px-6 py-2.5 hover:bg-green-700 transition shadow"
+                className="rounded-full bg-[color:var(--primary)] text-[color:var(--surface)] px-6 py-2.5 transition focus:outline-none focus:ring-2 focus:ring-[color:var(--accent)] hover:shadow-[0_8px_24px_rgba(var(--primary-rgb),0.25)]"
               >
                 Explore Products
               </a>
               <a
                 href="/contact"
-                className="rounded-full bg-white text-green-700 px-6 py-2.5 ring-1 ring-green-200 hover:bg-green-50 transition"
+                className="rounded-full bg-[color:var(--surface)] text-[color:var(--leaf)] px-6 py-2.5 ring-1 ring-[color:var(--supporting)] hover:bg-[color:var(--surface-2)] transition focus:outline-none focus:ring-2 focus:ring-[color:var(--leaf)]/30"
               >
                 Talk to Us
               </a>
             </div>
           </div>
+        </section>
+
+        {/* Buyer Registration Form */}
+        <section id="register" className="pt-2">
+          <div className="max-w-3xl mx-auto text-center mb-6">
+            <h2 className="text-2xl md:text-3xl font-extrabold text-[color:var(--primary)] tracking-tight">Buyer Registration</h2>
+            <p className="text-[color:var(--muted)] mt-2">Please fill in your details and we’ll get back to you.</p>
+          </div>
+          <BuyerRegistrationForm />
         </section>
       </div>
     </section>

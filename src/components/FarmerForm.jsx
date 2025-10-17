@@ -149,12 +149,12 @@ export default function FarmerForm() {
 
   if (isSubmitted) {
     return (
-      <div className="mt-8 bg-white rounded-2xl shadow-lg p-6 md:p-8 border border-green-200">
-        <h2 className="text-2xl font-semibold text-green-700">Registration Complete</h2>
-        <p className="mt-2 text-gray-600">
+      <div className="mt-8 bg-[color:var(--surface)] rounded-2xl shadow-lg p-6 md:p-8 border border-[color:var(--accent)]/40">
+        <h2 className="text-2xl font-semibold text-[color:var(--primary)]">Registration Complete</h2>
+        <p className="mt-2 text-[color:var(--muted)]">
           Thanks, {formData.fullName || "Farmer"}! Your produce listing is ready to be reviewed.
         </p>
-        <dl className="mt-4 space-y-2 text-gray-700">
+        <dl className="mt-4 space-y-2 text-[color:var(--foreground)]">
           <div>
             <dt className="font-medium">Produce</dt>
             <dd>{formData.productName}</dd>
@@ -173,14 +173,14 @@ export default function FarmerForm() {
         <div className="mt-6 flex flex-wrap gap-3">
           <Link
             href="/products"
-            className="bg-green-600 text-white rounded-full px-6 py-2.5 hover:bg-green-700 transition"
+            className="bg-[color:var(--leaf)] text-[color:var(--surface)] rounded-full px-6 py-2.5 hover:bg-[color:var(--secondary)] transition"
           >
             Go to Products
           </Link>
           <button
             type="button"
             onClick={resetForm}
-            className="bg-gray-100 text-gray-800 rounded-full px-5 py-2 hover:bg-gray-200"
+            className="bg-[color:var(--surface-2)] text-[color:var(--foreground)] rounded-full px-5 py-2 hover:bg-[color:var(--surface-2)]/80"
           >
             Register another
           </button>
@@ -195,7 +195,7 @@ export default function FarmerForm() {
         return (
           <div className="space-y-5">
             <div>
-              <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="fullName" className="block text-sm font-medium text-[color:var(--primary)]">
                 Full Name
               </label>
               <input
@@ -205,13 +205,13 @@ export default function FarmerForm() {
                 aria-label="Full Name"
                 value={formData.fullName}
                 onChange={handleInputChange}
-                className="w-full rounded-lg ring-1 ring-gray-200 focus:ring-2 focus:ring-green-500 bg-white text-gray-800 px-3 py-2"
+                  className="mt-2 w-full rounded-lg border border-[color:var(--surface-2)] px-3 py-2 text-sm transition-colors duration-200 ease-in-out placeholder:text-[color:var(--muted)] focus:outline-none focus:ring-2 focus:ring-[color:var(--leaf)]/60 focus:border-[color:var(--leaf)]/70 bg-[color:var(--surface)] text-[color:var(--foreground)]"
                 required
               />
             </div>
             <div className="grid gap-5 md:grid-cols-2">
               <div>
-                <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="phone" className="block text-sm font-medium text-[color:var(--primary)]">
                   Phone
                 </label>
                 <input
@@ -223,12 +223,12 @@ export default function FarmerForm() {
                   onChange={handleInputChange}
                   pattern="03\d{9}"
                   placeholder="03XXXXXXXXX"
-                  className="w-full rounded-lg ring-1 ring-gray-200 focus:ring-2 focus:ring-green-500 bg-white text-gray-800 px-3 py-2"
+                  className="mt-2 w-full rounded-lg border border-[color:var(--surface-2)] px-3 py-2 text-sm transition-colors duration-200 ease-in-out placeholder:text-[color:var(--muted)] focus:outline-none focus:ring-2 focus:ring-[color:var(--leaf)]/60 focus:border-[color:var(--leaf)]/70 bg-[color:var(--surface)] text-[color:var(--foreground)]"
                   required
                 />
               </div>
               <div>
-                <label htmlFor="cnic" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="cnic" className="block text-sm font-medium text-[color:var(--primary)]">
                   CNIC
                 </label>
                 <input
@@ -240,13 +240,13 @@ export default function FarmerForm() {
                   onChange={handleInputChange}
                   pattern="\d{13}"
                   placeholder="13 digit CNIC"
-                  className="w-full rounded-lg ring-1 ring-gray-200 focus:ring-2 focus:ring-green-500 bg-white text-gray-800 px-3 py-2"
+                  className="mt-2 w-full rounded-lg border border-[color:var(--surface-2)] px-3 py-2 text-sm transition-colors duration-200 ease-in-out placeholder:text-[color:var(--muted)] focus:outline-none focus:ring-2 focus:ring-[color:var(--leaf)]/60 focus:border-[color:var(--leaf)]/70 bg-[color:var(--surface)] text-[color:var(--foreground)]"
                   required
                 />
               </div>
             </div>
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="email" className="block text-sm font-medium text-[color:var(--primary)]">
                 Email (optional)
               </label>
               <input
@@ -256,7 +256,7 @@ export default function FarmerForm() {
                 aria-label="Email address"
                 value={formData.email}
                 onChange={handleInputChange}
-                className="w-full rounded-lg ring-1 ring-gray-200 focus:ring-2 focus:ring-green-500 bg-white text-gray-800 px-3 py-2"
+                className="mt-2 w-full rounded-lg border border-[color:var(--surface-2)] px-3 py-2 text-sm transition-colors duration-200 ease-in-out placeholder:text-[color:var(--muted)] focus:outline-none focus:ring-2 focus:ring-[color:var(--leaf)]/60 focus:border-[color:var(--leaf)]/70 bg-[color:var(--surface)] text-[color:var(--foreground)]"
               />
             </div>
           </div>
@@ -265,7 +265,7 @@ export default function FarmerForm() {
         return (
           <div className="space-y-5">
             <div>
-              <label htmlFor="category" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="category" className="block text-sm font-medium text-[color:var(--primary)]">
                 Category
               </label>
               <select
@@ -274,7 +274,7 @@ export default function FarmerForm() {
                 aria-label="Produce category"
                 value={formData.category}
                 onChange={handleInputChange}
-                className="w-full rounded-lg ring-1 ring-gray-200 focus:ring-2 focus:ring-green-500 bg-white text-gray-800 px-3 py-2"
+                className="mt-2 w-full rounded-lg border border-[color:var(--surface-2)] px-3 py-2 text-sm transition-colors duration-200 ease-in-out placeholder:text-[color:var(--muted)] focus:outline-none focus:ring-2 focus:ring-[color:var(--leaf)]/60 focus:border-[color:var(--leaf)]/70 bg-[color:var(--surface)] text-[color:var(--foreground)]"
                 required
               >
                 <option value="">Select category</option>
@@ -285,7 +285,7 @@ export default function FarmerForm() {
               </select>
             </div>
             <div>
-              <label htmlFor="productName" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="productName" className="block text-sm font-medium text-[color:var(--primary)]">
                 Product Name
               </label>
               <input
@@ -296,13 +296,13 @@ export default function FarmerForm() {
                 placeholder="e.g., Wheat, Mango Sindhri"
                 value={formData.productName}
                 onChange={handleInputChange}
-                className="w-full rounded-lg ring-1 ring-gray-200 focus:ring-2 focus:ring-green-500 bg-white text-gray-800 px-3 py-2"
+                className="mt-2 w-full rounded-lg border border-[color:var(--surface-2)] px-3 py-2 text-sm transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[color:var(--leaf)]/60 focus:border-[color:var(--leaf)]/70 placeholder:text-[color:var(--muted)] bg-[color:var(--surface)] text-[color:var(--foreground)]"
                 required
               />
             </div>
             <div className="grid gap-5 md:grid-cols-3">
               <div className="md:col-span-2">
-                <label htmlFor="quantity" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="quantity" className="block text-sm font-medium text-[color:var(--primary)]">
                   Quantity
                 </label>
                 <input
@@ -313,12 +313,12 @@ export default function FarmerForm() {
                   aria-label="Quantity"
                   value={formData.quantity}
                   onChange={handleInputChange}
-                  className="w-full rounded-lg ring-1 ring-gray-200 focus:ring-2 focus:ring-green-500 bg-white text-gray-800 px-3 py-2"
+                  className="mt-2 w-full rounded-lg border border-[color:var(--surface-2)] px-3 py-2 text-sm transition-colors duration-200 ease-in-out placeholder:text-[color:var(--muted)] focus:outline-none focus:ring-2 focus:ring-[color:var(--leaf)]/60 focus:border-[color:var(--leaf)]/70 bg-[color:var(--surface)] text-[color:var(--foreground)]"
                   required
                 />
               </div>
               <div>
-                <label htmlFor="unit" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="unit" className="block text-sm font-medium text-[color:var(--primary)]">
                   Unit
                 </label>
                 <select
@@ -327,7 +327,7 @@ export default function FarmerForm() {
                   aria-label="Quantity unit"
                   value={formData.unit}
                   onChange={handleInputChange}
-                  className="w-full rounded-lg ring-1 ring-gray-200 focus:ring-2 focus:ring-green-500 bg-white text-gray-800 px-3 py-2"
+                  className="mt-2 w-full rounded-lg border border-[color:var(--surface-2)] px-3 py-2 text-sm transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[color:var(--leaf)]/60 focus:border-[color:var(--leaf)]/70 bg-[color:var(--surface)] text-[color:var(--foreground)]"
                   required
                 >
                   <option value="kg">kg</option>
@@ -337,7 +337,7 @@ export default function FarmerForm() {
             </div>
             <div className="grid gap-5 md:grid-cols-2">
               <div>
-                <label htmlFor="basePrice" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="basePrice" className="block text-sm font-medium text-[color:var(--primary)]">
                   Base Price per kg
                 </label>
                 <input
@@ -348,12 +348,12 @@ export default function FarmerForm() {
                   aria-label="Base price per kilogram"
                   value={formData.basePrice}
                   onChange={handleInputChange}
-                  className="w-full rounded-lg ring-1 ring-gray-200 focus:ring-2 focus:ring-green-500 bg-white text-gray-800 px-3 py-2"
+                  className="mt-2 w-full rounded-lg border border-[color:var(--surface-2)] px-3 py-2 text-sm transition-colors duration-200 ease-in-out placeholder:text-[color:var(--muted)] focus:outline-none focus:ring-2 focus:ring-[color:var(--leaf)]/60 focus:border-[color:var(--leaf)]/70 bg-[color:var(--surface)] text-[color:var(--foreground)]"
                   required
                 />
               </div>
               <div>
-                <label htmlFor="harvestDate" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="harvestDate" className="block text-sm font-medium text-[color:var(--primary)]">
                   Harvest Date
                 </label>
                 <input
@@ -363,7 +363,7 @@ export default function FarmerForm() {
                   aria-label="Harvest date"
                   value={formData.harvestDate}
                   onChange={handleInputChange}
-                  className="w-full rounded-lg ring-1 ring-gray-200 focus:ring-2 focus:ring-green-500 bg-white text-gray-800 px-3 py-2"
+                className="mt-2 w-full rounded-lg border border-[color:var(--surface-2)] px-3 py-2 text-sm transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[color:var(--leaf)]/60 focus:border-[color:var(--leaf)]/70 placeholder:text-[color:var(--muted)] bg-[color:var(--surface)] text-[color:var(--foreground)]"
                   required
                 />
               </div>
@@ -374,7 +374,7 @@ export default function FarmerForm() {
         return (
           <div className="space-y-5">
             <div>
-              <label htmlFor="province" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="province" className="block text-sm font-medium text-[color:var(--primary)]">
                 Province
               </label>
               <select
@@ -383,7 +383,7 @@ export default function FarmerForm() {
                 aria-label="Province"
                 value={formData.province}
                 onChange={handleInputChange}
-                className="w-full rounded-lg ring-1 ring-gray-200 focus:ring-2 focus:ring-green-500 bg-white text-gray-800 px-3 py-2"
+                className="mt-2 w-full rounded-lg border border-[color:var(--surface-2)] px-3 py-2 text-sm transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[color:var(--leaf)]/60 focus:border-[color:var(--leaf)]/70 bg-[color:var(--surface)] text-[color:var(--foreground)]"
                 required
               >
                 <option value="">Select province</option>
@@ -396,7 +396,7 @@ export default function FarmerForm() {
               </select>
             </div>
             <div>
-              <label htmlFor="city" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="city" className="block text-sm font-medium text-[color:var(--primary)]">
                 City/Town
               </label>
               <input
@@ -406,12 +406,12 @@ export default function FarmerForm() {
                 aria-label="City or town"
                 value={formData.city}
                 onChange={handleInputChange}
-                className="w-full rounded-lg ring-1 ring-gray-200 focus:ring-2 focus:ring-green-500 bg-white text-gray-800 px-3 py-2"
+                className="mt-2 w-full rounded-lg border border-[color:var(--surface-2)] px-3 py-2 text-sm transition-colors duration-200 ease-in-out placeholder:text-[color:var(--muted)] focus:outline-none focus:ring-2 focus:ring-[color:var(--leaf)]/60 focus:border-[color:var(--leaf)]/70 bg-[color:var(--surface)] text-[color:var(--foreground)]"
                 required
               />
             </div>
             <div>
-              <label htmlFor="address" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="address" className="block text-sm font-medium text-[color:var(--primary)]">
                 Address (optional)
               </label>
               <textarea
@@ -421,11 +421,11 @@ export default function FarmerForm() {
                 value={formData.address}
                 onChange={handleInputChange}
                 rows={3}
-                className="w-full rounded-lg ring-1 ring-gray-200 focus:ring-2 focus:ring-green-500 bg-white text-gray-800 px-3 py-2"
+                className="mt-2 w-full rounded-lg border border-[color:var(--surface-2)] px-3 py-2 text-sm transition-colors duration-200 ease-in-out placeholder:text-[color:var(--muted)] focus:outline-none focus:ring-2 focus:ring-[color:var(--leaf)]/60 focus:border-[color:var(--leaf)]/70 bg-[color:var(--surface)] text-[color:var(--foreground)]"
               />
             </div>
             <div>
-              <label htmlFor="photos" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="photos" className="block text-sm font-medium text-[color:var(--primary)]">
                 Photos
               </label>
               <input
@@ -436,12 +436,12 @@ export default function FarmerForm() {
                 multiple
                 aria-label="Upload produce photos"
                 onChange={handleFileChange}
-                className="w-full rounded-lg ring-1 ring-gray-200 focus:ring-2 focus:ring-green-500 bg-white text-gray-800 px-3 py-2"
+                className="mt-2 w-full rounded-lg border border-[color:var(--surface-2)] bg-[color:var(--surface)] px-3 py-2 text-sm text-[color:var(--foreground)] placeholder:text-[color:var(--muted)] focus:outline-none focus:ring-2 focus:ring-[color:var(--leaf)]/60 focus:border-[color:var(--leaf)]/70"
               />
               {photoPreviews.length > 0 && (
                 <div className="grid grid-cols-3 md:grid-cols-4 gap-3 mt-3">
                   {photoPreviews.map((preview) => (
-                    <div key={preview.url} className="h-20 w-full overflow-hidden rounded-lg ring-1 ring-gray-200">
+                    <div key={preview.url} className="h-20 w-full overflow-hidden rounded-lg ring-1 ring-[color:var(--accent)]/40">
                       <img
                         src={preview.url}
                         alt={preview.name}
@@ -460,10 +460,10 @@ export default function FarmerForm() {
                 aria-label="Confirm information is accurate"
                 checked={formData.terms}
                 onChange={handleInputChange}
-                className="mt-1 h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-500"
+            className="mt-1 h-4 w-4 rounded border-[color:var(--accent)] text-[color:var(--leaf)] focus:ring-[color:var(--leaf)]"
                 required
               />
-              <label htmlFor="terms" className="text-sm text-gray-700">
+              <label htmlFor="terms" className="text-sm text-[color:var(--foreground)]">
                 I confirm the information is accurate.
               </label>
             </div>
@@ -477,7 +477,7 @@ export default function FarmerForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="mt-8 bg-white rounded-2xl shadow-lg p-6 md:p-8"
+      className="mt-8 bg-[color:var(--surface)] rounded-2xl shadow-lg p-6 md:p-8"
       noValidate
     >
       <div className="flex items-center gap-3 mb-6">
@@ -490,15 +490,15 @@ export default function FarmerForm() {
                 <div
                   className={`flex h-10 w-10 items-center justify-center rounded-full border-2 font-semibold transition-colors ${
                     isActive || isCompleted
-                      ? "border-green-600 bg-green-600 text-white"
-                      : "border-green-200 bg-white text-gray-400"
+                      ? "border-[color:var(--leaf)] bg-[color:var(--leaf)] text-[color:var(--surface)]"
+                      : "border-[color:var(--accent)] bg-[color:var(--surface)] text-[color:var(--muted)]"
                   }`}
                 >
                   {index + 1}
                 </div>
                 <span
                   className={`text-xs font-medium ${
-                    isActive ? "text-green-700" : "text-gray-500"
+                    isActive ? "text-[color:var(--primary)]" : "text-[color:var(--muted)]"
                   }`}
                 >
                   {label}
@@ -506,10 +506,10 @@ export default function FarmerForm() {
               </div>
               {index < steps.length - 1 && (
                 <div className="flex-1">
-                  <div className="h-1 bg-green-200 rounded">
+                  <div className="h-1 bg-[color:var(--accent)]/40 rounded">
                     <div
                       className={`h-1 rounded transition-all duration-300 ${
-                        isCompleted ? "bg-green-600 w-full" : "bg-green-600"
+                        isCompleted ? "bg-[color:var(--leaf)] w-full" : "bg-[color:var(--leaf)]"
                       }`}
                       style={{ width: isCompleted ? "100%" : 0 }}
                     />
@@ -528,7 +528,7 @@ export default function FarmerForm() {
           <button
             type="button"
             onClick={handleBack}
-            className="bg-gray-100 text-gray-800 rounded-full px-5 py-2 hover:bg-gray-200"
+            className="bg-[color:var(--surface-2)] text-[color:var(--foreground)] rounded-full px-5 py-2 hover:bg-[color:var(--surface-2)]/80"
           >
             Back
           </button>
@@ -541,8 +541,8 @@ export default function FarmerForm() {
             type="button"
             onClick={handleNext}
             disabled={!isCurrentStepValid}
-            className={`bg-green-600 text-white rounded-full px-6 py-2.5 transition ${
-              isCurrentStepValid ? "hover:bg-green-700" : "opacity-60 cursor-not-allowed"
+            className={`bg-[color:var(--leaf)] text-[color:var(--surface)] rounded-full px-6 py-2.5 transition ${
+              isCurrentStepValid ? "hover:bg-[color:var(--secondary)]" : "opacity-60 cursor-not-allowed"
             }`}
           >
             Next
@@ -551,8 +551,8 @@ export default function FarmerForm() {
           <button
             type="submit"
             disabled={!isCurrentStepValid}
-            className={`bg-green-600 text-white rounded-full px-6 py-2.5 transition ${
-              isCurrentStepValid ? "hover:bg-green-700" : "opacity-60 cursor-not-allowed"
+            className={`bg-[color:var(--leaf)] text-[color:var(--surface)] rounded-full px-6 py-2.5 transition ${
+              isCurrentStepValid ? "hover:bg-[color:var(--secondary)]" : "opacity-60 cursor-not-allowed"
             }`}
           >
             Submit

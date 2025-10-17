@@ -16,11 +16,11 @@ export default function ProductDetailActions({ product }) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="rounded-full bg-green-600 text-white px-6 py-2.5 hover:bg-green-700 transition shadow"
+        className="rounded-full bg-[color:var(--leaf)] text-[color:var(--surface)] px-6 py-2.5 font-semibold shadow transition-all duration-300 hover:bg-[color:var(--secondary)] focus:outline-none focus:ring-2 focus:ring-[color:var(--leaf)]"
       >
         Place Bid
       </button>
-      <a href="/products" className="text-green-700 hover:underline">
+      <a href="/products" className="text-[color:var(--leaf)] hover:underline">
         Back to Products
       </a>
       <BidModal open={open} onClose={() => setOpen(false)} item={product} />

@@ -1,5 +1,5 @@
 import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
+import "./globals.css?v=2.0";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
@@ -20,15 +20,27 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" className="bg-white">
+      <head></head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} bg-gray-50 antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col bg-white`}
       >
+        {/* Skip to main content for keyboard and screen-reader users */}
+        <a href="#main-content" className="skip-link">Skip to content</a>
+
+        {/* Global site header */}
         <Navbar />
-        <main className="flex-1 px-0 pb-0 pt-0">
+
+        {/* Offset for fixed Navbar height so content isn't hidden */}
+        <main id="main-content" role="main" className="flex-1 px-0 pb-0 pt-20" tabIndex={-1}>
           {children}
         </main>
+
+        {/* Global site footer */}
         <Footer />
+
+        {/* Global polite live region for occasional announcements */}
+        <div id="sr-announcer" className="sr-only" aria-live="polite" aria-atomic="true" />
       </body>
     </html>
   );

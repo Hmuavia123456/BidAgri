@@ -1,0 +1,208 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #0f172a; /* slate-900 */
+  --muted: #475569; /* slate-600 */
+  --surface: #ffffff;
+  --surface-2: #f8fafc; /* slate-50 */
+  --brand: #16a34a; /* green-600 */
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0b1220; /* deep slate */
+    --foreground: #e5e7eb; /* gray-200 */
+    --muted: #cbd5e1; /* slate-300 */
+    --surface: #0f172a; /* slate-900 */
+    --surface-2: #111827; /* gray-900 */
+    --brand: #22c55e; /* green-500 */
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: linear-gradient(180deg, var(--surface-2), var(--background));
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Accessible skip-to-content link: visible on focus, hidden otherwise */
+.skip-link {
+  position: fixed;
+  top: 0.25rem;
+  left: 0.25rem;
+  z-index: 1000;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  background: #16a34a;
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.7);
+  transform: translateY(-150%);
+}
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+/* Design tokens helpers */
+.card-surface {
+  background: linear-gradient(180deg, var(--surface), var(--surface-2));
+}
+
+.focus-ring {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--brand);
+}
+
+@layer utilities {
+  @keyframes fade-in-up {
+    0% {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fade-in-down {
+    0% {
+      opacity: 0;
+      transform: translateY(-16px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fade-in {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+
+  @keyframes fade-in-left {
+    0% {
+      opacity: 0;
+      transform: translateX(-24px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes fade-in-right {
+    0% {
+      opacity: 0;
+      transform: translateX(24px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes float-soft {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-8px);
+    }
+  }
+
+  .animate-fade-in-up {
+    animation: fade-in-up 0.9s ease-out forwards;
+  }
+
+  .animate-fade-in-down {
+    animation: fade-in-down 0.9s ease-out forwards;
+  }
+
+  .animate-fade-in {
+    animation: fade-in 1.1s ease-out forwards;
+  }
+
+  .animate-fade-in-left {
+    animation: fade-in-left 1s ease-out forwards;
+  }
+
+  .animate-fade-in-right {
+    animation: fade-in-right 1s ease-out forwards;
+  }
+
+  .animate-delay-200 {
+    animation-delay: 0.2s;
+  }
+
+  .animate-delay-300 {
+    animation-delay: 0.3s;
+  }
+
+  .animate-float-soft {
+    animation: float-soft 6s ease-in-out infinite;
+  }
+
+  /* Respect user reduced motion preference globally */
+  @media (prefers-reduced-motion: reduce) {
+    html:focus-within {
+      scroll-behavior: auto;
+    }
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+    .animate-float-soft,
+    .animate-fade-in,
+    .animate-fade-in-up,
+    .animate-fade-in-down,
+    .animate-fade-in-left,
+    .animate-fade-in-right {
+      animation: none !important;
+    }
+  }
+}
+
+/* Optional user toggle: enforce reduced motion when set via data attribute */
+body[data-reduce-motion='true'] {
+  scroll-behavior: auto !important;
+}
+body[data-reduce-motion='true'] *,
+body[data-reduce-motion='true'] *::before,
+body[data-reduce-motion='true'] *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}
+body[data-reduce-motion='true'] .animate-float-soft,
+body[data-reduce-motion='true'] .animate-fade-in,
+body[data-reduce-motion='true'] .animate-fade-in-up,
+body[data-reduce-motion='true'] .animate-fade-in-down,
+body[data-reduce-motion='true'] .animate-fade-in-left,
+body[data-reduce-motion='true'] .animate-fade-in-right {
+  animation: none !important;
+}

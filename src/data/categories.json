@@ -1,0 +1,48 @@
+{
+  "categories": [
+    {
+      "slug": "grains",
+      "name": "Grains",
+      "icon": "🌾",
+      "description": "Cereal grains grown across Pakistan including rice, wheat, and maize.",
+      "subcategories": [
+        { "slug": "rice", "name": "Rice", "icon": "🍚" },
+        { "slug": "wheat", "name": "Wheat", "icon": "🌿" },
+        { "slug": "maize", "name": "Maize", "icon": "🌽" }
+      ]
+    },
+    {
+      "slug": "nuts",
+      "name": "Nuts",
+      "icon": "🥜",
+      "description": "Premium tree nuts from northern regions — almonds and walnuts.",
+      "subcategories": [
+        { "slug": "almonds", "name": "Almonds", "icon": "🌰" },
+        { "slug": "walnuts", "name": "Walnuts", "icon": "🟤" }
+      ]
+    },
+    {
+      "slug": "fruits",
+      "name": "Fruits",
+      "icon": "🍓",
+      "description": "Seasonal fruits including tropical mangoes and more.",
+      "subcategories": [
+        { "slug": "tropical-fruits", "name": "Tropical Fruits", "icon": "🥭" },
+        { "slug": "citrus", "name": "Citrus", "icon": "🍋" },
+        { "slug": "berries", "name": "Berries", "icon": "🫐" }
+      ]
+    },
+    {
+      "slug": "vegetables",
+      "name": "Vegetables",
+      "icon": "🥦",
+      "description": "Fresh vegetables — leafy greens, nightshades, and roots.",
+      "subcategories": [
+        { "slug": "leafy-greens", "name": "Leafy Greens", "icon": "🥬" },
+        { "slug": "nightshades", "name": "Nightshades", "icon": "🍅" },
+        { "slug": "root-vegetables", "name": "Root Vegetables", "icon": "🥔" }
+      ]
+    }
+  ]
+}
+

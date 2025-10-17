@@ -1,32 +1,182 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* cache-busting theme version */
+  --theme-version: 8;
+  /* Global background requested */
+  --background: #FFFFFF;                 /* universal background */
+
+  /* Brand palette (only 3 colors) */
+  --primary: #0A400C;                    /* headings, strong text, primary CTAs */
+  --secondary: #819067;                  /* subheadings, hovers, minor highlights */
+  --accent: #B1AB86;                     /* borders, icons, subtle UI */
+
+  /* Derived tokens for consistency */
+  --supporting: var(--accent);           /* legacy alias kept for components */
+  --surface: var(--background);          /* base surface matches background */
+  --surface-2: var(--background);        /* uniform surfaces for minimal look */
+  --foreground: var(--primary);          /* default readable text */
+  --muted: var(--secondary);             /* secondary text uses secondary */
+  --leaf: var(--primary);                /* alias used for buttons/icons */
+
+  /* Footer theme aligned to palette */
+  --footer-bg-from: #FFFFFF;
+  --footer-bg-to: #FFFFFF;               /* white footer background */
+  --footer-fg: var(--primary);
+  --footer-heading: var(--primary);
+  --footer-muted: var(--secondary);
+  --footer-link: var(--primary);
+  --footer-link-hover: var(--secondary);
+  --footer-border: rgba(177, 171, 134, 0.28);
+  --footer-icon-border: rgba(177, 171, 134, 0.8);
+  --footer-icon-color: var(--accent);
+  --footer-accent: var(--accent);
+
+  /* RGB tokens (derived strictly from the palette) */
+  --primary-rgb: 10, 64, 12;
+  --secondary-rgb: 129, 144, 103;
+  --accent-rgb: 177, 171, 134;
+  --background-rgb: 255, 255, 255;
+  --surface-rgb: var(--background-rgb);
+  --surface-2-rgb: var(--background-rgb);
+  --foreground-rgb: var(--primary-rgb);
+  --muted-rgb: var(--secondary-rgb);
+  --leaf-rgb: var(--primary-rgb);
+
+  /* Back-compat alias */
+  --brand: var(--primary);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-sitebg: #FFFFFF; /* Tailwind: bg-sitebg */
+  --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    /* Force same universal background in dark mode */
+    --background: #FFFFFF;
+    --surface: #FFFFFF;
+    --surface-2: #FFFFFF;
+    --foreground: var(--primary);
+    --muted: var(--secondary);
+    --primary: #0A400C;
+    --secondary: #819067;
+    --accent: #B1AB86;
+    --leaf: #0A400C;
+
+    --primary-rgb: 10, 64, 12;
+    --secondary-rgb: 129, 144, 103;
+    --accent-rgb: 177, 171, 134;
+    --background-rgb: 255, 255, 255;
+    --surface-rgb: 255, 255, 255;
+    --surface-2-rgb: 255, 255, 255;
+    --foreground-rgb: 10, 64, 12;
+    --muted-rgb: 129, 144, 103;
+    --leaf-rgb: 10, 64, 12;
+    --brand: var(--primary);
+
+    /* Footer theme (dark) stays on brand */
+    --footer-bg-from: #FFFFFF;
+    --footer-bg-to: #FFFFFF;
+    --footer-fg: var(--primary);
+    --footer-heading: var(--primary);
+    --footer-muted: var(--secondary);
+    --footer-link: var(--primary);
+    --footer-link-hover: var(--secondary);
+    --footer-border: rgba(177, 171, 134, 0.25);
+    --footer-icon-border: rgba(177, 171, 134, 0.75);
+    --footer-icon-color: var(--accent);
+    --footer-accent: var(--accent);
+    --footer-accent-rgb: var(--accent-rgb);
   }
 }
 
 html {
   scroll-behavior: smooth;
+  /* Force universal background color */
+  background-color: #FFFFFF !important;
 }
 
 body {
-  background: var(--background);
+  /* Solid warm background as requested */
+  background-color: #FFFFFF !important;
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Typography defaults aligned with palette */
+h1, h2 {
+  color: var(--primary);
+  font-weight: 750; /* slightly heavier for presence */
+}
+h3, h4 {
+  color: var(--secondary);
+}
+h5, h6 {
+  color: var(--foreground);
+}
+
+/* Smooth, consistent hovers site-wide */
+a, button, .btn, .link, [role="button"] {
+  transition: all 0.3s ease;
+}
+
+/* Primary button accent shadow */
+button.bg-\[color\:var\(--leaf\)\],
+.btn-primary {
+  box-shadow: 0 6px 16px rgba(var(--accent-rgb), 0.25);
+}
+
+/* Force component surfaces to universal background */
+.card,
+.form-container,
+.modal,
+.footer,
+.navbar,
+.section,
+section,
+header,
+main,
+aside,
+footer,
+nav {
+  background-color: #FFFFFF !important;
+  background-image: none !important;
+}
+
+/* Accessible skip-to-content link: visible on focus, hidden otherwise */
+.skip-link {
+  position: fixed;
+  top: 0.25rem;
+  left: 0.25rem;
+  z-index: 1000;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  background: var(--primary);
+  color: var(--surface);
+  font-weight: 600;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.7);
+  transform: translateY(-150%);
+}
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+/* Design tokens helpers */
+.card-surface {
+  background: linear-gradient(180deg, var(--surface), var(--surface-2));
+}
+
+.focus-ring {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--brand);
 }
 
 @layer utilities {
@@ -124,4 +274,62 @@ body {
   .animate-float-soft {
     animation: float-soft 6s ease-in-out infinite;
   }
+
+  /* Respect user reduced motion preference globally */
+  @media (prefers-reduced-motion: reduce) {
+    html:focus-within {
+      scroll-behavior: auto;
+    }
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+    .animate-float-soft,
+    .animate-fade-in,
+    .animate-fade-in-up,
+    .animate-fade-in-down,
+    .animate-fade-in-left,
+    .animate-fade-in-right {
+      animation: none !important;
+    }
+  }
+}
+
+/* Removed user-enforced reduced motion toggle. OS-level prefers-reduced-motion is still respected above. */
+
+/* Price range slider: pixel-perfect thumb alignment */
+.price-range input[type="range"] {
+  /* ensure we control layout consistently */
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  height: var(--track-h, 4px);
+  cursor: pointer;
+}
+
+/* WebKit (Chrome, Edge) track + thumb */
+.price-range input[type="range"]::-webkit-slider-runnable-track {
+  height: var(--track-h, 4px);
+  background: transparent;
+}
+.price-range input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 9999px;
+  /* Center the thumb on the custom track line */
+  margin-top: calc((var(--track-h, 4px) - 16px) / 2);
+}
+
+/* Firefox track + thumb */
+.price-range input[type="range"]::-moz-range-track {
+  height: var(--track-h, 4px);
+  background: transparent;
+}
+.price-range input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 9999px;
 }

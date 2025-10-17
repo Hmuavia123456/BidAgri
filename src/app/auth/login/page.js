@@ -1,68 +1,55 @@
-export const metadata = {
-  title: "Login | BidAgri",
-  description:
-    "Access your BidAgri account to manage bids, track orders, and coordinate with trading partners.",
-};
+"use client";
+
+import { useState } from "react";
+import AuthForm from "@/components/AuthForm";
 
 export default function LoginPage() {
   return (
-    <div className="min-h-screen bg-white text-gray-900">
+    <div className="min-h-screen bg-white text-[color:var(--foreground)]">
       <section className="pt-24">
         <div className="w-full px-4 md:px-8 max-w-6xl mx-auto text-center py-12 md:py-16">
-          <h1 className="text-3xl md:text-4xl font-semibold text-[#14532D]">
+          <h1 className="text-3xl md:text-4xl font-semibold text-[color:var(--primary)]">
             Sign in to BidAgri
           </h1>
-          <p className="mt-4 text-sm md:text-base text-gray-600 max-w-2xl mx-auto">
+          <p className="mt-4 text-sm md:text-base text-[color:var(--foreground)] max-w-2xl mx-auto">
             Access your dashboard to review bids, manage listings, and stay connected with partners.
           </p>
         </div>
       </section>
 
-      <section className="py-12 md:py-16">
-        <div className="w-full px-4 md:px-8 max-w-6xl mx-auto flex justify-center">
-          <form className="w-full max-w-md space-y-6 rounded-2xl border border-green-100 bg-white p-6 shadow-sm">
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-[#14532D]"
-              >
-                Email
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                className="mt-2 w-full rounded-lg border border-green-200 bg-white px-4 py-2 text-sm focus:border-[#16A34A] focus:outline-none focus:ring-2 focus:ring-[#16A34A]/30"
-                placeholder="you@bidagri.com"
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-[#14532D]"
-              >
-                Password
-              </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                className="mt-2 w-full rounded-lg border border-green-200 bg-white px-4 py-2 text-sm focus:border-[#16A34A] focus:outline-none focus:ring-2 focus:ring-[#16A34A]/30"
-                placeholder="••••••••"
-              />
-            </div>
-
-            <button
-              type="submit"
-              className="inline-flex w-full items-center justify-center rounded-lg bg-[#16A34A] px-4 py-2 text-sm font-semibold text-white transition-colors duration-200 disabled:cursor-not-allowed disabled:bg-gray-300"
-              disabled
-            >
-              Sign In
-            </button>
-          </form>
-        </div>
-      </section>
+      <LoginClient />
     </div>
+  );
+}
+
+function LoginClient() {
+  return (
+    <section className="py-12 md:py-16">
+      <div className="w-full px-4 md:px-8 max-w-6xl mx-auto flex justify-center">
+        <AuthFlow mode="login" />
+      </div>
+    </section>
+  );
+}
+
+function AuthFlow({ mode }) {
+  const [success, setSuccess] = useState(false);
+  const [user, setUser] = useState(null);
+  return success ? (
+    <div className="w-full max-w-md space-y-6 rounded-2xl border border-[color:var(--surface-2)] bg-[color:var(--surface)] p-6 shadow-sm text-center">
+      <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[color:var(--surface-2)] text-[color:var(--leaf)]">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-8 w-8">
+          <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+        </svg>
+      </div>
+      <h2 className="text-lg font-semibold text-[color:var(--primary)]">Signed in successfully</h2>
+      <p className="text-sm text-[color:var(--foreground)]">Welcome back{user?.name ? `, ${user.name}` : ""}! You can now continue.</p>
+      <div className="flex justify-center gap-3">
+        <a href="/products" className="rounded-full bg-[color:var(--leaf)] text-[color:var(--surface)] px-6 py-2.5 hover:bg-[color:var(--primary)] transition shadow">Explore Products</a>
+        <a href="/" className="text-[color:var(--leaf)] hover:underline">Go Home</a>
+      </div>
+    </div>
+  ) : (
+    <AuthForm mode={mode} onSuccess={(u) => { setUser(u); setSuccess(true); }} />
   );
 }

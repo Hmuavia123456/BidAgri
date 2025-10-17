@@ -141,14 +141,14 @@ export default function EnhancedFarmerRegistrationForm() {
             transition={{ duration: 0.4 }}
             className="absolute top-0 left-1/2 z-20 w-full max-w-sm -translate-x-1/2 -translate-y-[110%]"
           >
-            <div className="flex items-center gap-3 rounded-2xl bg-white/95 p-4 shadow-2xl ring-1 ring-emerald-200">
+            <div className="flex items-center gap-3 rounded-2xl bg-[color:var(--surface)]/95 p-4 shadow-2xl ring-1 ring-[color:var(--accent)]/40">
               <Player
                 autoplay
                 loop
                 src="/animations/farmer-success.json"
                 style={{ height: "150px", width: "150px" }}
               />
-              <p className="text-sm font-semibold text-green-700">
+              <p className="text-sm font-semibold text-[color:var(--primary)]">
                 🎉 Registration submitted successfully! Our team will contact you soon.
               </p>
             </div>
@@ -161,7 +161,7 @@ export default function EnhancedFarmerRegistrationForm() {
         whileInView={{ opacity: 1, scale: 1 }}
         viewport={{ once: true }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        className="rounded-3xl bg-gradient-to-br from-white via-[#f1fdf4] to-[#e6f7eb] p-6 md:p-8 shadow-[0_20px_60px_-25px_rgba(22,163,74,0.45)] ring-1 ring-white/40 backdrop-blur-sm transition-shadow duration-500 hover:shadow-[0_28px_80px_-30px_rgba(22,163,74,0.55)]"
+        className="rounded-3xl bg-gradient-to-br from-[color:var(--surface)] via-[color:var(--surface-2)] to-[color:var(--surface-2)] p-6 md:p-8 shadow-[0_20px_60px_-25px_rgba(var(--leaf-rgb),0.35)] ring-1 ring-[color:var(--surface)]/40 backdrop-blur-sm transition-shadow duration-500 hover:shadow-[0_28px_80px_-30px_rgba(var(--leaf-rgb),0.45)]"
       >
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -174,31 +174,31 @@ export default function EnhancedFarmerRegistrationForm() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="mb-8 text-center text-3xl font-bold text-emerald-900 md:text-4xl"
+            className="mb-8 text-center text-3xl font-bold text-[color:var(--foreground)] md:text-4xl"
           >
             Farmer Registration
           </motion.h2>
-          <motion.div className="mb-8 flex flex-wrap items-center justify-center gap-6 text-sm font-semibold text-emerald-700 md:text-base">
+          <motion.div className="mb-8 flex flex-wrap items-center justify-center gap-6 text-sm font-semibold text-[color:var(--leaf)] md:text-base">
             <motion.span
               animate={floatingIconKeyframes}
               transition={floatingIconTransition}
               className="flex items-center gap-2"
             >
-              <User className="h-4 w-4 text-[#16a34a]" /> Profile
+              <User className="h-4 w-4 text-[color:var(--leaf)]" /> Profile
             </motion.span>
             <motion.span
               animate={floatingIconKeyframes}
               transition={{ ...floatingIconTransition, delay: 0.2 }}
               className="flex items-center gap-2"
             >
-              <Leaf className="h-4 w-4 text-[#16a34a]" /> Produce
+              <Leaf className="h-4 w-4 text-[color:var(--leaf)]" /> Produce
             </motion.span>
             <motion.span
               animate={floatingIconKeyframes}
               transition={{ ...floatingIconTransition, delay: 0.4 }}
               className="flex items-center gap-2"
             >
-              <MapPin className="h-4 w-4 text-[#16a34a]" /> Location &amp; Photos
+              <MapPin className="h-4 w-4 text-[color:var(--leaf)]" /> Location &amp; Photos
             </motion.span>
           </motion.div>
         </motion.div>
@@ -214,6 +214,7 @@ export default function EnhancedFarmerRegistrationForm() {
           <div className="grid gap-5 md:grid-cols-2">
             {fieldConfigs.map((field) => {
               const Icon = field.icon;
+              const filled = Boolean((formData[field.name] || "").length);
               return (
                 <motion.div
                   key={field.name}
@@ -221,8 +222,8 @@ export default function EnhancedFarmerRegistrationForm() {
                   transition={{ duration: 0.2 }}
                   className="group flex flex-col"
                 >
-                  <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-emerald-900/80">
-                    <Icon className="h-4 w-4 text-[#16a34a] transition-transform duration-300 group-hover:scale-110 group-hover:text-[#22c55e]" />
+                  <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-[color:var(--foreground)]/80">
+                    <Icon className="h-4 w-4 text-[color:var(--leaf)] transition-transform duration-300 group-hover:scale-110 group-hover:text-[color:var(--accent)]" />
                     {field.label}
                   </label>
                 <motion.input
@@ -232,10 +233,10 @@ export default function EnhancedFarmerRegistrationForm() {
                   onChange={handleChange}
                   placeholder={field.placeholder}
                   whileFocus={{ scale: 1.005 }}
-                  className="w-full rounded-2xl bg-white/90 px-4 py-3 text-emerald-900 shadow-sm outline-none transition-all duration-300 ring-1 ring-transparent hover:ring-[#16a34a]/40 focus:bg-white focus:ring-2 focus:ring-[#22c55e]/70"
+                  className={`w-full rounded-2xl px-4 py-3 shadow-sm outline-none ring-1 transition-colors duration-200 ease-in-out hover:ring-[color:var(--leaf)]/40 focus:ring-2 focus:ring-[color:var(--leaf)]/70 placeholder:text-[color:var(--muted)] bg-[color:var(--surface)] text-[color:var(--foreground)]`}
                 />
                 {errors[field.name] && (
-                  <p className="mt-1 text-sm text-rose-500">{errors[field.name]}</p>
+                  <p className="mt-1 text-sm text-[color:var(--secondary)]">{errors[field.name]}</p>
                 )}
                 </motion.div>
               );
@@ -245,8 +246,8 @@ export default function EnhancedFarmerRegistrationForm() {
               transition={{ duration: 0.2 }}
               className="group md:col-span-2"
             >
-              <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-emerald-900/80">
-                <FileText className="h-4 w-4 text-[#16a34a] transition-transform duration-300 group-hover:scale-110 group-hover:text-[#22c55e]" />
+              <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-[color:var(--foreground)]/80">
+                <FileText className="h-4 w-4 text-[color:var(--leaf)] transition-transform duration-300 group-hover:scale-110 group-hover:text-[color:var(--accent)]" />
                 Message
               </label>
               <motion.textarea
@@ -256,7 +257,7 @@ export default function EnhancedFarmerRegistrationForm() {
                 placeholder="Share details about your harvest, quantity, or preferred buyers."
                 rows={4}
                 whileFocus={{ scale: 1.005 }}
-                className="w-full rounded-2xl bg-white/90 px-4 py-3 text-emerald-900 shadow-sm outline-none transition-all duration-300 ring-1 ring-transparent hover:ring-[#16a34a]/40 focus:bg-white focus:ring-2 focus:ring-[#22c55e]/70"
+                className="w-full rounded-2xl px-4 py-3 shadow-sm outline-none ring-1 transition-colors duration-200 ease-in-out hover:ring-[color:var(--leaf)]/40 focus:ring-2 focus:ring-[color:var(--leaf)]/70 placeholder:text-[color:var(--muted)] bg-[color:var(--surface)] text-[color:var(--foreground)]"
               />
             </motion.div>
           </div>
@@ -267,7 +268,7 @@ export default function EnhancedFarmerRegistrationForm() {
             transition={{ type: "spring", stiffness: 240, damping: 14 }}
             type="submit"
             disabled={isSubmitting || !isFormValid}
-            className="w-full rounded-2xl bg-gradient-to-r from-[#16a34a] via-[#1ecb5f] to-[#22c55e] px-6 py-3 text-base font-semibold text-white shadow-[0_15px_35px_-20px_rgba(22,163,74,0.9)] transition-all duration-300 hover:from-[#18b34f] hover:via-[#24d369] hover:to-[#30d977] hover:shadow-[0_25px_45px_-25px_rgba(34,197,94,0.75)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/80 disabled:cursor-not-allowed disabled:opacity-75"
+            className="w-full rounded-2xl bg-[color:var(--primary)] px-6 py-3 text-base font-semibold text-[color:var(--surface)] shadow-[0_15px_35px_-20px_rgba(var(--leaf-rgb),0.35)] transition-all duration-300 hover:bg-[color:var(--leaf)] hover:shadow-[0_25px_45px_-25px_rgba(var(--leaf-rgb),0.45)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--leaf)]/80 disabled:cursor-not-allowed disabled:opacity-75"
           >
             {isSubmitting ? "Submitting..." : "Submit Registration"}
           </motion.button>

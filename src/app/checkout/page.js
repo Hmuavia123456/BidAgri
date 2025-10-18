@@ -82,15 +82,15 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-6 sm:py-10 text-[color:var(--foreground)]">
+    <div className="mx-auto max-w-6xl px-4 py-6 text-dark sm:py-10">
       <OrderStepper current={1} className="mb-6" />
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2 space-y-4">
-          <section className="rounded-2xl border border-[color:var(--supporting)] bg-white p-5 sm:p-8 shadow-sm">
-            <h1 className="text-2xl font-semibold tracking-tight text-[color:var(--foreground)]">Review & Payment</h1>
-            <p className="mt-1 text-sm text-[color:var(--muted)]">
-              Choose a payment method and confirm your order. Need help? <a href="/contact" className="text-[color:var(--leaf)] underline underline-offset-2 hover:opacity-90">Contact support</a>.
+        <div className="space-y-4 lg:col-span-2">
+          <section className="rounded-2xl border border-accent/40 bg-base p-5 shadow-sm sm:p-8">
+            <h1 className="text-2xl font-semibold tracking-tight text-dark">Review & Payment</h1>
+            <p className="mt-1 text-sm text-dark/70">
+              Choose a payment method and confirm your order. Need help? <a href="/contact" className="font-medium text-primary underline underline-offset-2 transition-colors hover:text-secondary">Contact support</a>.
             </p>
 
             <div className="mt-6">
@@ -103,14 +103,14 @@ export default function CheckoutPage() {
             </div>
 
             {error && (
-              <div className="mt-6 rounded-xl border border-[color:var(--accent)]/40 bg-white p-4 text-[color:var(--foreground)] shadow-sm">
+              <div className="mt-6 rounded-xl border border-accent/40 bg-base p-4 text-dark shadow-sm">
                 <p className="font-semibold">Payment Error</p>
                 <p className="text-sm leading-6">{error}</p>
                 <div className="mt-3 flex gap-2">
                   <button
                     type="button"
                     onClick={handlePay}
-                  className="rounded-lg bg-[color:var(--leaf)] px-3.5 py-2 text-sm font-medium text-[color:var(--surface)] shadow-sm transition hover:-translate-y-0.5 hover:bg-[color:var(--primary)] hover:shadow focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--leaf)]/60"
+                    className="rounded-full bg-primary px-3.5 py-2 text-sm font-semibold text-white shadow-md shadow-primary/20 transition-colors duration-200 hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 focus:ring-offset-base disabled:cursor-not-allowed disabled:opacity-60"
                     disabled={processing}
                   >
                     Retry Payment
@@ -118,7 +118,7 @@ export default function CheckoutPage() {
                   <button
                     type="button"
                     onClick={() => setError("")}
-                  className="rounded-lg border border-[color:var(--accent)] bg-[color:var(--surface)] px-3.5 py-2 text-sm font-medium text-[color:var(--foreground)] transition hover:bg-[color:var(--surface-2)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent)]"
+                    className="rounded-full border border-accent/60 bg-accent/30 px-3.5 py-2 text-sm font-semibold text-primary transition-colors duration-200 hover:bg-secondary hover:text-white focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 focus:ring-offset-base"
                     disabled={processing}
                   >
                     Dismiss
@@ -128,9 +128,9 @@ export default function CheckoutPage() {
             )}
           </section>
 
-          <div className="rounded-2xl border border-[color:var(--surface-2)] bg-[color:var(--surface)] p-4 text-xs text-[color:var(--foreground)] shadow-sm">
-            <p className="flex items-start gap-2 leading-6"><ShieldCheck className="mt-0.5 h-4 w-4 text-[color:var(--leaf)]" aria-hidden /> We use bank-grade 256-bit SSL encryption and tokenized payments when using cards. You may be redirected to a secure bank page if required. We never store sensitive payment data.</p>
-            <p className="mt-2 flex items-start gap-2 leading-6"><Lock className="mt-0.5 h-4 w-4 text-[color:var(--foreground)]/80" aria-hidden /> Refunds are easy. If something goes wrong, contact us within 7 days.</p>
+          <div className="rounded-2xl border border-accent/40 bg-base p-4 text-xs text-dark shadow-sm">
+            <p className="flex items-start gap-2 leading-6"><ShieldCheck className="mt-0.5 h-4 w-4 text-primary" aria-hidden /> We use bank-grade 256-bit SSL encryption and tokenized payments when using cards. You may be redirected to a secure bank page if required. We never store sensitive payment data.</p>
+            <p className="mt-2 flex items-start gap-2 leading-6"><Lock className="mt-0.5 h-4 w-4 text-dark/70" aria-hidden /> Refunds are easy. If something goes wrong, contact us within 7 days.</p>
           </div>
         </div>
 
@@ -139,7 +139,7 @@ export default function CheckoutPage() {
           <form className="mt-4" onSubmit={handlePay}>
             <button
               type="submit"
-              className="group w-full rounded-2xl bg-[color:var(--leaf)] px-6 py-3.5 font-semibold text-[color:var(--surface)] shadow-sm transition-all duration-200 hover:bg-[color:var(--primary)] hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--leaf)] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:shadow-none"
+              className="group w-full rounded-2xl bg-primary px-6 py-3.5 font-semibold text-white shadow-md shadow-primary/20 transition-colors duration-200 hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 focus:ring-offset-base disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:shadow-none"
               disabled={processing || !isMethodValid}
               aria-busy={processing}
             >

@@ -176,7 +176,7 @@ export default function FarmerOnboardingWizard() {
           type="button"
           onClick={prev}
           disabled={active === 0}
-          className="rounded-lg px-4 py-2 text-sm text-[color:var(--foreground)] ring-1 ring-[color:var(--accent)] disabled:opacity-50"
+          className="rounded-full px-4 py-2 text-sm text-dark ring-1 ring-accent/60 transition-colors duration-200 hover:bg-accent/30 focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 focus:ring-offset-base disabled:cursor-not-allowed disabled:opacity-50"
         >
           Back
         </button>
@@ -185,7 +185,7 @@ export default function FarmerOnboardingWizard() {
             type="button"
             onClick={next}
             disabled={!canNext}
-            className="rounded-lg bg-[color:var(--primary)] px-4 py-2 text-sm font-semibold text-[#FED16A] disabled:opacity-50 hover:bg-[rgba(var(--primary-rgb),0.9)]"
+            className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white shadow-md shadow-primary/20 transition-colors duration-200 hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 focus:ring-offset-base disabled:cursor-not-allowed disabled:opacity-50"
           >
             Next
           </button>
@@ -194,7 +194,7 @@ export default function FarmerOnboardingWizard() {
             type="button"
             onClick={submit}
             disabled={submitting}
-            className="inline-flex items-center gap-2 rounded-lg bg-[color:var(--primary)] px-4 py-2 text-sm font-semibold text-[#FED16A] hover:bg-[rgba(var(--primary-rgb),0.9)]"
+            className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white shadow-md shadow-primary/20 transition-colors duration-200 hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 focus:ring-offset-base disabled:cursor-not-allowed disabled:opacity-60"
           >
             {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
             Submit

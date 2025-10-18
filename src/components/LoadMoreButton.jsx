@@ -8,7 +8,7 @@ export default function LoadMoreButton({ onClick, loading = false, disabled = fa
         type="button"
         onClick={onClick}
         disabled={disabled || loading}
-        className="inline-flex items-center gap-2 rounded-full bg-[color:var(--primary)] text-[color:var(--surface)] px-5 py-2.5 shadow hover:bg-[color:var(--leaf)] focus:outline-none focus:ring-2 focus:ring-[color:var(--accent)] disabled:opacity-50 disabled:cursor-not-allowed"
+        className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 font-semibold text-white shadow-md shadow-primary/20 transition-colors duration-200 hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 focus:ring-offset-base disabled:cursor-not-allowed disabled:opacity-50"
       >
         {loading && (
           <svg

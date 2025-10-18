@@ -2,45 +2,49 @@
 
 :root {
   /* cache-busting theme version */
-  --theme-version: 8;
+  --theme-version: 9;
   /* Global background requested */
   --background: #FFFFFF;                 /* universal background */
 
-  /* Brand palette (only 3 colors) */
-  --primary: #0A400C;                    /* headings, strong text, primary CTAs */
-  --secondary: #819067;                  /* subheadings, hovers, minor highlights */
-  --accent: #B1AB86;                     /* borders, icons, subtle UI */
+  /* Brand palette */
+  --primary: #00B386;                    /* main accent / CTAs */
+  --secondary: #00C8A3;                  /* hover and secondary buttons */
+  --accent: #A3E8D1;                     /* light accents and badges */
+  --dark: #222831;                       /* base text / deep contrast */
+  --light: #F2F2F2;                      /* subtle dividers, light surfaces */
 
   /* Derived tokens for consistency */
   --supporting: var(--accent);           /* legacy alias kept for components */
   --surface: var(--background);          /* base surface matches background */
   --surface-2: var(--background);        /* uniform surfaces for minimal look */
-  --foreground: var(--primary);          /* default readable text */
-  --muted: var(--secondary);             /* secondary text uses secondary */
+  --foreground: var(--dark);             /* default readable text */
+  --muted: rgba(34, 40, 49, 0.7);        /* softened dark for secondary text */
   --leaf: var(--primary);                /* alias used for buttons/icons */
 
   /* Footer theme aligned to palette */
-  --footer-bg-from: #FFFFFF;
-  --footer-bg-to: #FFFFFF;               /* white footer background */
-  --footer-fg: var(--primary);
-  --footer-heading: var(--primary);
-  --footer-muted: var(--secondary);
-  --footer-link: var(--primary);
+  --footer-bg-from: rgba(34, 40, 49, 0.95);
+  --footer-bg-to: rgba(34, 40, 49, 0.88);
+  --footer-fg: #F2F2F2;
+  --footer-heading: #FFFFFF;
+  --footer-muted: rgba(255, 255, 255, 0.7);
+  --footer-link: var(--accent);
   --footer-link-hover: var(--secondary);
-  --footer-border: rgba(177, 171, 134, 0.28);
-  --footer-icon-border: rgba(177, 171, 134, 0.8);
+  --footer-border: rgba(163, 232, 209, 0.35);
+  --footer-icon-border: rgba(163, 232, 209, 0.5);
   --footer-icon-color: var(--accent);
   --footer-accent: var(--accent);
 
   /* RGB tokens (derived strictly from the palette) */
-  --primary-rgb: 10, 64, 12;
-  --secondary-rgb: 129, 144, 103;
-  --accent-rgb: 177, 171, 134;
+  --primary-rgb: 0, 179, 134;
+  --secondary-rgb: 0, 200, 163;
+  --accent-rgb: 163, 232, 209;
+  --dark-rgb: 34, 40, 49;
+  --light-rgb: 242, 242, 242;
   --background-rgb: 255, 255, 255;
   --surface-rgb: var(--background-rgb);
   --surface-2-rgb: var(--background-rgb);
-  --foreground-rgb: var(--primary-rgb);
-  --muted-rgb: var(--secondary-rgb);
+  --foreground-rgb: var(--dark-rgb);
+  --muted-rgb: var(--dark-rgb);
   --leaf-rgb: var(--primary-rgb);
 
   /* Back-compat alias */
@@ -50,6 +54,12 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  --color-accent: var(--accent);
+  --color-dark: var(--dark);
+  --color-light: var(--light);
+  --color-base: var(--background);
   --color-sitebg: #FFFFFF; /* Tailwind: bg-sitebg */
   --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
@@ -61,34 +71,36 @@
     --background: #FFFFFF;
     --surface: #FFFFFF;
     --surface-2: #FFFFFF;
-    --foreground: var(--primary);
-    --muted: var(--secondary);
-    --primary: #0A400C;
-    --secondary: #819067;
-    --accent: #B1AB86;
-    --leaf: #0A400C;
+    --foreground: var(--dark);
+    --muted: rgba(34, 40, 49, 0.7);
+    --primary: #00B386;
+    --secondary: #00C8A3;
+    --accent: #A3E8D1;
+    --leaf: #00B386;
 
-    --primary-rgb: 10, 64, 12;
-    --secondary-rgb: 129, 144, 103;
-    --accent-rgb: 177, 171, 134;
+    --primary-rgb: 0, 179, 134;
+    --secondary-rgb: 0, 200, 163;
+    --accent-rgb: 163, 232, 209;
+    --dark-rgb: 34, 40, 49;
+    --light-rgb: 242, 242, 242;
     --background-rgb: 255, 255, 255;
     --surface-rgb: 255, 255, 255;
     --surface-2-rgb: 255, 255, 255;
-    --foreground-rgb: 10, 64, 12;
-    --muted-rgb: 129, 144, 103;
-    --leaf-rgb: 10, 64, 12;
+    --foreground-rgb: 34, 40, 49;
+    --muted-rgb: 34, 40, 49;
+    --leaf-rgb: 0, 179, 134;
     --brand: var(--primary);
 
     /* Footer theme (dark) stays on brand */
-    --footer-bg-from: #FFFFFF;
-    --footer-bg-to: #FFFFFF;
-    --footer-fg: var(--primary);
-    --footer-heading: var(--primary);
-    --footer-muted: var(--secondary);
-    --footer-link: var(--primary);
+    --footer-bg-from: rgba(34, 40, 49, 0.95);
+    --footer-bg-to: rgba(34, 40, 49, 0.88);
+    --footer-fg: #F2F2F2;
+    --footer-heading: #FFFFFF;
+    --footer-muted: rgba(255, 255, 255, 0.7);
+    --footer-link: var(--accent);
     --footer-link-hover: var(--secondary);
-    --footer-border: rgba(177, 171, 134, 0.25);
-    --footer-icon-border: rgba(177, 171, 134, 0.75);
+    --footer-border: rgba(163, 232, 209, 0.3);
+    --footer-icon-border: rgba(163, 232, 209, 0.5);
     --footer-icon-color: var(--accent);
     --footer-accent: var(--accent);
     --footer-accent-rgb: var(--accent-rgb);
@@ -113,14 +125,12 @@ body {
 
 /* Typography defaults aligned with palette */
 h1, h2 {
-  color: var(--primary);
+  color: var(--dark);
   font-weight: 750; /* slightly heavier for presence */
 }
-h3, h4 {
-  color: var(--secondary);
-}
+h3, h4,
 h5, h6 {
-  color: var(--foreground);
+  color: rgba(var(--dark-rgb), 0.85);
 }
 
 /* Smooth, consistent hovers site-wide */
@@ -130,6 +140,7 @@ a, button, .btn, .link, [role="button"] {
 
 /* Primary button accent shadow */
 button.bg-\[color\:var\(--leaf\)\],
+button.bg-primary,
 .btn-primary {
   box-shadow: 0 6px 16px rgba(var(--accent-rgb), 0.25);
 }
@@ -138,15 +149,10 @@ button.bg-\[color\:var\(--leaf\)\],
 .card,
 .form-container,
 .modal,
-.footer,
-.navbar,
 .section,
 section,
-header,
 main,
-aside,
-footer,
-nav {
+aside {
   background-color: #FFFFFF !important;
   background-image: none !important;
 }

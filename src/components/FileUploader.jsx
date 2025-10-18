@@ -131,14 +131,14 @@ export default function FileUploader({
         <div className="flex gap-3 mt-2">
           <button
             type="button"
-            className="inline-flex items-center gap-2 rounded-lg bg-[color:var(--primary)] px-3 py-1.5 text-[#FED16A] text-sm transition-colors duration-[250ms] ease-in-out hover:bg-[rgba(var(--primary-rgb),0.9)] focus:outline-none focus:ring-2 focus:ring-[color:var(--secondary)]"
+            className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-1.5 text-sm font-medium text-white shadow-md shadow-primary/20 transition-colors duration-200 hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 focus:ring-offset-base"
             onClick={() => fileInputRef.current?.click()}
           >
             <File className="h-4 w-4" /> Choose file
           </button>
           <button
             type="button"
-            className="inline-flex items-center gap-2 rounded-lg bg-white px-3 py-1.5 text-[color:var(--primary)] text-sm ring-1 ring-[color:var(--accent)] transition-colors duration-[250ms] ease-in-out hover:bg-[rgba(var(--accent-rgb),0.08)] focus:outline-none focus:ring-2 focus:ring-[color:var(--secondary)]"
+            className="inline-flex items-center gap-2 rounded-full bg-accent/40 px-4 py-1.5 text-sm font-medium text-primary ring-1 ring-accent/60 transition-colors duration-200 hover:bg-accent/60 focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 focus:ring-offset-base"
             onClick={openCamera}
           >
             <Camera className="h-4 w-4" /> Use camera

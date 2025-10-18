@@ -57,10 +57,10 @@ export default function FarmersPage() {
               verified buyers, and receive secure payments seamlessly.
             </p>
             <div className="space-x-4">
-              <button className="bg-[color:var(--primary)] text-[color:var(--surface)] px-6 py-3 rounded-lg hover:bg-[color:var(--leaf)] transition focus:outline-none focus:ring-2 focus:ring-[color:var(--leaf)]/50">
+              <button className="rounded-full bg-primary px-6 py-3 font-semibold text-white shadow-md shadow-primary/25 transition-colors duration-200 hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 focus:ring-offset-base">
                 Start Selling
               </button>
-              <button className="border border-[color:var(--leaf)] text-[color:var(--leaf)] px-6 py-3 rounded-lg hover:bg-[color:var(--leaf)] hover:text-[color:var(--surface)] transition focus:outline-none focus:ring-2 focus:ring-[color:var(--leaf)]/30">
+              <button className="rounded-full border border-accent/60 bg-accent/30 px-6 py-3 font-semibold text-primary transition-colors duration-200 hover:bg-secondary hover:text-white focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 focus:ring-offset-base">
                 Learn More
               </button>
             </div>
@@ -90,10 +90,9 @@ export default function FarmersPage() {
               <FadeIn
                 initial={{ opacity: 0, y: 50, scale: 0.95 }}
                 whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                whileHover={{ scale: 1.07, rotate: 1 }}
                 transition={{ duration: 0.6, ease: "easeOut" }}
                 viewport={{ once: true }}
-                className="p-8 rounded-2xl bg-gradient-to-br from-[color:var(--surface-2)] via-[color:var(--surface)] to-[color:var(--surface-2)] shadow-inner shadow-[rgba(var(--leaf-rgb),0.2)] shadow-lg hover:shadow-2xl transition-all duration-500"
+                className="p-8 rounded-2xl bg-gradient-to-br from-[color:var(--surface-2)] via-[color:var(--surface)] to-[color:var(--surface-2)] shadow-inner shadow-[rgba(var(--leaf-rgb),0.2)] shadow-lg transition-all duration-500"
               >
                 <div className="mx-auto mb-4 h-20 w-20 flex items-center justify-center rounded-full bg-white shadow-lg ring-2 ring-[color:var(--accent)]">
                   <ShieldCheck className="h-10 w-10 text-[color:var(--primary)]" strokeWidth={1.8} aria-hidden />
@@ -112,10 +111,9 @@ export default function FarmersPage() {
               <FadeIn
                 initial={{ opacity: 0, y: 50, scale: 0.95 }}
                 whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                whileHover={{ scale: 1.07, rotate: 1 }}
                 transition={{ duration: 0.6, ease: "easeOut" }}
                 viewport={{ once: true }}
-                className="p-8 rounded-2xl bg-gradient-to-br from-[color:var(--surface-2)] via-[color:var(--surface)] to-[color:var(--surface-2)] shadow-inner shadow-[rgba(var(--leaf-rgb),0.2)] shadow-lg hover:shadow-2xl transition-all duration-500"
+                className="p-8 rounded-2xl bg-gradient-to-br from-[color:var(--surface-2)] via-[color:var(--surface)] to-[color:var(--surface-2)] shadow-inner shadow-[rgba(var(--leaf-rgb),0.2)] shadow-lg transition-all duration-500"
               >
                 <div className="mx-auto mb-4 h-20 w-20 flex items-center justify-center rounded-full bg-white shadow-lg ring-2 ring-[color:var(--accent)]">
                   <ShieldCheck className="h-10 w-10 text-[color:var(--primary)]" strokeWidth={1.8} aria-hidden />
@@ -134,10 +132,9 @@ export default function FarmersPage() {
               <FadeIn
                 initial={{ opacity: 0, y: 50, scale: 0.95 }}
                 whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                whileHover={{ scale: 1.07, rotate: 1 }}
                 transition={{ duration: 0.6, ease: "easeOut" }}
                 viewport={{ once: true }}
-                className="p-8 rounded-2xl bg-gradient-to-br from-[color:var(--surface-2)] via-[color:var(--surface)] to-[color:var(--surface-2)] shadow-inner shadow-[rgba(var(--leaf-rgb),0.2)] shadow-lg hover:shadow-2xl transition-all duration-500"
+                className="p-8 rounded-2xl bg-gradient-to-br from-[color:var(--surface-2)] via-[color:var(--surface)] to-[color:var(--surface-2)] shadow-inner shadow-[rgba(var(--leaf-rgb),0.2)] shadow-lg transition-all duration-500"
               >
                 <div className="mx-auto mb-4 h-20 w-20 flex items-center justify-center rounded-full bg-white shadow-lg ring-2 ring-[color:var(--accent)]">
                   <ShoppingBag className="h-10 w-10 text-[color:var(--primary)]" strokeWidth={1.8} aria-hidden />
@@ -170,18 +167,14 @@ export default function FarmersPage() {
               <FadeIn
                 initial={{ opacity: 0, y: 50, scale: 0.95 }}
                 whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                whileHover={{ scale: 1.07, rotate: 1 }}
                 transition={{ duration: 0.6, ease: "easeOut" }}
                 viewport={{ once: true }}
-                className="p-8 rounded-2xl bg-gradient-to-br from-[color:var(--surface-2)] via-[color:var(--surface)] to-[color:var(--surface-2)] shadow-inner shadow-[rgba(var(--leaf-rgb),0.2)] shadow-lg hover:shadow-2xl transition-all duration-500"
+                className="p-8 rounded-2xl bg-gradient-to-br from-[color:var(--surface-2)] via-[color:var(--surface)] to-[color:var(--surface-2)] shadow-inner shadow-[rgba(var(--leaf-rgb),0.2)] shadow-lg transition-all duration-500"
               >
                 <div className="mx-auto mb-3 flex items-center justify-center h-10 w-10 rounded-full bg-[color:var(--primary)] text-[color:var(--surface)] font-bold">
                   1
                 </div>
-                <FadeIn
-                  whileHover={{ y: -5, scale: 1.1 }}
-                  className="mx-auto mb-4 h-20 w-20 flex items-center justify-center rounded-full bg-[color:var(--surface)] shadow-lg ring-2 ring-[color:var(--surface-2)]"
-                >
+                <FadeIn className="mx-auto mb-4 h-20 w-20 flex items-center justify-center rounded-full bg-[color:var(--surface)] shadow-lg ring-2 ring-[color:var(--surface-2)]">
                   <ShieldCheck className="h-10 w-10 text-[color:var(--primary)]" strokeWidth={1.8} aria-hidden />
                 </FadeIn>
                 <h3 className="text-xl font-semibold text-[color:var(--foreground)] mb-3">
@@ -198,18 +191,14 @@ export default function FarmersPage() {
               <FadeIn
                 initial={{ opacity: 0, y: 50, scale: 0.95 }}
                 whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                whileHover={{ scale: 1.07, rotate: 1 }}
                 transition={{ duration: 0.6, ease: "easeOut" }}
                 viewport={{ once: true }}
-                className="p-8 rounded-2xl bg-gradient-to-br from-[color:var(--surface-2)] via-[color:var(--surface)] to-[color:var(--surface-2)] shadow-inner shadow-[rgba(var(--leaf-rgb),0.2)] shadow-lg hover:shadow-2xl transition-all duration-500"
+                className="p-8 rounded-2xl bg-gradient-to-br from-[color:var(--surface-2)] via-[color:var(--surface)] to-[color:var(--surface-2)] shadow-inner shadow-[rgba(var(--leaf-rgb),0.2)] shadow-lg transition-all duration-500"
               >
                 <div className="mx-auto mb-3 flex items-center justify-center h-10 w-10 rounded-full bg-[color:var(--primary)] text-[color:var(--surface)] font-bold">
                   2
                 </div>
-                <FadeIn
-                  whileHover={{ y: -5, scale: 1.1 }}
-                  className="mx-auto mb-4 h-20 w-20 flex items-center justify-center rounded-full bg-[color:var(--surface)] shadow-lg ring-2 ring-[color:var(--surface-2)]"
-                >
+                <FadeIn className="mx-auto mb-4 h-20 w-20 flex items-center justify-center rounded-full bg-[color:var(--surface)] shadow-lg ring-2 ring-[color:var(--surface-2)]">
                   <ShoppingBag
                     className="h-10 w-10 text-[color:var(--leaf)] drop-shadow"
                     strokeWidth={1.8}
@@ -230,18 +219,14 @@ export default function FarmersPage() {
               <FadeIn
                 initial={{ opacity: 0, y: 50, scale: 0.95 }}
                 whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                whileHover={{ scale: 1.07, rotate: 1 }}
                 transition={{ duration: 0.6, ease: "easeOut" }}
                 viewport={{ once: true }}
-                className="p-8 rounded-2xl bg-gradient-to-br from-[color:var(--surface-2)] via-[color:var(--surface)] to-[color:var(--surface-2)] shadow-inner shadow-[rgba(var(--leaf-rgb),0.2)] shadow-lg hover:shadow-2xl transition-all duration-500"
+                className="p-8 rounded-2xl bg-gradient-to-br from-[color:var(--surface-2)] via-[color:var(--surface)] to-[color:var(--surface-2)] shadow-inner shadow-[rgba(var(--leaf-rgb),0.2)] shadow-lg transition-all duration-500"
               >
                 <div className="mx-auto mb-3 flex items-center justify-center h-10 w-10 rounded-full bg-[color:var(--primary)] text-[color:var(--surface)] font-bold">
                   3
                 </div>
-                <FadeIn
-                  whileHover={{ y: -5, scale: 1.1 }}
-                  className="mx-auto mb-4 h-20 w-20 flex items-center justify-center rounded-full bg-[color:var(--surface)] shadow-lg ring-2 ring-[color:var(--surface-2)]"
-                >
+                <FadeIn className="mx-auto mb-4 h-20 w-20 flex items-center justify-center rounded-full bg-[color:var(--surface)] shadow-lg ring-2 ring-[color:var(--surface-2)]">
                   <ShoppingBag className="h-10 w-10 text-[color:var(--primary)]" strokeWidth={1.8} aria-hidden />
                 </FadeIn>
                 <h3 className="text-xl font-semibold text-[color:var(--foreground)] mb-3">

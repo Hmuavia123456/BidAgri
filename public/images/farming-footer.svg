@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="600" viewBox="0 0 1600 600" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fdf6e3"/>
+      <stop offset="55%" stop-color="#fcefd6"/>
+      <stop offset="100%" stop-color="#f7e4ba"/>
+    </linearGradient>
+    <linearGradient id="sun" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fcd34d" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#fbbf24" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="field" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#14532d"/>
+      <stop offset="70%" stop-color="#166534"/>
+      <stop offset="100%" stop-color="#1a3a24"/>
+    </linearGradient>
+    <linearGradient id="furrow" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#22c55e" stop-opacity="0.75"/>
+      <stop offset="100%" stop-color="#047857" stop-opacity="0.15"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="360" fill="url(#sky)"/>
+  <ellipse cx="800" cy="200" rx="220" ry="120" fill="url(#sun)"/>
+  <path d="M0 260 Q400 200 800 240 T1600 260 L1600 600 L0 600 Z" fill="#14532d" opacity="0.35"/>
+  <path d="M0 320 Q400 260 800 300 T1600 320 L1600 600 L0 600 Z" fill="#15803d" opacity="0.4"/>
+  <path d="M0 380 Q400 320 800 360 T1600 380 L1600 600 L0 600 Z" fill="#166534" opacity="0.65"/>
+  <path d="M0 430 Q400 370 800 410 T1600 430 L1600 600 L0 600 Z" fill="url(#field)"/>
+  <g fill="none" stroke="url(#furrow)" stroke-width="8" stroke-linecap="round">
+    <path d="M-120 480 Q400 420 800 460 T1720 480"/>
+    <path d="M-120 520 Q400 460 800 500 T1720 520"/>
+    <path d="M-120 560 Q400 500 800 540 T1720 560"/>
+  </g>
+  <g fill="#0f5132" opacity="0.7">
+    <path d="M140 430 l40 -90 50 90 z"/>
+    <path d="M290 430 l40 -90 50 90 z"/>
+    <path d="M1320 420 l35 -80 45 80 z"/>
+    <path d="M1460 440 l40 -90 50 90 z"/>
+  </g>
+</svg>

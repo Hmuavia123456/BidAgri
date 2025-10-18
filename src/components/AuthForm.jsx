@@ -3,6 +3,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import InlineError from "@/components/InlineError";
 import PasswordInput from "@/components/PasswordInput";
+import { auth } from "@/lib/firebase";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from "firebase/auth";
 
 // Reusable Auth Form: supports login and signup modes
 // Props:
@@ -42,19 +44,45 @@ export default function AuthForm({ mode = "login", onSuccess }) {
     if (!isValid) return;
     setSubmitting(true);
     try {
-      // Mock local API call
-      const res = await fetch("/api/auth/mock", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mode, email, password, name }),
-      });
-      const data = await res.json();
-      if (!res.ok || data.status !== "ok") {
-        throw new Error(data.message || "Authentication failed");
+      let credential;
+      if (isSignup) {
+        credential = await createUserWithEmailAndPassword(auth, email, password);
+        const trimmedName = name.trim();
+        if (trimmedName) {
+          await updateProfile(credential.user, { displayName: trimmedName });
+        }
+      } else {
+        credential = await signInWithEmailAndPassword(auth, email, password);
       }
-      onSuccess?.({ mode, email, name });
+
+      const { user } = credential;
+      const displayName = user.displayName || name.trim() || user.email?.split("@")[0] || "";
+      onSuccess?.({
+        uid: user.uid,
+        email: user.email,
+        name: displayName,
+        mode,
+      });
     } catch (err) {
-      setError(err.message || "Something went wrong.");
+      const code = err?.code || "";
+      const message = (() => {
+        switch (code) {
+          case "auth/invalid-credential":
+          case "auth/invalid-email":
+          case "auth/user-not-found":
+          case "auth/wrong-password":
+            return "Incorrect email or password.";
+          case "auth/too-many-requests":
+            return "Too many attempts. Please wait a moment and try again.";
+          case "auth/email-already-in-use":
+            return "That email is already registered.";
+          case "auth/weak-password":
+            return "Password is too weak. Try adding more characters or symbols.";
+          default:
+            return err?.message || "Something went wrong.";
+        }
+      })();
+      setError(message);
     } finally {
       setSubmitting(false);
     }
@@ -149,7 +177,7 @@ export default function AuthForm({ mode = "login", onSuccess }) {
       <div className="flex items-center justify-between">
         <a
           href="/auth/forgot-password"
-          className="text-sm text-[color:var(--leaf)] hover:underline"
+          className="text-sm font-medium text-primary transition-colors hover:text-secondary"
         >
           Forgot password?
         </a>
@@ -165,7 +193,7 @@ export default function AuthForm({ mode = "login", onSuccess }) {
       <button
         type="submit"
         disabled={!isValid || submitting}
-        className="inline-flex w-full items-center justify-center rounded-lg bg-[color:var(--leaf)] px-4 py-2 text-sm font-semibold text-[color:var(--surface)] transition-colors duration-200 hover:bg-[color:var(--primary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--leaf)]/50 disabled:cursor-not-allowed disabled:opacity-60"
+        className="inline-flex w-full items-center justify-center rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white shadow-md shadow-primary/20 transition-colors duration-200 hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 focus:ring-offset-base disabled:cursor-not-allowed disabled:opacity-60"
       >
         {submitting ? "Please wait…" : isSignup ? "Create Account" : "Sign In"}
       </button>

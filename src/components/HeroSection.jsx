@@ -42,7 +42,7 @@ export default function HeroSection() {
   // Content should always be visible and animate safely without gating
 
   useEffect(() => {
-    console.log("🎥 Video HeroSection loaded successfully");
+    console.log("Video HeroSection loaded successfully");
     if (reduceMotion) return; // respect reduced motion
     const id = setInterval(() => setShowFirst((v) => !v), SLIDE_MS);
     return () => clearInterval(id);
@@ -65,7 +65,7 @@ export default function HeroSection() {
 
   return (
     <section
-      className="relative flex h-screen min-h-screen w-full items-center justify-center overflow-hidden text-[color:var(--surface)]"
+      className="relative flex h-screen min-h-screen w-full items-start justify-start overflow-hidden text-[color:var(--surface)]"
       aria-label="Cinematic farming videos with overlay"
     >
       {/* Background video layers */}
@@ -110,20 +110,18 @@ export default function HeroSection() {
       </div>
 
       {/* Subtle dark overlay for text clarity */}
-      <div className="absolute inset-0 z-10 pointer-events-none bg-[rgba(0,0,0,0.25)]" aria-hidden="true" />
+      <div className="absolute inset-0 z-10 pointer-events-none bg-black/35" aria-hidden="true" />
 
-      {/* Centered overlay content with entrance animations after video loads */}
-      <div className="relative z-20 mx-auto flex w-full max-w-5xl flex-col items-center gap-6 px-4 text-center sm:px-6 lg:px-8">
+      {/* Overlay content positioned for immediate readability */}
+      <div className="relative z-20 flex h-full w-full max-w-5xl flex-col items-start gap-6 px-5 pt-16 text-left sm:px-6 sm:pt-20 md:pl-10 md:pt-24 lg:px-12">
         <motion.div
+          className="max-w-4xl"
           initial={reduceMotion ? false : { opacity: 0, y: 30 }}
           animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
           transition={reduceMotion ? undefined : { duration: 1 }}
         >
-          <h1
-            className="text-4xl font-bold leading-tight sm:text-5xl md:text-6xl text-[#FEFAE0]"
-            style={{ textShadow: "2px 2px 8px rgba(0, 0, 0, 0.4)" }}
-          >
-            Fresh from the Fields
+          <h1 className="text-balance text-4xl font-extrabold leading-tight tracking-tight text-amber-100 drop-shadow-[0_3px_8px_rgba(0,0,0,0.7)] md:text-6xl">
+            Empowering Farmers, Connecting Buyers — Fair, Fast, Transparent.
           </h1>
         </motion.div>
 
@@ -137,7 +135,7 @@ export default function HeroSection() {
           </p>
         </motion.div>
 
-        <div className="flex flex-col items-center gap-4 sm:flex-row">
+        <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
           <motion.div
             initial={reduceMotion ? false : { opacity: 0, scale: 0.9 }}
             animate={reduceMotion ? undefined : { opacity: 1, scale: 1 }}
@@ -145,7 +143,7 @@ export default function HeroSection() {
           >
             <a
               href="#products"
-              className="inline-flex items-center justify-center rounded-full px-8 py-3 text-base font-semibold bg-[color:var(--leaf)] text-[color:var(--surface)] shadow-md shadow-[rgba(var(--leaf-rgb),0.35)] transition-colors duration-200 ease-out hover:bg-[color:var(--primary)] hover:shadow-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--leaf)]"
+              className="inline-flex items-center justify-center rounded-full bg-primary px-8 py-3 text-base font-semibold text-white shadow-md shadow-primary/30 transition-all duration-200 ease-out hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 focus-visible:ring-offset-base"
             >
               Explore Products
             </a>
@@ -157,7 +155,7 @@ export default function HeroSection() {
           >
             <a
               href="/buyers#register"
-              className="inline-flex items-center justify-center rounded-full px-8 py-3 text-base font-semibold bg-[color:var(--surface)] text-[color:var(--leaf)] ring-1 ring-[color:var(--surface-2)] shadow-sm transition-colors duration-200 ease-out hover:bg-[color:var(--surface-2)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--leaf)]"
+              className="inline-flex items-center justify-center rounded-full bg-accent px-8 py-3 text-base font-semibold text-dark shadow-md shadow-primary/20 transition-all duration-200 ease-out hover:bg-secondary hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 focus-visible:ring-offset-base"
             >
               Get Started
             </a>

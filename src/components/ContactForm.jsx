@@ -41,12 +41,12 @@ export default function ContactForm() {
 
   return (
     <form
-      className="space-y-6 rounded-2xl border border-[color:var(--surface-2)] bg-white p-6 md:p-8 shadow-sm"
+      className="space-y-6 rounded-2xl border border-accent/40 bg-base p-6 shadow-sm md:p-8"
       onSubmit={handleSubmit}
       noValidate
     >
       <div>
-        <label htmlFor="name" className="block text-sm font-medium text-[color:var(--primary)]">
+        <label htmlFor="name" className="block text-sm font-medium text-dark">
           Name
         </label>
         <input
@@ -56,7 +56,7 @@ export default function ContactForm() {
           value={formData.name}
           onChange={handleChange}
           onBlur={handleBlur}
-          className="mt-2 w-full rounded-lg border border-[color:var(--surface-2)] bg-white px-4 py-2 text-sm text-[color:var(--foreground)] placeholder:text-[color:var(--muted)] focus:border-[color:var(--leaf)] focus:outline-none focus:ring-2 focus:ring-[color:var(--leaf)]/30"
+          className="mt-2 w-full rounded-lg border border-accent/40 bg-base px-4 py-2 text-sm text-dark placeholder:text-dark/50 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
           placeholder="Jane Doe"
         />
         {touched.name && errors.name && (
@@ -65,7 +65,7 @@ export default function ContactForm() {
       </div>
 
       <div>
-        <label htmlFor="email" className="block text-sm font-medium text-[color:var(--primary)]">
+        <label htmlFor="email" className="block text-sm font-medium text-dark">
           Email
         </label>
         <input
@@ -75,7 +75,7 @@ export default function ContactForm() {
           value={formData.email}
           onChange={handleChange}
           onBlur={handleBlur}
-            className="mt-2 w-full rounded-lg border border-[color:var(--surface-2)] bg-white px-4 py-2 text-sm text-[color:var(--foreground)] placeholder:text-[color:var(--muted)] focus:border-[color:var(--leaf)] focus:outline-none focus:ring-2 focus:ring-[color:var(--leaf)]/30"
+          className="mt-2 w-full rounded-lg border border-accent/40 bg-base px-4 py-2 text-sm text-dark placeholder:text-dark/50 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
           placeholder="hello@company.com"
         />
         {touched.email && errors.email && (
@@ -84,7 +84,7 @@ export default function ContactForm() {
       </div>
 
       <div>
-        <label htmlFor="message" className="block text-sm font-medium text-[color:var(--primary)]">
+        <label htmlFor="message" className="block text-sm font-medium text-dark">
           Message
         </label>
         <textarea
@@ -94,7 +94,7 @@ export default function ContactForm() {
           onChange={handleChange}
           onBlur={handleBlur}
           rows={5}
-          className="mt-2 w-full rounded-lg border border-[color:var(--surface-2)] bg-white px-4 py-2 text-sm text-[color:var(--foreground)] placeholder:text-[color:var(--muted)] focus:border-[color:var(--leaf)] focus:outline-none focus:ring-2 focus:ring-[color:var(--leaf)]/30"
+          className="mt-2 w-full rounded-lg border border-accent/40 bg-base px-4 py-2 text-sm text-dark placeholder:text-dark/50 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
           placeholder="Share a brief overview of your inquiry..."
         />
         {touched.message && errors.message && (
@@ -104,7 +104,7 @@ export default function ContactForm() {
 
       <button
         type="submit"
-        className="inline-flex w-full items-center justify-center rounded-lg bg-[color:var(--leaf)] px-4 py-2 text-sm font-semibold text-[color:var(--surface)] transition-colors duration-200 hover:bg-[color:var(--primary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--leaf)]/50 disabled:cursor-not-allowed disabled:opacity-60"
+        className="inline-flex w-full items-center justify-center rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white shadow-md shadow-primary/20 transition-colors duration-200 hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 focus:ring-offset-base disabled:cursor-not-allowed disabled:opacity-60"
         disabled={!isFormValid}
       >
         Send Message

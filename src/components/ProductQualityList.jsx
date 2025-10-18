@@ -32,7 +32,7 @@ export default function ProductQualityList() {
           {MOCK_PRODUCTS.map((item) => (
             <article
               key={item.name}
-              className="group rounded-xl border border-[color:var(--supporting)] bg-[color:var(--surface)] p-4 text-center shadow-sm transition-all duration-200 ease-out hover:shadow-md hover:-translate-y-0.5"
+              className="rounded-xl border border-[color:var(--supporting)] bg-[color:var(--surface)] p-4 text-center shadow-sm"
             >
               <h3 className="text-sm sm:text-base font-semibold text-[color:var(--foreground)]">{item.name}</h3>
 

@@ -17,7 +17,7 @@ export default function AnimatedTestimonial({ story }) {
         return { initial, whileInView: animate, transition };
       })()}
       viewport={{ once: true }}
-      className="p-6 bg-[color:var(--surface)] shadow-lg rounded-2xl hover:shadow-2xl transition-all duration-500 text-center"
+      className="rounded-2xl bg-[color:var(--surface)] p-6 text-center shadow-lg"
     >
       <img
         src={imageSrc}

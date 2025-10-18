@@ -30,7 +30,7 @@ const ProductQualityGrid = ({ products = mockProducts }) => {
         {products.map((product) => (
           <div
             key={`${product.name}-${product.grade}`}
-            className="group rounded-xl shadow-lg bg-[color:var(--surface)] overflow-hidden transition transform duration-200 ease-out hover:scale-105 hover:shadow-xl"
+            className="rounded-xl overflow-hidden bg-[color:var(--surface)] shadow-lg"
           >
             <div className="relative w-full h-40 sm:h-48">
               <ImageWithFallback

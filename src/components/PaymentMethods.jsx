@@ -75,11 +75,11 @@ export default function PaymentMethods({ onSelect, selected, disabled = false, o
           return (
             <label
               key={m.id}
-              className={`relative group flex cursor-pointer items-start gap-4 rounded-2xl border p-4 shadow-sm transition ${
+              className={`relative flex cursor-pointer items-start gap-4 rounded-2xl border p-4 shadow-sm transition ${
                 isSelected
                   ? "border-[color:var(--leaf)] bg-[color:var(--surface-2)] ring-2 ring-[color:var(--leaf)]/60"
-                  : "border-[color:var(--surface-2)] bg-[color:var(--surface)] hover:border-[color:var(--leaf)]/50 hover:shadow-md"
-              } ${disabled ? "opacity-60 cursor-not-allowed" : ""}`}
+                  : "border-[color:var(--surface-2)] bg-[color:var(--surface)]"
+              } ${disabled ? "cursor-not-allowed opacity-60" : ""}`}
             >
               <input
                 type="radio"

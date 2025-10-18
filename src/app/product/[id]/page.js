@@ -65,9 +65,9 @@ export default function ProductDetailPage({ params }) {
     <section className="w-full min-h-screen bg-white pt-24 pb-16">
       <div className="max-w-6xl mx-auto px-4 md:px-8 space-y-6">
         <nav className="text-sm text-[color:var(--muted)]">
-          <a href="/products" className="hover:text-[color:var(--secondary)]">
+          <Link href="/products" className="transition-colors hover:text-secondary">
             Products
-          </a>
+          </Link>
           <span className="mx-2">/</span>
           <span className="text-[color:var(--foreground)] font-medium">{product.title}</span>
         </nav>
@@ -147,7 +147,7 @@ export default function ProductDetailPage({ params }) {
             {related.map((item) => (
               <article
                 key={item.id}
-                className="group rounded-2xl overflow-hidden bg-white text-[color:var(--foreground)] border border-[color:var(--accent)]/40 shadow-lg hover:shadow-2xl transition-all duration-300 transform-gpu hover:scale-105"
+                className="rounded-2xl overflow-hidden border border-[color:var(--accent)]/40 bg-white text-[color:var(--foreground)] shadow-lg"
               >
                 <Link
                   href={`/product/${item.id}`}
@@ -160,7 +160,7 @@ export default function ProductDetailPage({ params }) {
                       fill
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                       quality={75}
-                      className="transition-transform duration-300 ease-out will-change-transform group-hover:scale-105 group-hover:rotate-[0.5deg]"
+                      className="object-cover"
                     />
                   </div>
                   <div className="p-4 space-y-1">

@@ -103,7 +103,7 @@ export default function Home() {
               placeholder="blur"
               blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAICAgICAgICAgIDAwMDBAQEBAQEBAgIBAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgP/2wCEAAQEBAQIBAgICAwICAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwP/wAARCAAQABADASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAgP/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCkAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/2Q=="
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-green-900/30 to-transparent" aria-hidden="true" />
+            <div className="absolute inset-0 bg-gradient-to-t from-dark/80 to-transparent" aria-hidden="true" />
           </div>
 
           <div className="flex w-full flex-col gap-10 rounded-3xl bg-white p-8 shadow-lg shadow-[rgba(var(--leaf-rgb),0.1)] md:w-1/2 animate-fade-in-right">
@@ -226,27 +226,27 @@ export default function Home() {
             <article
               key={category.title}
               tabIndex={0}
-              className="group relative overflow-hidden rounded-2xl bg-[color:var(--surface)] p-4 shadow-lg transition duration-300 ease-in-out hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-[color:var(--accent)]/60 focus-visible:scale-105"
+              className="relative flex flex-col overflow-hidden rounded-2xl bg-[color:var(--surface)] shadow-lg ring-1 ring-[color:var(--supporting)]/30 focus:outline-none focus:ring-2 focus:ring-[color:var(--accent)]/60"
               aria-label={`${category.title} category card`}
             >
               <span className="sr-only">{`${category.title}: ${category.description}`}</span>
-              <div className="relative h-72 w-full overflow-hidden rounded-2xl">
+              <div className="relative h-72 w-full overflow-hidden">
                 <ImageWithFallback
                   src={category.image}
                   alt={`${category.title} category`}
                   fallbackSrc="/images/placeholder-produce.jpg"
                   fill
                   sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 25vw"
-                  className="rounded-2xl object-cover transition-transform duration-300 ease-in-out group-hover:scale-105 group-focus-visible:scale-105"
+                  className="object-cover"
                 />
-                <div className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl bg-[rgba(var(--primary-rgb),0.6)] opacity-0 transition duration-300 ease-in-out group-hover:opacity-100 group-focus-visible:opacity-100">
-                  <h3 className="translate-y-1 text-2xl font-semibold text-[color:var(--surface)] opacity-0 transition duration-300 ease-in-out group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:opacity-100 sm:text-3xl">
-                    {category.title}
-                  </h3>
-                  <p className="mt-3 w-full translate-y-1 px-4 text-center text-sm text-[color:var(--surface)]/90 opacity-0 transition duration-300 ease-in-out group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:opacity-100 sm:text-base">
-                    {category.description}
-                  </p>
-                </div>
+              </div>
+              <div className="flex flex-1 flex-col gap-3 p-5">
+                <h3 className="text-2xl font-semibold text-[color:var(--foreground)] sm:text-3xl">
+                  {category.title}
+                </h3>
+                <p className="text-sm text-[color:var(--muted)] sm:text-base">
+                  {category.description}
+                </p>
               </div>
             </article>
           ))}

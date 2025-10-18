@@ -4,6 +4,7 @@ export const metadata = {
     "Buy fresh, verified produce directly from farmers with transparent pricing and secure bidding.",
 };
 
+import Link from "next/link";
 import BuyerRegistrationForm from "@/components/BuyerRegistrationForm";
 
 export default function BuyersPage() {
@@ -22,18 +23,18 @@ export default function BuyersPage() {
               BidAgri helps procurement teams shorten their sourcing cycle, secure fresh produce, and collaborate seamlessly with verified farmers.
             </p>
             <div className="flex flex-wrap items-center gap-3">
-              <a
+              <Link
                 href="/products"
-                className="rounded-full bg-[color:var(--primary)] text-[color:var(--surface)] px-6 py-2.5 transition focus:outline-none focus:ring-2 focus:ring-[color:var(--accent)] hover:shadow-[0_8px_24px_rgba(var(--primary-rgb),0.25)]"
+                className="rounded-full bg-primary px-6 py-2.5 font-semibold text-white shadow-md shadow-primary/25 transition-colors duration-200 hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 focus:ring-offset-base"
               >
                 Explore Products
-              </a>
-              <a
+              </Link>
+              <Link
                 href="/contact"
-                className="rounded-full bg-[color:var(--surface)] text-[color:var(--leaf)] px-6 py-2.5 ring-1 ring-[color:var(--supporting)] hover:bg-[color:var(--surface-2)] transition focus:outline-none focus:ring-2 focus:ring-[color:var(--leaf)]/30"
+                className="rounded-full bg-accent/40 px-6 py-2.5 font-semibold text-primary ring-1 ring-accent/60 transition-colors duration-200 hover:bg-secondary hover:text-white focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 focus:ring-offset-base"
               >
                 Talk to Us
-              </a>
+              </Link>
             </div>
           </div>
           <div>
@@ -72,7 +73,7 @@ export default function BuyersPage() {
             ].map((b, i) => (
               <div
                 key={i}
-                className="rounded-2xl bg-gradient-to-b from-[color:var(--surface)] to-[color:var(--surface-2)] p-5 shadow-sm ring-1 ring-[color:var(--supporting)]/40 hover:shadow-md transition"
+                className="rounded-2xl bg-gradient-to-b from-[color:var(--surface)] to-[color:var(--surface-2)] p-5 shadow-sm ring-1 ring-[color:var(--supporting)]/40 transition"
               >
                 <div className="text-[color:var(--leaf)] font-semibold tracking-tight">{b.title}</div>
                 <p className="text-[color:var(--muted)] mt-1">{b.desc}</p>
@@ -109,9 +110,9 @@ export default function BuyersPage() {
               <li key={i} className="rounded-2xl bg-gradient-to-b from-[color:var(--surface)] to-[color:var(--surface-2)] p-6 shadow-sm ring-1 ring-[color:var(--supporting)]/40 flex flex-col gap-3">
                 <div className="text-[color:var(--leaf)] font-bold tracking-tight">{`${s.number}) ${s.title}`}</div>
                 <p className="text-[color:var(--muted)]">{s.desc}</p>
-                <a href={s.href} className="text-[color:var(--leaf)] font-semibold hover:underline focus:outline-none focus:ring-2 focus:ring-[color:var(--leaf)]/30">
+                <Link href={s.href} className="font-semibold text-primary transition-colors hover:text-secondary focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 focus:ring-offset-base">
                   Learn more
-                </a>
+                </Link>
               </li>
             ))}
           </ol>
@@ -182,15 +183,15 @@ export default function BuyersPage() {
                 alt="Facebook"
                 className="h-10 w-auto object-contain"
               />
-              <div className="h-10 w-auto flex items-center justify-center">
+              <div className="flex h-10 w-auto items-center justify-center">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 120" className="h-10">
-                  <text x="0" y="80" fontSize="60" fontFamily="Arial, sans-serif" fill="#002f6c" fontWeight="bold">
+                  <text x="0" y="80" fontSize="60" fontFamily="Arial, sans-serif" fill="#00B386" fontWeight="bold">
                     Farmers
                   </text>
-                  <text x="260" y="80" fontSize="60" fontFamily="Arial, sans-serif" fill="#d81e05" fontWeight="bold">
+                  <text x="260" y="80" fontSize="60" fontFamily="Arial, sans-serif" fill="#00C8A3" fontWeight="bold">
                     Insurance
                   </text>
-                  <circle cx="230" cy="45" r="10" fill="#002f6c" />
+                  <circle cx="230" cy="45" r="10" fill="#00B386" />
                 </svg>
               </div>
             </div>
@@ -204,18 +205,18 @@ export default function BuyersPage() {
               Explore verified listings and place bids with confidence.
             </p>
             <div className="flex items-center gap-3">
-              <a
+              <Link
                 href="/products"
-                className="rounded-full bg-[color:var(--primary)] text-[color:var(--surface)] px-6 py-2.5 transition focus:outline-none focus:ring-2 focus:ring-[color:var(--accent)] hover:shadow-[0_8px_24px_rgba(var(--primary-rgb),0.25)]"
+                className="rounded-full bg-primary px-6 py-2.5 font-semibold text-white shadow-md shadow-primary/25 transition-colors duration-200 hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 focus:ring-offset-base"
               >
                 Explore Products
-              </a>
-              <a
+              </Link>
+              <Link
                 href="/contact"
-                className="rounded-full bg-[color:var(--surface)] text-[color:var(--leaf)] px-6 py-2.5 ring-1 ring-[color:var(--supporting)] hover:bg-[color:var(--surface-2)] transition focus:outline-none focus:ring-2 focus:ring-[color:var(--leaf)]/30"
+                className="rounded-full bg-accent/40 px-6 py-2.5 font-semibold text-primary ring-1 ring-accent/60 transition-colors duration-200 hover:bg-secondary hover:text-white focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 focus:ring-offset-base"
               >
                 Talk to Us
-              </a>
+              </Link>
             </div>
           </div>
         </section>

@@ -161,7 +161,7 @@ export default function EnhancedFarmerRegistrationForm() {
         whileInView={{ opacity: 1, scale: 1 }}
         viewport={{ once: true }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        className="rounded-3xl bg-gradient-to-br from-[color:var(--surface)] via-[color:var(--surface-2)] to-[color:var(--surface-2)] p-6 md:p-8 shadow-[0_20px_60px_-25px_rgba(var(--leaf-rgb),0.35)] ring-1 ring-[color:var(--surface)]/40 backdrop-blur-sm transition-shadow duration-500 hover:shadow-[0_28px_80px_-30px_rgba(var(--leaf-rgb),0.45)]"
+        className="rounded-3xl bg-gradient-to-br from-[color:var(--surface)] via-[color:var(--surface-2)] to-[color:var(--surface-2)] p-6 md:p-8 shadow-[0_20px_60px_-25px_rgba(var(--leaf-rgb),0.35)] ring-1 ring-[color:var(--surface)]/40 backdrop-blur-sm transition-shadow duration-500"
       >
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -218,36 +218,32 @@ export default function EnhancedFarmerRegistrationForm() {
               return (
                 <motion.div
                   key={field.name}
-                  whileHover={{ scale: 1.01 }}
-                  transition={{ duration: 0.2 }}
-                  className="group flex flex-col"
+                  className="flex flex-col"
                 >
                   <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-[color:var(--foreground)]/80">
-                    <Icon className="h-4 w-4 text-[color:var(--leaf)] transition-transform duration-300 group-hover:scale-110 group-hover:text-[color:var(--accent)]" />
+                    <Icon className="h-4 w-4 text-[color:var(--leaf)]" />
                     {field.label}
                   </label>
-                <motion.input
-                  name={field.name}
-                  type={field.type}
-                  value={formData[field.name]}
-                  onChange={handleChange}
-                  placeholder={field.placeholder}
-                  whileFocus={{ scale: 1.005 }}
-                  className={`w-full rounded-2xl px-4 py-3 shadow-sm outline-none ring-1 transition-colors duration-200 ease-in-out hover:ring-[color:var(--leaf)]/40 focus:ring-2 focus:ring-[color:var(--leaf)]/70 placeholder:text-[color:var(--muted)] bg-[color:var(--surface)] text-[color:var(--foreground)]`}
-                />
-                {errors[field.name] && (
-                  <p className="mt-1 text-sm text-[color:var(--secondary)]">{errors[field.name]}</p>
-                )}
+                  <motion.input
+                    name={field.name}
+                    type={field.type}
+                    value={formData[field.name]}
+                    onChange={handleChange}
+                    placeholder={field.placeholder}
+                    whileFocus={{ scale: 1.005 }}
+                    className="w-full rounded-2xl px-4 py-3 shadow-sm outline-none ring-1 transition-colors duration-200 ease-in-out hover:ring-[color:var(--leaf)]/40 focus:ring-2 focus:ring-[color:var(--leaf)]/70 placeholder:text-[color:var(--muted)] bg-[color:var(--surface)] text-[color:var(--foreground)]"
+                  />
+                  {errors[field.name] && (
+                    <p className="mt-1 text-sm text-[color:var(--secondary)]">{errors[field.name]}</p>
+                  )}
                 </motion.div>
               );
             })}
             <motion.div
-              whileHover={{ scale: 1.01 }}
-              transition={{ duration: 0.2 }}
-              className="group md:col-span-2"
+              className="md:col-span-2"
             >
               <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-[color:var(--foreground)]/80">
-                <FileText className="h-4 w-4 text-[color:var(--leaf)] transition-transform duration-300 group-hover:scale-110 group-hover:text-[color:var(--accent)]" />
+                <FileText className="h-4 w-4 text-[color:var(--leaf)]" />
                 Message
               </label>
               <motion.textarea

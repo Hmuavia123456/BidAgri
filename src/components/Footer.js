@@ -76,7 +76,7 @@ export default function Footer() {
         className="absolute inset-0 -z-20 bg-gradient-to-t from-dark/95 via-dark/80 to-dark/40"
       />
 
-      <div className="relative mx-auto flex w-full max-w-6xl flex-col gap-12 rounded-3xl border border-accent/40 bg-dark/70 px-8 py-10 text-light backdrop-blur-md shadow-xl shadow-dark/50 sm:px-10 md:px-12">
+      <div className="relative mx-auto w-full max-w-6xl flex flex-col gap-12 text-light">
         <div className="grid gap-10 md:grid-cols-3">
           <div
             className={`space-y-5 transition-all duration-700 ${reveal}`}
@@ -97,13 +97,13 @@ export default function Footer() {
             className={`space-y-5 transition-all duration-700 ${reveal}`}
             style={{ transitionDelay: "0.25s" }}
           >
-            <h3 className="text-lg font-semibold text-white">Quick Links</h3>
-            <ul className="space-y-3 text-sm">
+            <h3 className="text-2xl md:text-3xl font-extrabold text-white">Quick Links</h3>
+            <ul className="space-y-2 text-base md:text-lg">
               {quickLinks.map(({ label, href }) => (
                 <li key={label}>
                   <Link
                     href={href}
-                    className="inline-flex items-center gap-2 text-light/80 transition-colors duration-200 hover:text-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-base"
+                    className="inline-flex items-center gap-2 font-medium text-white/95 transition-colors duration-200 hover:text-accent hover:underline hover:decoration-accent/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-base"
                   >
                     <span aria-hidden className="text-xl">›</span>
                     {label}
@@ -117,8 +117,8 @@ export default function Footer() {
             className={`space-y-5 transition-all duration-700 ${reveal}`}
             style={{ transitionDelay: "0.4s" }}
           >
-            <h3 className="text-lg font-semibold text-white">Stay Connected</h3>
-            <p className="text-sm text-light/80">
+            <h3 className="text-2xl md:text-3xl font-extrabold text-white">Stay Connected</h3>
+            <p className="text-base md:text-lg text-white/95">
               Follow BidAgri for stories from the fields, pricing trends, and market insights.
             </p>
             <div className="flex items-center gap-4">
@@ -127,7 +127,7 @@ export default function Footer() {
                   key={name}
                   href={href}
                   aria-label={name}
-                  className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-accent/50 text-accent transition-colors duration-200 hover:bg-accent/20 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-base"
+                  className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-white/15 text-white transition-colors duration-200 hover:bg-accent/40 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-base"
                 >
                   <Icon className="h-5 w-5" />
                 </Link>

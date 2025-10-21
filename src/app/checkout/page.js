@@ -29,6 +29,7 @@ export default function CheckoutPage() {
   const [isMethodValid, setIsMethodValid] = useState(false);
   const [error, setError] = useState("");
   const [promoApplied, setPromoApplied] = useState(false);
+  const [stepStage, setStepStage] = useState(1);
 
   const total = useMemo(
     () => items.reduce((acc, it) => acc + it.price * it.qty, 0) + fees.shipping + fees.service,
@@ -48,6 +49,7 @@ export default function CheckoutPage() {
   async function handlePay(e) {
     e.preventDefault();
     setError("");
+    setStepStage(2);
     setProcessing(true);
     try {
       // Simulate processing
@@ -76,6 +78,7 @@ export default function CheckoutPage() {
       router.push(`/checkout/receipt/${encodeURIComponent(orderId)}`);
     } catch (err) {
       setError(err.message || "Something went wrong. Please retry.");
+      setStepStage(1);
     } finally {
       setProcessing(false);
     }
@@ -83,7 +86,7 @@ export default function CheckoutPage() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-6 text-dark sm:py-10">
-      <OrderStepper current={1} className="mb-6" />
+      <OrderStepper current={stepStage} className="mb-6" />
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="space-y-4 lg:col-span-2">

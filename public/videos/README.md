@@ -4,6 +4,7 @@ Place short MP4 clips (5–7s) in this folder using the following filenames so t
 
 - `farmer-field.mp4` — Farmer working in the field
 - `tractor-plowing.mp4` — Tractor plowing the soil
+- `tractor-cutting.mp4` — Tractor cutting grass in the field (approx. 9.5s, 720p)
 - `crops-wind.mp4` — Crops waving in the wind
 - `farmer-inspecting.mp4` — Farmer inspecting plants or harvesting
 

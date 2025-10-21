@@ -169,9 +169,9 @@ export default function FarmersPage() {
                 whileInView={{ opacity: 1, y: 0, scale: 1 }}
                 transition={{ duration: 0.6, ease: "easeOut" }}
                 viewport={{ once: true }}
-                className="p-8 rounded-2xl bg-gradient-to-br from-[color:var(--surface-2)] via-[color:var(--surface)] to-[color:var(--surface-2)] shadow-inner shadow-[rgba(var(--leaf-rgb),0.2)] shadow-lg transition-all duration-500"
+                className="relative p-8 rounded-2xl bg-gradient-to-br from-[color:var(--surface-2)] via-[color:var(--surface)] to-[color:var(--surface-2)] shadow-inner shadow-[rgba(var(--leaf-rgb),0.2)] shadow-lg transition-all duration-500"
               >
-                <div className="mx-auto mb-3 flex items-center justify-center h-10 w-10 rounded-full bg-[color:var(--primary)] text-[color:var(--surface)] font-bold">
+                <div className="absolute top-3 left-3 flex h-10 w-10 items-center justify-center rounded-full bg-[color:var(--primary)] text-[color:var(--surface)] font-bold shadow ring-2 ring-[color:var(--surface)]/70">
                   1
                 </div>
                 <FadeIn className="mx-auto mb-4 h-20 w-20 flex items-center justify-center rounded-full bg-[color:var(--surface)] shadow-lg ring-2 ring-[color:var(--surface-2)]">
@@ -193,9 +193,9 @@ export default function FarmersPage() {
                 whileInView={{ opacity: 1, y: 0, scale: 1 }}
                 transition={{ duration: 0.6, ease: "easeOut" }}
                 viewport={{ once: true }}
-                className="p-8 rounded-2xl bg-gradient-to-br from-[color:var(--surface-2)] via-[color:var(--surface)] to-[color:var(--surface-2)] shadow-inner shadow-[rgba(var(--leaf-rgb),0.2)] shadow-lg transition-all duration-500"
+                className="relative p-8 rounded-2xl bg-gradient-to-br from-[color:var(--surface-2)] via-[color:var(--surface)] to-[color:var(--surface-2)] shadow-inner shadow-[rgba(var(--leaf-rgb),0.2)] shadow-lg transition-all duration-500"
               >
-                <div className="mx-auto mb-3 flex items-center justify-center h-10 w-10 rounded-full bg-[color:var(--primary)] text-[color:var(--surface)] font-bold">
+                <div className="absolute top-3 left-3 flex h-10 w-10 items-center justify-center rounded-full bg-[color:var(--primary)] text-[color:var(--surface)] font-bold shadow ring-2 ring-[color:var(--surface)]/70">
                   2
                 </div>
                 <FadeIn className="mx-auto mb-4 h-20 w-20 flex items-center justify-center rounded-full bg-[color:var(--surface)] shadow-lg ring-2 ring-[color:var(--surface-2)]">
@@ -221,9 +221,9 @@ export default function FarmersPage() {
                 whileInView={{ opacity: 1, y: 0, scale: 1 }}
                 transition={{ duration: 0.6, ease: "easeOut" }}
                 viewport={{ once: true }}
-                className="p-8 rounded-2xl bg-gradient-to-br from-[color:var(--surface-2)] via-[color:var(--surface)] to-[color:var(--surface-2)] shadow-inner shadow-[rgba(var(--leaf-rgb),0.2)] shadow-lg transition-all duration-500"
+                className="relative p-8 rounded-2xl bg-gradient-to-br from-[color:var(--surface-2)] via-[color:var(--surface)] to-[color:var(--surface-2)] shadow-inner shadow-[rgba(var(--leaf-rgb),0.2)] shadow-lg transition-all duration-500"
               >
-                <div className="mx-auto mb-3 flex items-center justify-center h-10 w-10 rounded-full bg-[color:var(--primary)] text-[color:var(--surface)] font-bold">
+                <div className="absolute top-3 left-3 flex h-10 w-10 items-center justify-center rounded-full bg-[color:var(--primary)] text-[color:var(--surface)] font-bold shadow ring-2 ring-[color:var(--surface)]/70">
                   3
                 </div>
                 <FadeIn className="mx-auto mb-4 h-20 w-20 flex items-center justify-center rounded-full bg-[color:var(--surface)] shadow-lg ring-2 ring-[color:var(--surface-2)]">

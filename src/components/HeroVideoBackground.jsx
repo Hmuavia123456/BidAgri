@@ -7,8 +7,8 @@ import { motion } from "framer-motion";
 // Default clips sourced from Pexels (public royalty-free). Optimized to only 2 as requested.
 const DEFAULT_CLIPS = [
   {
-    // Replace farmer-working clip with requested tractor cutting grass video
-    src: "https://videos.pexels.com/video-files/4375939/4375939-hd_1920_1080_30fps.mp4",
+    // Local 720p clip trimmed to ~9.5s for quick playback
+    src: "/videos/tractor-cutting.mp4",
     label: "Tractor cutting grass in the field",
     position: "center",
   },

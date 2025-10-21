@@ -13,6 +13,7 @@ function FiltersSidebar({
   onApply,
   onClear,
   products = [],
+  className = "",
 }) {
   const categories = getCategories();
   const titles = useMemo(() => products.map((p) => p.title), [products]);
@@ -44,68 +45,94 @@ function FiltersSidebar({
     }, {});
   }, [products]);
 
+  const containerClasses = [
+    "space-y-5 rounded-xl border border-gray-200 bg-white p-5 shadow-sm",
+    className,
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   return (
-    <div className="rounded-xl border border-[color:var(--surface-2)] bg-[color:var(--surface)] p-4 shadow-sm space-y-4">
-        {/* Sidebar content; parent applies sticky + width */}
-        <div>
-          <SearchBar
-            value={filters.q}
-            onChange={handleSearchChange}
-            suggestions={titles}
-            label="Search products"
-            placeholder="Search products…"
-          />
-        </div>
+    <div className={containerClasses}>
+      <h2 className="text-lg font-semibold text-[color:var(--primary)]">
+        Filters
+      </h2>
 
-        <div>
-          <label className="text-sm font-medium text-[color:var(--foreground)]" htmlFor="category-select">Category</label>
-          <select
-            id="category-select"
-            className="mt-1 w-full rounded-md border border-[color:var(--surface-2)] px-3 py-2 text-sm bg-[color:var(--surface)] text-[color:var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[color:var(--leaf)]"
-            value={filters.category}
-            onChange={handleCategoryChange}
-          >
-            <option className="text-[color:var(--foreground)]" value="All">All</option>
-            {categories.map((c) => (
-              <option className="text-[color:var(--foreground)]" key={c.slug} value={c.name}>
-                {c.name}{categoryCounts[c.name] != null ? ` (${categoryCounts[c.name]})` : ""}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <PriceRangeSlider
-            value={{ min: filters.minPrice, max: filters.maxPrice }}
-            onChange={handlePriceChange}
-            min={0}
-            max={2000}
-            step={10}
-          />
-        </div>
-
-        <div>
-          <p className="text-sm font-medium text-[color:var(--foreground)] mb-1">Availability</p>
-          <StatusChips value={filters.status} onChange={handleStatusChange} counts={statusCounts} />
-        </div>
-
-        <div>
-          <button
-            type="button"
-            onClick={onApply}
-            className="w-full rounded-full bg-[color:var(--primary)] px-4 py-2 text-sm font-semibold text-[color:var(--surface)] shadow-sm transition hover:bg-[color:var(--leaf)] focus:outline-none focus:ring-2 focus:ring-[color:var(--leaf)]"
-          >
-            Apply filters
-          </button>
-          <button
-            type="button"
-            onClick={onClear}
-            className="mt-2 w-full rounded-full bg-[color:var(--surface)] px-4 py-2 text-sm font-semibold text-[color:var(--foreground)] ring-1 ring-[color:var(--surface-2)] hover:bg-[color:var(--surface-2)] focus:outline-none focus:ring-2 focus:ring-[color:var(--leaf)]/40"
-          >
-            Clear all
-          </button>
-        </div>
+      <div>
+        <SearchBar
+          value={filters.q}
+          onChange={handleSearchChange}
+          suggestions={titles}
+          label="Search products"
+          placeholder="Search products…"
+        />
       </div>
+
+      <div>
+        <label
+          className="text-sm font-semibold text-gray-800"
+          htmlFor="category-select"
+        >
+          Category
+        </label>
+        <select
+          id="category-select"
+          className="mt-1 w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-secondary"
+          value={filters.category}
+          onChange={handleCategoryChange}
+        >
+          <option className="text-gray-800" value="All">
+            All
+          </option>
+          {categories.map((c) => (
+            <option className="text-gray-800" key={c.slug} value={c.name}>
+              {c.name}
+              {categoryCounts[c.name] != null
+                ? ` (${categoryCounts[c.name]})`
+                : ""}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div>
+        <PriceRangeSlider
+          value={{ min: filters.minPrice, max: filters.maxPrice }}
+          onChange={handlePriceChange}
+          min={0}
+          max={2000}
+          step={10}
+        />
+      </div>
+
+      <div>
+        <p className="mb-1 text-sm font-semibold text-gray-800">
+          Availability
+        </p>
+        <StatusChips
+          value={filters.status}
+          onChange={handleStatusChange}
+          counts={statusCounts}
+        />
+      </div>
+
+      <div>
+        <button
+          type="button"
+          onClick={onApply}
+          className="w-full rounded-full bg-primary px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary/70 focus:ring-offset-2 focus:ring-offset-white"
+        >
+          Apply filters
+        </button>
+        <button
+          type="button"
+          onClick={onClear}
+          className="mt-2 w-full rounded-full bg-white px-5 py-2 text-sm font-semibold text-gray-800 ring-1 ring-gray-200 transition hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-secondary/50 focus:ring-offset-2 focus:ring-offset-white"
+        >
+          Clear all
+        </button>
+      </div>
+    </div>
   );
 }
 

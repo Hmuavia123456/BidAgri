@@ -3,18 +3,65 @@
 import React from "react";
 import ImageWithFallback from "@/components/ImageWithFallback";
 
-function formatDate(iso) {
+const STABLE_FORMATTER = new Intl.DateTimeFormat("en-GB", {
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+  hour: "2-digit",
+  minute: "2-digit",
+  second: "2-digit",
+  hour12: false,
+  timeZone: "UTC",
+});
+
+function formatForSSR(iso) {
   try {
     const d = new Date(iso);
-    return d.toLocaleString();
+    if (Number.isNaN(d.getTime())) return iso || "—";
+    return `${STABLE_FORMATTER.format(d)} UTC`;
   } catch {
-    return iso;
+    return iso || "—";
   }
+}
+
+function formatForClient(iso) {
+  try {
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return iso || "—";
+    const locale = typeof navigator !== "undefined" ? navigator.language : "en-GB";
+    const resolved = typeof Intl !== "undefined" ? Intl.DateTimeFormat().resolvedOptions() : {};
+    const tz = resolved?.timeZone || "UTC";
+    return new Intl.DateTimeFormat(locale, {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false,
+      timeZone: tz,
+      timeZoneName: "short",
+    }).format(d);
+  } catch {
+    return iso || "—";
+  }
+}
+
+function useFormattedTimestamp(iso) {
+  const ssrValue = React.useMemo(() => formatForSSR(iso), [iso]);
+  const [value, setValue] = React.useState(ssrValue);
+
+  React.useEffect(() => {
+    setValue(formatForClient(iso));
+  }, [iso]);
+
+  return value;
 }
 
 export function InspectionCard({ item, onOpen }) {
   const { inspector, timestamp, note, images = [] } = item || {};
   const img = images[0];
+  const formattedTimestamp = useFormattedTimestamp(timestamp);
 
   return (
     <article className="flex items-start gap-3 rounded-lg ring-1 ring-[color:var(--supporting)]/40 bg-[color:var(--surface)] p-3 shadow-sm">
@@ -23,7 +70,7 @@ export function InspectionCard({ item, onOpen }) {
           <div className="relative h-full w-full">
             <ImageWithFallback
               src={img}
-              alt="Inspector checking grain quality with moisture meter."
+              alt="Quality assurance checklist illustration."
               fill
               sizes="64px"
               quality={60}
@@ -36,7 +83,9 @@ export function InspectionCard({ item, onOpen }) {
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between">
           <h4 className="text-sm font-semibold text-[color:var(--foreground)]">Inspection</h4>
-          <time className="text-xs text-[color:var(--muted)]" dateTime={timestamp}>{formatDate(timestamp)}</time>
+          <time className="text-xs text-[color:var(--muted)]" dateTime={timestamp}>
+            {formattedTimestamp}
+          </time>
         </div>
         <p className="mt-1 text-sm text-[color:var(--foreground)] line-clamp-2">{note}</p>
         <div className="mt-2 flex items-center justify-between">
@@ -59,6 +108,7 @@ export function InspectionModal({ open, onClose, item }) {
   const firstRef = React.useRef(null);
   const lastFocusedRef = React.useRef(null);
   const dialogRef = React.useRef(null);
+  const formattedTimestamp = useFormattedTimestamp(item?.timestamp);
   React.useEffect(() => {
     if (!open) return;
     lastFocusedRef.current = document.activeElement;
@@ -105,7 +155,9 @@ export function InspectionModal({ open, onClose, item }) {
           <header className="flex items-start justify-between gap-3 border-b border-[color:var(--accent)]/30 pb-3">
             <div>
               <h3 id={titleId} className="text-base font-semibold text-[color:var(--foreground)]">Inspection proof</h3>
-              <p id={descId} className="text-xs text-[color:var(--muted)]">Inspector: {inspector} • {formatDate(timestamp)}</p>
+              <p id={descId} className="text-xs text-[color:var(--muted)]">
+                Inspector: {inspector} • {formattedTimestamp}
+              </p>
             </div>
             <button ref={firstRef} onClick={onClose} className="rounded-full p-2 text-[color:var(--muted)] hover:bg-[color:var(--surface-2)] focus:outline-none focus:ring-2 focus:ring-[color:var(--accent)]" aria-label="Close">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-4 w-4"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
@@ -119,7 +171,7 @@ export function InspectionModal({ open, onClose, item }) {
                   <div className="relative h-40 w-full">
                     <ImageWithFallback
                       src={src}
-                      alt={`Inspector checking grain quality with moisture meter.`}
+                      alt="Quality assurance checklist illustration."
                       fill
                       sizes="(max-width: 640px) 45vw, 25vw"
                       quality={65}

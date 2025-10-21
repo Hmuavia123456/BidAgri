@@ -8,10 +8,11 @@ import { getQAForProduct } from "@/data/qa";
 
 function ProductCard({ item, onBid }) {
   const qa = getQAForProduct(item.id);
+  // Increase contrast and clarity for status badge on image
   const statusClasses =
     item.status === "Available"
-      ? "bg-accent/40 text-primary"
-      : "bg-light text-dark/80";
+      ? "bg-primary text-white ring-primary/40"
+      : "bg-secondary text-white ring-secondary/40";
 
   return (
     <article className="overflow-hidden rounded-2xl border border-accent/40 bg-base text-dark shadow-sm">
@@ -28,7 +29,11 @@ function ProductCard({ item, onBid }) {
             quality={75}
             className="object-cover"
           />
-          <span className={`${statusClasses} absolute top-3 right-3 rounded-full px-2.5 py-1 text-xs font-semibold shadow-sm ring-1 ring-accent/40`}>{item.status}</span>
+          <span
+            className={`${statusClasses} absolute top-3 right-3 rounded-full px-3 py-1.5 text-sm font-semibold shadow-sm ring-1 backdrop-blur-sm`}
+          >
+            {item.status}
+          </span>
         </div>
         <div className="p-4 space-y-2 min-h-[150px]">
           <h3 className="text-base font-semibold tracking-tight text-dark md:text-lg">

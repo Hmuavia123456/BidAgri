@@ -3,165 +3,232 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 
-// Two cinematic background clips (per request)
-const CLIPS = [
+const VIDEO_SOURCES = [
   {
-    // First Video (Pixabay)
-    src: "https://cdn.pixabay.com/video/2021/08/10/84624-585553977_large.mp4",
-    label: "Golden field and horizon",
+    id: "field-harvest",
+    sources: [
+      {
+        src: "https://cdn.pixabay.com/video/2021/08/10/84624-585553977_large.mp4",
+        type: "video/mp4",
+      },
+    ],
   },
   {
-    // Second Video (Pexels): download link provided
-    src: "https://www.pexels.com/download/video/4375939/",
-    label: "Tractor cutting grass in the field",
+    id: "tractor-cutting",
+    sources: [
+      {
+        src: "/videos/tractor-cutting.mp4",
+        type: "video/mp4",
+      },
+    ],
   },
 ];
 
-const FADE_S = 1.5; // smooth fade (1.5s)
-const SLIDE_MS = 6500; // 6–7 seconds per clip
-
-function usePrefersReducedMotion() {
-  const [prefersReduced, setPrefersReduced] = useState(false);
-  const mq = useRef(null);
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    mq.current = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const handler = () => setPrefersReduced(mq.current?.matches || false);
-    handler();
-    mq.current?.addEventListener?.("change", handler);
-    return () => mq.current?.removeEventListener?.("change", handler);
-  }, []);
-  return prefersReduced;
-}
+const SWITCH_INTERVAL_MS = 10000;
 
 export default function HeroSection() {
-  const [showFirst, setShowFirst] = useState(true);
-  const reduceMotion = usePrefersReducedMotion();
-  const v1Ref = useRef(null);
-  const v2Ref = useRef(null);
-  // Content should always be visible and animate safely without gating
+  const videoRefs = useRef([]);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [videoReady, setVideoReady] = useState(VIDEO_SOURCES.map(() => false));
+  const readyStateRef = useRef(videoReady);
+
+  const anyClipPlaying = videoReady.some((isReady) => isReady);
 
   useEffect(() => {
-    console.log("Video HeroSection loaded successfully");
-    if (reduceMotion) return; // respect reduced motion
-    const id = setInterval(() => setShowFirst((v) => !v), SLIDE_MS);
-    return () => clearInterval(id);
-  }, [reduceMotion]);
+    const preloadLinks = VIDEO_SOURCES.flatMap((video) =>
+      video.sources
+        .filter((source) => source.src.toLowerCase().endsWith(".mp4"))
+        .map((source) => {
+          const link = document.createElement("link");
+          link.rel = "preload";
+          link.as = "video";
+          link.type = source.type || "video/mp4";
+          link.href = source.src;
+          document.head.appendChild(link);
+          return link;
+        }),
+    );
 
-  // Remove animation gating to prevent content from staying hidden
+    return () => {
+      preloadLinks.forEach((link) => {
+        if (link.parentNode) {
+          link.parentNode.removeChild(link);
+        }
+      });
+    };
+  }, []);
 
-  // Limit playback to the first 9 seconds and loop that segment
-  const handleSegmentTimeUpdate = (videoEl, endSeconds = 9) => {
-    if (!videoEl) return;
-    if (videoEl.currentTime >= endSeconds) {
-      try {
-        videoEl.currentTime = 0;
-        videoEl.play?.();
-      } catch (_) {
-        // ignore autoplay or play promise issues
+  useEffect(() => {
+    readyStateRef.current = videoReady;
+  }, [videoReady]);
+
+  useEffect(() => {
+    const intervalId = window.setInterval(() => {
+      setActiveIndex((prev) => {
+        const readySnapshot = readyStateRef.current;
+        const total = readySnapshot.length;
+        for (let offset = 1; offset <= total; offset += 1) {
+          const candidate = (prev + offset) % total;
+          if (readySnapshot[candidate]) {
+            return candidate;
+          }
+        }
+        return prev;
+      });
+    }, SWITCH_INTERVAL_MS);
+    return () => {
+      window.clearInterval(intervalId);
+    };
+  }, []);
+
+  useEffect(() => {
+    videoRefs.current.forEach((video, index) => {
+      if (!video) return;
+      video.muted = true;
+      video.playsInline = true;
+      video.loop = true;
+      if (index === activeIndex) {
+        try {
+          video.currentTime = 0;
+        } catch (_) {
+          // Ignore seek errors on metadata-less videos.
+        }
       }
+      if (video.paused) {
+        const playPromise = video.play?.();
+        if (playPromise && typeof playPromise.catch === "function") {
+          playPromise.catch(() => {
+            // Autoplay might be deferred until the browser is ready.
+          });
+        }
+      }
+    });
+  }, [activeIndex, videoReady]);
+
+  useEffect(() => {
+    if (videoReady[activeIndex]) return;
+    const firstReady = videoReady.findIndex((ready) => ready);
+    if (firstReady !== -1 && firstReady !== activeIndex) {
+      setActiveIndex(firstReady);
+    }
+  }, [activeIndex, videoReady]);
+
+  const handleVideoLoaded = (index, element) => {
+    setVideoReady((prev) => {
+      if (prev[index]) {
+        return prev;
+      }
+      const next = [...prev];
+      next[index] = true;
+      return next;
+    });
+    const playPromise = element.play?.();
+    if (playPromise && typeof playPromise.catch === "function") {
+      playPromise.catch(() => {
+        // Ignore autoplay rejections; playback resumes once permitted.
+      });
     }
   };
 
   return (
     <section
-      className="relative flex h-screen min-h-screen w-full items-start justify-start overflow-hidden text-[color:var(--surface)]"
+      className="relative flex h-screen min-h-screen w-full items-start justify-center overflow-hidden bg-black text-[color:var(--surface)]"
       aria-label="Cinematic farming videos with overlay"
     >
-      {/* Background video layers */}
-      <div className="absolute inset-0 z-0" aria-hidden="true">
-        <motion.video
-          ref={v1Ref}
-          aria-hidden="true"
-          className="absolute inset-0 h-full w-full object-cover pointer-events-none"
-          initial={false}
-          animate={{ opacity: reduceMotion ? 1 : showFirst ? 1 : 0 }}
-          transition={{ duration: reduceMotion ? 0 : FADE_S, ease: "easeInOut" }}
-          style={{ willChange: "opacity", filter: "brightness(0.9) contrast(1.05)" }}
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="metadata"
-          onLoadedData={() => void 0}
-          onTimeUpdate={(e) => handleSegmentTimeUpdate(e.currentTarget, 9)}
-        >
-          <source src={CLIPS[0].src} type="video/mp4" />
-        </motion.video>
+      <div className="absolute inset-0 z-0 overflow-hidden" aria-hidden="true">
+        {VIDEO_SOURCES.map((video, index) => {
+          const isActive = activeIndex === index;
+          const isReady = videoReady[index];
+          return (
+            <video
+              key={video.id}
+              ref={(el) => {
+                videoRefs.current[index] = el;
+              }}
+              className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-900 ease-in-out ${
+                isActive ? "opacity-100" : "opacity-0"
+              } ${isReady || isActive ? "" : "opacity-0"}`}
+              preload="auto"
+              autoPlay
+              muted
+              loop
+              playsInline
+              onLoadedData={(event) => handleVideoLoaded(index, event.currentTarget)}
+              onCanPlay={(event) => handleVideoLoaded(index, event.currentTarget)}
+              onLoadedMetadata={(event) => handleVideoLoaded(index, event.currentTarget)}
+              onError={(event) => {
+                const videoEl = event.currentTarget;
+                videoEl.removeAttribute("poster");
+                try {
+                  videoEl.load();
+                } catch (_) {
+                  // Ignore load retries; browser will move to the next <source>.
+                }
+              }}
+            >
+              {video.sources.map((source, sourceIdx) => (
+                <source
+                  key={`${video.id}-${sourceIdx}`}
+                  src={source.src}
+                  type={source.type || "video/mp4"}
+                />
+              ))}
+            </video>
+          );
+        })}
 
-        <motion.video
-          ref={v2Ref}
-          aria-hidden="true"
-          className="absolute inset-0 h-full w-full object-cover pointer-events-none"
-          initial={false}
-          animate={{ opacity: reduceMotion ? 0 : showFirst ? 0 : 1 }}
-          transition={{ duration: reduceMotion ? 0 : FADE_S, ease: "easeInOut" }}
-          style={{ willChange: "opacity", filter: "brightness(0.9) contrast(1.05)" }}
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="metadata"
-          onLoadedData={() => void 0}
-          onTimeUpdate={(e) => handleSegmentTimeUpdate(e.currentTarget, 9)}
-        >
-          <source src={CLIPS[1].src} type="video/mp4" />
-        </motion.video>
       </div>
 
-      {/* Subtle dark overlay for text clarity */}
-      <div className="absolute inset-0 z-10 pointer-events-none bg-black/35" aria-hidden="true" />
+      <div className="pointer-events-none absolute inset-0 z-[1] bg-black/25" aria-hidden="true" />
 
-      {/* Overlay content positioned for immediate readability */}
-      <div className="relative z-20 flex h-full w-full max-w-5xl flex-col items-start gap-6 px-5 pt-16 text-left sm:px-6 sm:pt-20 md:pl-10 md:pt-24 lg:px-12">
+      <HeroContent hasLoaded={anyClipPlaying} />
+    </section>
+  );
+}
+
+function HeroContent({ hasLoaded }) {
+  return (
+    <div className="absolute inset-0 z-[2] flex h-full w-full items-center justify-center px-5 py-20 text-center mix-blend-normal sm:px-6 md:px-10 lg:px-12">
+      <div className="mx-auto flex w-full max-w-5xl flex-col items-center gap-6 text-center sm:gap-8">
         <motion.div
-          className="max-w-4xl"
-          initial={reduceMotion ? false : { opacity: 0, y: 30 }}
-          animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
-          transition={reduceMotion ? undefined : { duration: 1 }}
+          className="w-full max-w-4xl"
+          initial={{ opacity: 0, y: 30 }}
+          animate={hasLoaded ? { opacity: 1, y: 0 } : { opacity: 0.85, y: 0 }}
+          transition={{ duration: 0.9 }}
         >
-          <h1 className="text-balance text-4xl font-extrabold leading-tight tracking-tight text-amber-100 drop-shadow-[0_3px_8px_rgba(0,0,0,0.7)] md:text-6xl">
-            Empowering Farmers, Connecting Buyers — Fair, Fast, Transparent.
+          <h1
+            className="relative z-[2] text-balance text-center text-3xl font-extrabold leading-snug tracking-tight text-white drop-shadow-[0_6px_18px_rgba(0,0,0,1)] sm:text-4xl md:text-6xl md:leading-tight"
+            style={{ color: "#ffffff" }}
+          >
+            Convey trust, transparency, and opportunity.
           </h1>
         </motion.div>
 
         <motion.div
-          initial={reduceMotion ? false : { opacity: 0, y: 30 }}
-          animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
-          transition={reduceMotion ? undefined : { duration: 1, delay: 0.3 }}
+          initial={{ opacity: 0, y: 26 }}
+          animate={hasLoaded ? { opacity: 1, y: 0 } : { opacity: 0.85, y: 0 }}
+          transition={{ duration: 0.9, delay: 0.2 }}
         >
-          <p className="max-w-3xl text-sm font-light text-[color:var(--surface)] sm:text-base md:text-lg">
-            Bridging the Gap Between Farmers and Buyers — building transparent connections rooted in trust and opportunity.
+          <p className="relative z-[2] mx-auto mt-4 w-full max-w-3xl text-center text-base font-medium tracking-wide text-white drop-shadow-[0_6px_18px_rgba(0,0,0,1)] sm:text-lg md:text-xl">
+            Bridging fields and markets with fairness and hope.
           </p>
         </motion.div>
 
-        <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
+        <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-4">
           <motion.div
-            initial={reduceMotion ? false : { opacity: 0, scale: 0.9 }}
-            animate={reduceMotion ? undefined : { opacity: 1, scale: 1 }}
-            transition={reduceMotion ? undefined : { duration: 1, delay: 0.6 }}
+            initial={{ opacity: 0, scale: 0.92 }}
+            animate={hasLoaded ? { opacity: 1, scale: 1 } : { opacity: 0.85, scale: 1 }}
+            transition={{ duration: 0.9, delay: 0.5 }}
           >
             <a
-              href="#products"
-              className="inline-flex items-center justify-center rounded-full bg-primary px-8 py-3 text-base font-semibold text-white shadow-md shadow-primary/30 transition-all duration-200 ease-out hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 focus-visible:ring-offset-base"
+              href="/products"
+              className="inline-flex min-w-[11rem] items-center justify-center rounded-full bg-primary px-10 py-3 text-base font-semibold text-white shadow-md shadow-primary/30 transition-all duration-200 ease-out hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 focus-visible:ring-offset-base"
             >
               Explore Products
             </a>
           </motion.div>
-          <motion.div
-            initial={reduceMotion ? false : { opacity: 0, scale: 0.97 }}
-            animate={reduceMotion ? undefined : { opacity: 1, scale: 1 }}
-            transition={reduceMotion ? undefined : { duration: 0.6, ease: "easeInOut", delay: 0.6 }}
-          >
-            <a
-              href="/buyers#register"
-              className="inline-flex items-center justify-center rounded-full bg-accent px-8 py-3 text-base font-semibold text-dark shadow-md shadow-primary/20 transition-all duration-200 ease-out hover:bg-secondary hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 focus-visible:ring-offset-base"
-            >
-              Get Started
-            </a>
-          </motion.div>
         </div>
       </div>
-    </section>
+    </div>
   );
 }

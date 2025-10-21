@@ -31,8 +31,8 @@ export default function RootLayout({ children }) {
         {/* Global site header */}
         <Navbar />
 
-        {/* Offset for fixed Navbar height so content isn't hidden */}
-        <main id="main-content" role="main" className="flex-1 px-0 pb-0 pt-20" tabIndex={-1}>
+        {/* Offset for navbar height so content isn't hidden */}
+        <main id="main-content" role="main" className="flex-1 px-0 pb-0 pt-[72px]" tabIndex={-1}>
           {children}
         </main>
 

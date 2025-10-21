@@ -1,8 +1,9 @@
 "use client";
 
 import ProductCard from "@/components/ProductCard";
-import { useMemo, useState, useEffect, useCallback, memo, useRef } from "react";
+import { useMemo, useState, useEffect, useCallback, useRef } from "react";
 import { usePathname } from "next/navigation";
+import Link from "next/link";
 import FiltersSidebar from "@/components/FiltersSidebar";
 import MobileFilterSheet from "@/components/MobileFilterSheet";
 import StickyFilterBar from "@/components/StickyFilterBar";
@@ -15,9 +16,9 @@ import BidModal from "@/components/BidModal";
 
 import { PRODUCTS } from "@/data/products";
 import ProductList from "@/components/ProductList";
-import styles from "./ProductLayout.module.css";
 
-const CATEGORY_NAMES = getCategories().map((c) => c.name);
+const CATEGORY_DATA = getCategories();
+const CATEGORY_NAMES = CATEGORY_DATA.map((c) => c.name);
 const categoryOptions = ["All", ...CATEGORY_NAMES];
 const sortOptions = [
   { value: "Newest", label: "Newest" },
@@ -140,6 +141,21 @@ export default function ProductCatalog() {
       });
     }
   }, [pathname, setFilters]);
+
+  const pathSegments = useMemo(
+    () => (pathname || "").split("/").filter(Boolean),
+    [pathname]
+  );
+  const activeCategorySlug = pathSegments[1] || "";
+  const activeSubcategorySlug = pathSegments[2] || "";
+
+  const categoryTotals = useMemo(() => {
+    return baseItems.reduce((acc, product) => {
+      acc[product.category] = (acc[product.category] || 0) + 1;
+      return acc;
+    }, {});
+  }, [baseItems]);
+
   const handleApply = useCallback(() => {
     applyFilters({});
   }, [applyFilters]);
@@ -230,11 +246,65 @@ export default function ProductCatalog() {
         }}
       />
 
-      {/* Stable two-column layout using CSS module to prevent overlap */}
-      <div className={`mt-6 ${styles.productPage}`}>
-        {/* Sidebar: sticky within layout; not absolute. Hidden on small screens. */}
-        <div className="hidden md:block">
-          <div className={styles.filters}>
+      <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-[320px_minmax(0,1fr)] md:items-start xl:gap-8">
+        <aside className="hidden md:block">
+          <div className="sticky top-32 space-y-6">
+            <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+              <h2 className="text-lg font-semibold text-[color:var(--primary)]">
+                Categories
+              </h2>
+              <ul className="mt-4 space-y-2 text-gray-800">
+                {CATEGORY_DATA.map((cat) => {
+                  const isActiveCat = activeCategorySlug === cat.slug;
+                  return (
+                    <li key={cat.slug}>
+                      <Link
+                        href={`/products/${cat.slug}`}
+                        prefetch
+                        className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-secondary ${
+                          isActiveCat
+                            ? "bg-[color:var(--surface-2)] text-[color:var(--primary)] shadow-sm"
+                            : "text-gray-800 hover:bg-[color:var(--surface-2)]"
+                        }`}
+                        aria-current={isActiveCat ? "page" : undefined}
+                      >
+                        <span>{cat.name}</span>
+                        <span className="text-xs text-gray-500">
+                          {categoryTotals[cat.name] ?? 0}
+                        </span>
+                      </Link>
+                      {isActiveCat && (cat.subcategories?.length ?? 0) > 0 && (
+                        <ul className="mt-2 space-y-1 border-l border-gray-200 pl-3">
+                          {cat.subcategories.map((sub) => {
+                            const isActiveSub =
+                              activeSubcategorySlug === sub.slug;
+                            return (
+                              <li key={sub.slug}>
+                                <Link
+                                  href={`/products/${cat.slug}/${sub.slug}`}
+                                  prefetch
+                                  className={`flex w-full items-center justify-between rounded-md px-3 py-1.5 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-secondary ${
+                                    isActiveSub
+                                      ? "bg-[color:var(--surface-2)] text-[color:var(--primary)]"
+                                      : "text-gray-700 hover:bg-[color:var(--surface-2)]"
+                                  }`}
+                                  aria-current={
+                                    isActiveSub ? "page" : undefined
+                                  }
+                                >
+                                  <span>{sub.name}</span>
+                                </Link>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+
             <FiltersSidebar
               filters={filters}
               setFilters={setFilters}
@@ -243,12 +313,14 @@ export default function ProductCatalog() {
               products={baseItems}
             />
           </div>
-        </div>
-        {/* Products column: grid via CSS module; ensure minimum height */}
-        <div className="min-h-[320px] flex-1">
+        </aside>
+
+        <div className="min-h-[320px]">
           {filteredItems.length === 0 ? (
             <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-[color:var(--surface-2)] bg-[color:var(--surface)]/60 p-10 text-center">
-              <p className="text-base font-semibold text-[color:var(--foreground)]">No matches found</p>
+              <p className="text-base font-semibold text-[color:var(--foreground)]">
+                No matches found
+              </p>
               <p className="mt-1 text-sm text-[color:var(--muted)]">
                 Try adjusting your search or filters to see available produce.
               </p>
@@ -261,17 +333,15 @@ export default function ProductCatalog() {
               </button>
             </div>
           ) : (
-            <div className={styles.productsGrid}>
-              <ProductList
-                items={filteredItems}
-                pageSize={9}
-                resetKey={queryString}
-                renderItem={(product) => (
-                  <ProductCard item={product} onBid={handleOpenBid} />
-                )}
-                getItemId={(item) => item.id}
-              />
-            </div>
+            <ProductList
+              items={filteredItems}
+              pageSize={9}
+              resetKey={queryString}
+              renderItem={(product) => (
+                <ProductCard item={product} onBid={handleOpenBid} />
+              )}
+              getItemId={(item) => item.id}
+            />
           )}
         </div>
       </div>

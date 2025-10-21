@@ -1,15 +1,31 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import BidModal from "@/components/BidModal";
 
-export default function ProductDetailActions({ product }) {
+export default function ProductDetailActions({ product, onModalToggle }) {
   const [open, setOpen] = useState(false);
 
   if (!product) {
     return null;
   }
+
+  useEffect(() => {
+    onModalToggle?.(open);
+    if (typeof document !== "undefined") {
+      const overlay = document.querySelector("[data-hero-overlay]");
+      overlay?.setAttribute("data-state", open ? "hidden" : "visible");
+    }
+    return () => {
+      if (typeof document !== "undefined") {
+        const overlay = document.querySelector("[data-hero-overlay]");
+        overlay?.setAttribute("data-state", "visible");
+      }
+    };
+  }, [open, onModalToggle]);
+
+  const handleClose = () => setOpen(false);
 
   return (
     <div className="flex items-center gap-3 pt-2">
@@ -23,7 +39,7 @@ export default function ProductDetailActions({ product }) {
       <a href="/products" className="text-primary transition-colors hover:text-secondary">
         Back to Products
       </a>
-      <BidModal open={open} onClose={() => setOpen(false)} item={product} />
+      <BidModal open={open} onClose={handleClose} item={product} />
     </div>
   );
 }

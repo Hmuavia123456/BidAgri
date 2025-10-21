@@ -23,14 +23,14 @@ export default function ProductsPage() {
           <p className="mt-4 text-base text-[color:var(--muted)] md:text-lg">
             Explore upcoming listings and prepare for bids as we build out the full catalog experience.
           </p>
-          <div className="mt-4 flex flex-wrap gap-2">
+          <div className="mt-4 flex flex-wrap gap-3">
             {categories.slice(0, 6).flatMap((cat) =>
               (cat.subcategories || []).slice(0, 2).map((sub) => (
                 <Link
                   key={`${cat.slug}-${sub.slug}`}
                   href={`/products/${cat.slug}/${sub.slug}`}
                   prefetch
-                  className="inline-flex items-center gap-2 rounded-full bg-[color:var(--surface-2)] px-3 py-1.5 text-sm text-[color:var(--leaf)] ring-1 ring-[color:var(--surface-2)] hover:bg-[color:var(--surface-2)] focus:outline-none focus:ring-2 focus:ring-[color:var(--leaf)]"
+                  className="inline-flex items-center justify-center rounded-full bg-primary px-5 py-2 text-sm font-semibold text-white shadow-md transition-all duration-300 hover:bg-secondary hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 focus-visible:ring-offset-white md:text-base"
                 >
                   {cat.name}: {sub.name}
                 </Link>

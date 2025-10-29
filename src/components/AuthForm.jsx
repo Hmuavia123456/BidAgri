@@ -7,8 +7,10 @@ import { auth } from "@/lib/firebase";
 import { getAllowedAdmins } from "@/lib/adminEmails";
 import { getUserProfile, upsertUserProfile } from "@/lib/userProfile";
 import {
+  GoogleAuthProvider,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  signInWithPopup,
   updateProfile,
 } from "firebase/auth";
 
@@ -45,6 +47,62 @@ export default function AuthForm({ mode = "login", onSuccess, selectedRole, onPr
   }, [email, password, name, isSignup]);
 
   const isValid = Object.keys(errors).length === 0;
+
+  const handleGoogleSignIn = async () => {
+    setError("");
+    setTouched({});
+    setSubmitting(true);
+    try {
+      const provider = new GoogleAuthProvider();
+      provider.setCustomParameters({ prompt: "select_account" });
+      const credential = await signInWithPopup(auth, provider);
+      const { user } = credential;
+      const emailSource = user.email || email || "";
+      const emailLower = emailSource.toLowerCase();
+      const displayName =
+        user.displayName || name.trim() || emailLower.split("@")[0] || "";
+
+      const resolvedRole = allowedAdmins.includes(emailLower)
+        ? "admin"
+        : selectedRole || "buyer";
+
+      const profile = await upsertUserProfile({
+        uid: user.uid,
+        email: emailLower,
+        displayName,
+        role: resolvedRole,
+        photoURL: user.photoURL ?? "",
+        phoneNumber: user.phoneNumber ?? "",
+      });
+
+      onProfile?.(profile);
+      onSuccess?.({
+        uid: user.uid,
+        email: user.email,
+        name: displayName,
+        role: profile?.role || resolvedRole,
+        mode: "google",
+      });
+    } catch (err) {
+      const code = err?.code || "";
+      const message = (() => {
+        switch (code) {
+          case "auth/popup-blocked":
+          case "auth/cancelled-popup-request":
+            return "Browser blocked the Google popup. Please allow popups and try again.";
+          case "auth/popup-closed-by-user":
+            return "Google sign-in popup was closed before completing.";
+          case "auth/account-exists-with-different-credential":
+            return "This email is already linked with a different sign-in method.";
+          default:
+            return err?.message || "Google sign-in failed. Please try again.";
+        }
+      })();
+      setError(message);
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -245,6 +303,44 @@ export default function AuthForm({ mode = "login", onSuccess, selectedRole, onPr
         className="inline-flex w-full items-center justify-center rounded-full bg-[color:var(--leaf)] px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-[rgba(var(--leaf-rgb),0.28)] transition-colors duration-200 hover:bg-[color:var(--secondary)] focus:outline-none focus:ring-2 focus:ring-[color:var(--secondary)] focus:ring-offset-2 focus:ring-offset-white disabled:cursor-not-allowed disabled:opacity-60"
       >
         {submitting ? "Please wait…" : isSignup ? "Create Account" : "Sign In"}
+      </button>
+
+      <div className="flex items-center gap-3 text-[10px] font-semibold uppercase tracking-[0.35em] text-[color:var(--muted)]">
+        <span aria-hidden className="h-px flex-1 bg-[rgba(var(--leaf-rgb),0.2)]" />
+        <span>Or continue with</span>
+        <span aria-hidden className="h-px flex-1 bg-[rgba(var(--leaf-rgb),0.2)]" />
+      </div>
+
+      <button
+        type="button"
+        onClick={handleGoogleSignIn}
+        disabled={submitting}
+        className="inline-flex w-full items-center justify-center gap-3 rounded-full border border-[rgba(var(--leaf-rgb),0.25)] bg-white px-5 py-2.5 text-sm font-semibold text-[color:var(--foreground)] shadow-sm transition-colors duration-200 hover:border-[color:var(--leaf)] hover:text-[color:var(--leaf)] focus:outline-none focus:ring-2 focus:ring-[color:var(--secondary)] focus:ring-offset-2 focus:ring-offset-white disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        <svg
+          aria-hidden="true"
+          focusable="false"
+          className="h-4 w-4"
+          viewBox="0 0 24 24"
+        >
+          <path
+            fill="#EA4335"
+            d="M12 10.14v3.72h5.26c-.22 1.2-.89 2.21-1.9 2.89l3.07 2.38c1.79-1.65 2.83-4.08 2.83-6.95 0-.67-.06-1.31-.18-1.94H12z"
+          />
+          <path
+            fill="#34A853"
+            d="M6.56 14.56l-.86.66-2.45 1.9C4.68 19.97 8.08 22 12 22c2.7 0 4.96-.9 6.61-2.41l-3.07-2.38c-.83.56-1.89.9-3.54.9-2.72 0-5.03-1.83-5.85-4.35z"
+          />
+          <path
+            fill="#4A90E2"
+            d="M3.25 7.56A9.95 9.95 0 0 0 2 12c0 1.62.39 3.15 1.07 4.5l3.49-2.72c-.21-.63-.33-1.31-.33-2.01s.12-1.38.33-2.01z"
+          />
+          <path
+            fill="#FBBC05"
+            d="M12 4.75c1.47 0 2.47.64 3.05 1.17l2.23-2.18C16.95 2.42 14.7 1.5 12 1.5 8.08 1.5 4.68 3.53 3.25 7.56l3.49 2.72C7.97 7.76 9.28 4.75 12 4.75z"
+          />
+        </svg>
+        <span>Continue with Google</span>
       </button>
 
       <div className="flex items-center justify-center gap-2 text-xs text-[color:var(--muted)]">

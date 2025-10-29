@@ -209,7 +209,7 @@ function HeroContent({ hasLoaded }) {
           animate={hasLoaded ? { opacity: 1, y: 0 } : { opacity: 0.85, y: 0 }}
           transition={{ duration: 0.9, delay: 0.2 }}
         >
-          <p className="relative z-[2] mx-auto mt-4 w-full max-w-3xl text-center text-base font-medium tracking-wide text-white drop-shadow-[0_6px_18px_rgba(0,0,0,1)] sm:text-lg md:text-xl">
+          <p className="relative z-[2] mx-auto mt-4 w-full max-w-3xl text-center text-base font-medium tracking-wide !text-white drop-shadow-[0_6px_18px_rgba(0,0,0,1)] sm:text-lg md:text-xl">
             Bridging fields and markets with fairness and hope.
           </p>
         </motion.div>

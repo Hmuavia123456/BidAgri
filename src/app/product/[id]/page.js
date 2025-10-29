@@ -12,14 +12,46 @@ import QABadge from "@/components/QABadge";
 import DeliveryStepper from "@/components/DeliveryStepper";
 import { getQAForProduct } from "@/data/qa";
 import InspectionHistory from "@/components/InspectionHistory";
-import { PRODUCTS } from "@/data/products";
+import { adminDb } from "@/lib/firebaseAdmin";
+import { Timestamp } from "firebase-admin/firestore";
 
-export async function generateStaticParams() {
-  return PRODUCTS.map((product) => ({ id: product.id }));
+const DEFAULT_IMAGE = "https://images.unsplash.com/photo-1582515073490-dc0c84f0ca04?q=80&w=1200&auto=format&fit=crop";
+
+function toIso(value) {
+  return value instanceof Timestamp ? value.toDate().toISOString() : null;
 }
 
-export function generateMetadata({ params }) {
-  const product = PRODUCTS.find((item) => item.id === params.id);
+function transformProductDoc(docSnap) {
+  const data = docSnap.data() ?? {};
+  return {
+    id: docSnap.id,
+    ...data,
+    createdAt: toIso(data.createdAt),
+    updatedAt: toIso(data.updatedAt),
+    publishedAt: toIso(data.publishedAt),
+  };
+}
+
+async function getProductById(id) {
+  if (!id) return null;
+  const ref = adminDb.collection("products").doc(id);
+  const snap = await ref.get();
+  if (!snap.exists) return null;
+  return transformProductDoc(snap);
+}
+
+async function getRelatedProducts(excludeId) {
+  const snapshot = await adminDb
+    .collection("products")
+    .orderBy("createdAt", "desc")
+    .limit(6)
+    .get();
+  return snapshot.docs.map(transformProductDoc).filter((product) => product.id !== excludeId).slice(0, 4);
+}
+
+export async function generateMetadata(props) {
+  const params = await props.params;
+  const product = await getProductById(params.id);
 
   if (!product) {
     return {
@@ -28,60 +60,133 @@ export function generateMetadata({ params }) {
     };
   }
 
-  const url = `https://bidagri.example/product/${product.id}`; // placeholder domain
+  const url = `https://bidagri.example/product/${product.id}`;
   return {
-    title: `${product.title} | BidAgri` ,
-    description: `${product.title} from ${product.location} — ${product.category} on BidAgri.`,
+    title: `${product.title} | BidAgri`,
+    description: `${product.title} from ${product.location || "Location pending"} — ${product.category || "Farmer listings"} on BidAgri.`,
     openGraph: {
       title: `${product.title} | BidAgri`,
-      description: `${product.title} from ${product.location} — ${product.category} on BidAgri.`,
+      description: `${product.title} from ${product.location || "Location pending"} — ${product.category || "Farmer listings"} on BidAgri.`,
       url,
-      images: [{ url: product.image }],
+      images: [{ url: product.image || DEFAULT_IMAGE }],
       type: "article",
     },
     twitter: {
       card: "summary_large_image",
       title: `${product.title} | BidAgri`,
-      description: `${product.title} from ${product.location} — ${product.category} on BidAgri.`,
-      images: [product.image],
+      description: `${product.title} from ${product.location || "Location pending"} — ${product.category || "Farmer listings"} on BidAgri.`,
+      images: [product.image || DEFAULT_IMAGE],
     },
   };
 }
 
-export default function ProductDetailPage({ params }) {
-  const product = PRODUCTS.find((item) => item.id === params.id);
+export default async function ProductDetailPage(props) {
+  const params = await props.params;
+  const product = await getProductById(params.id);
 
   if (!product) {
     notFound();
   }
 
-  const related = PRODUCTS.filter(
-    (item) => item.category === product.category && item.id !== product.id
-  ).slice(0, 4);
-
+  const related = await getRelatedProducts(product.id);
   const qa = getQAForProduct(product.id);
+
+  const galleryEntries = Array.isArray(product.gallery) ? product.gallery : [];
+  const galleryUrls = galleryEntries
+    .map((photo) => photo?.url || photo?.publicUrl)
+    .filter((value) => typeof value === "string" && value.length > 0);
+  const provideHeroImage = () => {
+    const candidates = [
+      galleryUrls[0],
+      product.image,
+      product.documents?.farmProof?.url,
+      product.documents?.farmProof?.publicUrl,
+      product.imgUrl,
+      DEFAULT_IMAGE,
+    ];
+    const chosen = candidates.find((value) => typeof value === "string" && value.startsWith("http"));
+    return chosen || DEFAULT_IMAGE;
+  };
+  const heroImage = provideHeroImage();
+  const galleryImages = galleryUrls.length
+    ? galleryUrls.map((url, index) => ({ url, name: `${product.title} ${index + 1}` }))
+    : product.image
+    ? [{ url: product.image, name: product.title }]
+    : [];
+
+  const pricePerKg = Number(product.pricePerKg ?? 0);
+  const priceDisplay = pricePerKg > 0 ? `Rs ${pricePerKg.toLocaleString()}` : "Price on request";
+  const locationDisplay = product.location || "Location pending";
+  const statusDisplay = product.status || "Pending review";
+  const bidsCount = Number(product.bidsCount || 0);
+  const highestBidValue = Number(product.highestBid || 0);
+  const highestBidDisplay = highestBidValue > 0 ? `Rs ${highestBidValue.toLocaleString()}` : "No bids yet";
+  const bidsCaption =
+    highestBidValue > 0 ? `${bidsCount} bid${bidsCount === 1 ? "" : "s"} placed` : "Be the first to bid";
+  const statusHighlight =
+    statusDisplay === "Available"
+      ? {
+          badge: "bg-[rgba(var(--leaf-rgb),0.15)] text-[color:var(--leaf)]",
+        }
+      : statusDisplay === "In Bidding"
+      ? {
+          badge: "bg-[rgba(var(--accent-rgb),0.24)] !text-black",
+        }
+      : null;
+  const detailStatusClass = statusHighlight
+    ? `inline-flex items-center gap-1 rounded-full px-3 py-1 text-sm font-semibold ${statusHighlight.badge}`
+    : "font-semibold text-[color:var(--foreground)]";
+
+  const highlightToneClass = (tone) => {
+    switch (tone) {
+      case "accent":
+        return "bg-gradient-to-br from-white via-[rgba(var(--accent-rgb),0.05)] to-white border-[rgba(var(--accent-rgb),0.32)]";
+      case "leaf":
+        return "bg-gradient-to-br from-white via-[rgba(var(--leaf-rgb),0.06)] to-white border-[rgba(var(--leaf-rgb),0.26)]";
+      default:
+        return "bg-gradient-to-br from-white via-[rgba(var(--leaf-rgb),0.04)] to-white border-[rgba(var(--leaf-rgb),0.18)]";
+    }
+  };
+  const subtleTextClass = "!text-black";
 
   const primaryHighlights = [
     {
       label: "Price per kg",
-      value: `Rs ${product.pricePerKg}`,
+      value: priceDisplay,
       caption: "Farmer listed reserve price",
+      tone: "leaf",
+    },
+    {
+      label: "Highest bid",
+      value: highestBidDisplay,
+      caption: bidsCaption,
+      tone: highestBidValue > 0 ? "accent" : "neutral",
+      highlight: highestBidValue > 0 ? statusHighlight : null,
     },
     {
       label: "Location",
-      value: product.location,
+      value: locationDisplay,
       caption: "Direct farm pickup & partner logistics",
+      tone: "neutral",
     },
     {
       label: "Availability",
-      value: product.status,
-      caption: product.status === "Available" ? "Ready for shipment" : "Live auction in progress",
-      accent: product.status === "Available" ? "text-[color:var(--leaf)]" : "text-[color:var(--foreground)]",
+      value: statusDisplay,
+      caption:
+        statusDisplay === "Available"
+          ? "Ready for shipment"
+          : statusDisplay === "In Bidding"
+          ? "Live auction in progress"
+          : "Pending review",
+      highlight: statusHighlight,
+      tone:
+        statusDisplay === "In Bidding" ? "accent" : statusDisplay === "Available" ? "leaf" : "neutral",
     },
     {
       label: "Quality grade",
       value: qa.grade,
       caption: qa.verified ? "Verified by BidAgri QA team" : "Awaiting verification",
+      tone: qa.verified ? "leaf" : "neutral",
     },
   ];
 
@@ -100,148 +205,237 @@ export default function ProductDetailPage({ params }) {
     },
   ];
 
-  return (
-    <section className="relative min-h-screen bg-white pb-20 pt-24">
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-64 bg-gradient-to-b from-[rgba(var(--leaf-rgb),0.12)] via-white to-white" aria-hidden="true" />
+  const deliveryWindow = qa.delivery?.eta || product.deliveryWindow || "Dispatch in 48h";
+  const summaryBullets = [
+    {
+      title: qa.verified ? "QA verified" : "QA review pending",
+      subtitle: qa.verified
+        ? "Quality checks cleared by BidAgri inspectors."
+        : "Our QA team reviews each lot before release.",
+      tone: qa.verified ? "leaf" : "neutral",
+    },
+    {
+      title: bidsCount > 0 ? `${bidsCount} active bid${bidsCount === 1 ? "" : "s"}` : "Open for bids",
+      subtitle:
+        highestBidValue > 0
+          ? `Top offer currently at ${highestBidDisplay}/kg.`
+          : "Place the first offer to unlock negotiations.",
+      tone: "accent",
+    },
+    {
+      title: "Logistics ready",
+      subtitle: deliveryWindow,
+      tone: "leaf",
+    },
+  ];
 
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-4 md:px-8">
-        <nav aria-label="Breadcrumb" className="flex items-center gap-3">
+  return (
+    <section className="bg-gradient-to-b from-white via-[rgba(var(--leaf-rgb),0.05)] to-white pb-20 pt-24">
+      <div className="mx-auto max-w-6xl space-y-12 px-4 sm:px-6 lg:px-8">
+        <nav
+          aria-label="Breadcrumb"
+          className="flex flex-wrap items-center gap-2 text-sm text-[color:var(--muted)] sm:gap-3 sm:text-base"
+        >
           <Link
             href="/products"
-            className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[color:var(--leaf)] shadow-[0_8px_24px_rgba(15,23,42,0.12)] transition-colors hover:bg-[rgba(var(--leaf-rgb),0.08)] hover:text-[color:var(--secondary)]"
+            className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 font-semibold text-[color:var(--leaf)] shadow-[0_10px_22px_rgba(15,23,42,0.12)] transition hover:bg-[rgba(var(--leaf-rgb),0.12)] hover:text-[color:var(--secondary)]"
           >
             Products
           </Link>
-          <span aria-hidden className="text-sm text-[color:var(--muted)]">›</span>
-          <span className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[color:var(--foreground)] shadow-[0_8px_24px_rgba(15,23,42,0.12)]">
+          <span aria-hidden className="text-[color:var(--muted)]">/</span>
+          <span className="max-w-full truncate font-semibold text-[color:var(--foreground)]" title={product.title}>
             {product.title}
           </span>
         </nav>
 
-        <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr]">
+        <div className="grid gap-8 lg:grid-cols-[1.35fr_1fr] lg:items-start">
           <div className="space-y-8">
-            <div className="group relative overflow-hidden rounded-[32px] border border-[rgba(var(--leaf-rgb),0.18)] bg-white shadow-xl shadow-[rgba(var(--leaf-rgb),0.12)]">
-              <ProductHeroImage src={product.image || product.imgUrl} alt={product.title} />
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" aria-hidden="true" />
-              <div className="absolute inset-x-0 bottom-0 z-[2] p-6 sm:p-8">
-                <div
-                  data-hero-overlay
-                  className="flex flex-col gap-2 rounded-2xl bg-white/10 px-6 py-5 text-white shadow-lg shadow-black/20 ring-1 ring-white/20 backdrop-blur-sm transition-all duration-300 data-[state=hidden]:pointer-events-none data-[state=hidden]:translate-y-2 data-[state=hidden]:opacity-0"
-                >
-                  <div className="flex flex-wrap items-center gap-3 text-xs uppercase tracking-[0.35em] text-white/90">
-                    <span className="rounded-full bg-white/20 px-3 py-1">{product.category}</span>
-                    <span className="rounded-full bg-white/20 px-3 py-1">{product.status}</span>
-                    <QABadge grade={qa.grade} verified={qa.verified} className="text-white bg-white/20 ring-white/20" />
-                  </div>
-                  <h1 className="mt-3 text-balance text-3xl font-semibold leading-tight text-white drop-shadow-[0_8px_24px_rgba(0,0,0,0.55)] sm:text-4xl md:text-5xl">
-                    {product.title}
-                  </h1>
-                  <p className="mt-2 max-w-2xl text-sm leading-relaxed text-white/90 sm:text-base">
-                    Fresh lot curated by BidAgri specialists. Transparent quality metrics and delivery commitments included below.
-                  </p>
-                </div>
+            <div className="overflow-hidden rounded-3xl border border-[rgba(var(--leaf-rgb),0.16)] bg-white shadow-[0_20px_36px_rgba(15,23,42,0.12)]">
+              <ProductHeroImage src={heroImage} alt={product.title} />
+              <div className="space-y-3 border-t border-[rgba(var(--leaf-rgb),0.12)] px-6 py-6 sm:px-8">
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[color:var(--leaf)]">
+                  {product.category || "Farmer listings"}
+                </p>
+                <h1 className="text-3xl font-semibold text-[color:var(--foreground)] sm:text-4xl md:text-5xl">
+                  {product.title}
+                </h1>
+                <p className={`max-w-3xl text-sm leading-relaxed ${subtleTextClass} sm:text-base`}>
+                  Fresh lot curated by BidAgri specialists. Transparent quality metrics and delivery commitments included below.
+                </p>
               </div>
             </div>
 
-            <div className="grid gap-4 sm:grid-cols-2">
-              {primaryHighlights.map(({ label, value, caption, accent }) => (
+            {galleryImages.length > 1 && (
+              <div className="rounded-3xl border border-[rgba(var(--leaf-rgb),0.14)] bg-white p-6 shadow-[0_16px_32px_rgba(15,23,42,0.08)] sm:p-8">
+                <h2 className="text-lg font-semibold text-[color:var(--foreground)]">Lot gallery</h2>
+                <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                  {galleryImages.map((item, index) => {
+                    const url = item?.url || item;
+                    if (!url) return null;
+                    return (
+                      <div
+                        key={`${url}-${index}`}
+                        className="overflow-hidden rounded-2xl border border-[rgba(var(--leaf-rgb),0.12)] bg-white shadow-sm shadow-[rgba(15,23,42,0.08)]"
+                      >
+                        <ImageWithFallback
+                          src={url}
+                          alt={`${product.title} photo ${index + 1}`}
+                          width={600}
+                          height={420}
+                          quality={80}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            <div className="rounded-3xl border border-[rgba(var(--accent-rgb),0.16)] bg-white p-6 shadow-[0_20px_36px_rgba(var(--accent-rgb),0.15)] sm:p-8">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="max-w-2xl">
+                  <h2 className="text-lg font-semibold text-[color:var(--foreground)]">Lot snapshot</h2>
+                  <p className={`mt-2 text-sm ${subtleTextClass} sm:text-base`}>
+                    Bid-ready produce with transparent QA, logistics, and payment protection. Review the quick summary or jump straight into bidding.
+                  </p>
+                </div>
+              </div>
+              <div className="mt-6 grid gap-4 sm:grid-cols-3">
+                {summaryBullets.map((item) => {
+                  const toneClass =
+                    item.tone === "leaf"
+                      ? "bg-[rgba(var(--leaf-rgb),0.12)]"
+                      : item.tone === "accent"
+                      ? "bg-[rgba(var(--accent-rgb),0.12)]"
+                      : "bg-white";
+                  return (
+                    <div
+                      key={item.title}
+                      className={`rounded-2xl border border-[rgba(var(--leaf-rgb),0.12)] p-4 text-sm text-[color:var(--foreground)] shadow-sm shadow-[rgba(15,23,42,0.08)] ${toneClass}`}
+                    >
+                      <p className="font-semibold">{item.title}</p>
+                      <p className={`mt-1 text-xs ${subtleTextClass}`}>{item.subtitle}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              {primaryHighlights.map(({ label, value, caption, highlight, tone }) => (
                 <div
                   key={label}
-                  className="rounded-3xl border border-[rgba(var(--leaf-rgb),0.2)] bg-white/90 p-5 shadow-sm shadow-[rgba(var(--leaf-rgb),0.08)] transition-transform duration-300 hover:-translate-y-1 hover:shadow-lg"
+                  className={`rounded-3xl border p-5 shadow-[0_18px_32px_rgba(15,23,42,0.08)] ${highlightToneClass(tone)}`}
                 >
-                  <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[color:var(--muted)]">
-                    {label}
-                  </p>
-                  <p className={`mt-2 text-2xl font-bold text-[color:var(--foreground)] ${accent || ""}`}>
-                    {value}
-                  </p>
-                  <p className="mt-2 text-sm leading-relaxed text-[color:var(--muted)]">
-                    {caption}
-                  </p>
+                  <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[color:var(--muted)]">{label}</p>
+                  {highlight ? (
+                    <p className="mt-3 text-2xl font-bold text-[color:var(--foreground)]">
+                      <span className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-base font-semibold ${highlight.badge}`}>
+                        {value}
+                      </span>
+                    </p>
+                  ) : (
+                    <p className="mt-3 text-2xl font-bold text-[color:var(--foreground)]">{value}</p>
+                  )}
+                  <p className={`mt-2 text-sm leading-relaxed ${subtleTextClass}`}>{caption}</p>
                 </div>
               ))}
             </div>
 
-            <div className="rounded-[28px] border border-[rgba(var(--leaf-rgb),0.18)] bg-white/95 p-6 shadow-sm shadow-[rgba(var(--leaf-rgb),0.1)]">
+            <div className="rounded-3xl border border-[rgba(var(--leaf-rgb),0.12)] bg-white p-6 shadow-[0_18px_34px_rgba(15,23,42,0.08)] sm:p-8">
               <h2 className="text-lg font-semibold text-[color:var(--foreground)]">Why growers love this listing</h2>
               <ul className="mt-4 grid gap-4 sm:grid-cols-3">
                 {sellingPoints.map((point) => (
-                  <li key={point.title} className="rounded-2xl bg-[rgba(var(--leaf-rgb),0.05)] p-4 ring-1 ring-[rgba(var(--leaf-rgb),0.12)]">
+                  <li key={point.title} className="rounded-2xl border border-[rgba(var(--leaf-rgb),0.12)] bg-white/90 p-4 shadow-sm shadow-[rgba(15,23,42,0.08)]">
                     <p className="text-sm font-semibold text-[color:var(--foreground)]">{point.title}</p>
-                    <p className="mt-2 text-sm leading-relaxed text-[color:var(--muted)]">{point.description}</p>
+                    <p className={`mt-2 text-sm leading-relaxed ${subtleTextClass}`}>{point.description}</p>
                   </li>
                 ))}
               </ul>
             </div>
 
-            <div className="rounded-[28px] border border-[rgba(var(--leaf-rgb),0.18)] bg-white/95 p-6 shadow-sm shadow-[rgba(var(--leaf-rgb),0.08)]">
+            <div className="rounded-3xl border border-[rgba(var(--accent-rgb),0.16)] bg-white p-6 shadow-[0_18px_34px_rgba(var(--accent-rgb),0.14)] sm:p-8">
               <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                 <div>
                   <h2 className="text-lg font-semibold text-[color:var(--foreground)]">Logistics & delivery</h2>
-                  <p className="mt-1 text-sm text-[color:var(--muted)]">Live tracking of shipment milestones once your bid is accepted.</p>
+                  <p className={`mt-1 text-sm ${subtleTextClass}`}>
+                    Live tracking of shipment milestones once your bid is accepted.
+                  </p>
                 </div>
-                <DeliveryStepper current={qa.delivery?.current ?? 0} steps={qa.steps} className="w-full max-w-lg" />
+                <DeliveryStepper current={qa.delivery?.current ?? 0} steps={qa.steps} className="w-full lg:w-auto" />
               </div>
-              <p className="mt-2 text-xs text-[color:var(--muted)]">{qa.delivery?.eta}</p>
+              <p className={`mt-3 text-xs ${subtleTextClass}`}>{deliveryWindow}</p>
               <div className="mt-4 flex flex-wrap gap-3 text-xs">
-                <span className="inline-flex items-center gap-1 rounded-full bg-[rgba(var(--leaf-rgb),0.12)] px-3 py-1 font-medium text-[color:var(--leaf)]">✔ End-to-end tracking</span>
-                <span className="inline-flex items-center gap-1 rounded-full bg-[rgba(var(--leaf-rgb),0.12)] px-3 py-1 font-medium text-[color:var(--leaf)]">🚚 Cold chain partners</span>
-                <span className="inline-flex items-center gap-1 rounded-full bg-[rgba(var(--leaf-rgb),0.12)] px-3 py-1 font-medium text-[color:var(--leaf)]">🧾 Digital POD</span>
+                <span className="inline-flex items-center gap-2 rounded-full bg-[rgba(var(--leaf-rgb),0.14)] px-3 py-1 font-medium text-[color:var(--leaf)]">
+                  End-to-end tracking
+                </span>
+                <span className="inline-flex items-center gap-2 rounded-full bg-[rgba(var(--leaf-rgb),0.14)] px-3 py-1 font-medium text-[color:var(--leaf)]">
+                  Cold chain partners
+                </span>
+                <span className="inline-flex items-center gap-2 rounded-full bg-[rgba(var(--leaf-rgb),0.14)] px-3 py-1 font-medium text-[color:var(--leaf)]">
+                  Digital proof of delivery
+                </span>
               </div>
             </div>
           </div>
 
-          <aside className="space-y-6 lg:sticky lg:top-28">
-            <div className="rounded-[28px] border border-[rgba(var(--leaf-rgb),0.2)] bg-white/95 p-6 shadow-lg shadow-[rgba(var(--leaf-rgb),0.12)]">
-              <div className="flex flex-col gap-4">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="text-sm font-medium text-[color:var(--muted)]">Current lot</p>
-                    <h2 className="text-2xl font-semibold text-[color:var(--primary)]">{product.title}</h2>
-                    <p className="text-sm text-[color:var(--muted)]">Origin: {product.location}</p>
-                  </div>
-                  <QABadge grade={qa.grade} verified={qa.verified} />
+          <aside className="space-y-6 lg:sticky lg:top-24">
+            <div className="rounded-3xl border border-[rgba(var(--leaf-rgb),0.16)] bg-white p-6 shadow-[0_24px_44px_rgba(15,23,42,0.12)] sm:p-8">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-sm font-medium text-[color:var(--muted)]">Current lot</p>
+                  <h2 className="text-2xl font-semibold text-[color:var(--primary)]">{product.title}</h2>
+                  <p className="text-sm text-[color:var(--muted)]">Origin: {product.location || "Location pending"}</p>
                 </div>
+                <QABadge grade={qa.grade} verified={qa.verified} />
+              </div>
 
-                <div className="space-y-3 rounded-2xl bg-[rgba(var(--leaf-rgb),0.05)] p-4 ring-1 ring-[rgba(var(--leaf-rgb),0.12)]">
-                  <div className="flex items-center justify-between text-sm text-[color:var(--foreground)]">
-                    <span>Base price</span>
-                    <strong>Rs {product.pricePerKg}/kg</strong>
-                  </div>
-                  <div className="flex items-center justify-between text-sm text-[color:var(--foreground)]">
-                    <span>Status</span>
-                    <strong className="text-[color:var(--leaf)]">{product.status}</strong>
-                  </div>
-                  <div className="flex items-center justify-between text-sm text-[color:var(--foreground)]">
-                    <span>Category</span>
-                    <strong>{product.category}</strong>
-                  </div>
+              <dl className="mt-6 space-y-3 text-sm text-[color:var(--foreground)]">
+                <div className="flex items-center justify-between">
+                  <dt className="text-[color:var(--muted)]">Base price</dt>
+                  <dd className="font-semibold">{priceDisplay}</dd>
                 </div>
+                <div className="flex items-center justify-between">
+                  <dt className="text-[color:var(--muted)]">Status</dt>
+                  <dd className={detailStatusClass}>{statusDisplay}</dd>
+                </div>
+                <div className="flex items-center justify-between">
+                  <dt className="text-[color:var(--muted)]">Highest bid</dt>
+                  <dd className="font-semibold">{highestBidDisplay}</dd>
+                </div>
+                <div className="flex items-center justify-between">
+                  <dt className="text-[color:var(--muted)]">Category</dt>
+                  <dd className="font-semibold">{product.category || "Farmer listings"}</dd>
+                </div>
+              </dl>
 
-                <div className="flex flex-wrap items-center gap-3">
-                  <ProductDetailActions product={product} />
-                  <WatchlistButton product={product} />
-                  <ShareActions product={product} />
-                </div>
+              <div className="mt-6 flex flex-wrap items-center gap-3">
+                <ProductDetailActions product={product} />
+                <WatchlistButton product={product} />
+                <ShareActions product={product} />
               </div>
             </div>
 
-            <BidHistory productId={product.id} />
+            <div className="rounded-3xl border border-[rgba(var(--leaf-rgb),0.12)] bg-white p-4 shadow-[0_18px_34px_rgba(15,23,42,0.1)] sm:p-6">
+              <BidHistory productId={product.id} />
+            </div>
           </aside>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-          <div className="space-y-6 rounded-[28px] border border-[rgba(var(--leaf-rgb),0.18)] bg-white/95 p-6 shadow-sm shadow-[rgba(var(--leaf-rgb),0.08)]">
+        <div className="grid gap-8 lg:grid-cols-[1.35fr_1fr]">
+          <div className="rounded-3xl border border-[rgba(var(--leaf-rgb),0.14)] bg-white p-6 shadow-[0_20px_36px_rgba(15,23,42,0.1)] sm:p-8">
             <ProductTabs product={product} />
-            <section aria-labelledby="inspection-heading" className="pt-2">
-              <h3 id="inspection-heading" className="text-lg font-semibold text-[color:var(--foreground)]">Inspection history</h3>
+            <section aria-labelledby="inspection-heading" className="mt-8">
+              <h3 id="inspection-heading" className="text-lg font-semibold text-[color:var(--foreground)]">
+                Inspection history
+              </h3>
               <InspectionHistory qa={qa} />
             </section>
           </div>
 
-          <div className="rounded-[28px] border border-[rgba(var(--leaf-rgb),0.18)] bg-white/95 p-6 shadow-sm shadow-[rgba(var(--leaf-rgb),0.08)]">
+          <div className="rounded-3xl border border-[rgba(var(--leaf-rgb),0.12)] bg-white p-6 shadow-[0_20px_36px_rgba(15,23,42,0.08)] sm:p-8">
             <h3 className="text-lg font-semibold text-[color:var(--foreground)]">Checklist before bidding</h3>
-            <ul className="mt-4 space-y-3 text-sm text-[color:var(--muted)]">
+            <ul className={`mt-4 space-y-3 text-sm ${subtleTextClass}`}>
               <li>• Confirm desired quantity and preferred pickup dates.</li>
               <li>• Review latest inspection proofs provided by BidAgri QA.</li>
               <li>• Clarify payment method (escrow / direct) with the seller if needed.</li>
@@ -250,41 +444,41 @@ export default function ProductDetailPage({ params }) {
           </div>
         </div>
 
-        <div>
-          <h3 className="mb-4 text-lg font-semibold text-[color:var(--foreground)]">
-            Related {product.category}
-          </h3>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="rounded-3xl border border-[rgba(var(--leaf-rgb),0.12)] bg-white p-6 shadow-[0_20px_36px_rgba(15,23,42,0.08)] sm:p-8">
+          <h3 className="text-lg font-semibold text-[color:var(--foreground)]">Related {product.category}</h3>
+          <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {related.map((item) => (
               <article
                 key={item.id}
-                className="overflow-hidden rounded-3xl border border-[rgba(var(--leaf-rgb),0.2)] bg-white shadow-lg shadow-[rgba(var(--leaf-rgb),0.12)] transition-transform duration-300 hover:-translate-y-1 hover:shadow-xl"
+                className="overflow-hidden rounded-3xl border border-[rgba(var(--leaf-rgb),0.18)] bg-white shadow-[0_16px_30px_rgba(15,23,42,0.1)] transition-transform duration-300 hover:-translate-y-1 hover:shadow-[0_24px_38px_rgba(15,23,42,0.14)]"
               >
                 <Link
                   href={`/product/${item.id}`}
-                  className="block focus:outline-none focus:ring-2 focus:ring-[color:var(--accent)]/60"
+                  className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent)]/60"
                 >
                   <div className="relative aspect-[4/3] w-full overflow-hidden">
                     <ImageWithFallback
-                      src={item.image || item.imgUrl}
+                      src={item.image || item.imgUrl || DEFAULT_IMAGE}
                       alt={item.title}
                       fill
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                       quality={75}
-                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                      className="object-cover transition-transform duration-500 hover:scale-105"
                     />
                   </div>
                   <div className="space-y-1 p-4">
                     <h4 className="text-base font-semibold text-[color:var(--primary)]">{item.title}</h4>
-                    <p className="text-sm text-[color:var(--muted)]">Rs {item.pricePerKg}/kg</p>
+                    <p className={`text-sm ${subtleTextClass}`}>
+                      {Number(item.pricePerKg ?? 0) > 0
+                        ? `Rs ${Number(item.pricePerKg ?? 0).toLocaleString()}/${item.unit || "kg"}`
+                        : "Price on request"}
+                    </p>
                   </div>
                 </Link>
               </article>
             ))}
             {related.length === 0 && (
-              <div className="col-span-full text-sm text-[color:var(--muted)]">
-                No related items yet.
-              </div>
+              <div className={`col-span-full text-sm ${subtleTextClass}`}>No related items yet.</div>
             )}
           </div>
         </div>
@@ -292,5 +486,3 @@ export default function ProductDetailPage({ params }) {
     </section>
   );
 }
-
-// moved to dedicated component for reuse

@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import LoadMoreButton from "@/components/LoadMoreButton";
 import ProductSkeleton from "@/components/ProductSkeleton";
 
 const DEFAULT_PAGE_SIZE = 9;
@@ -342,18 +341,8 @@ export default function ProductList({
       )}
 
       {/* Infinite controls */}
-      {mode === "infinite" && (
-        <>
-          {!loading && hasMore && (
-            <div ref={sentinelRef} className="h-2" aria-hidden />
-          )}
-          <LoadMoreButton
-            onClick={loadNext}
-            // Keep SSR/initial client render deterministic
-            loading={hydrated ? loading : false}
-            disabled={hydrated ? !hasMore : false}
-          />
-        </>
+      {mode === "infinite" && hasMore && (
+        <div ref={sentinelRef} className="h-2" aria-hidden />
       )}
 
       <div

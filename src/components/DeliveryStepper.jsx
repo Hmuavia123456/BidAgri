@@ -5,7 +5,7 @@ import React from "react";
 export default function DeliveryStepper({ current = 0, steps = ["Ordered", "Packed", "In transit", "Delivered"], className = "" }) {
   return (
     <nav aria-label="Delivery progress" className={`w-full ${className}`}>
-      <ol className="flex items-center gap-2 sm:gap-3" role="list">
+      <ol className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-2" role="list">
         {steps.map((label, idx) => {
           const isActive = idx === current;
           const isCompleted = idx < current;
@@ -17,7 +17,7 @@ export default function DeliveryStepper({ current = 0, steps = ["Ordered", "Pack
           return (
             <li key={label} className="flex items-center">
               <div
-                className={`flex items-center gap-2 rounded-full px-2.5 py-1.5 text-xs sm:text-sm border ${
+                className={`flex items-center gap-1 rounded-full px-2 py-1 text-xs sm:text-sm border ${
                   isCompleted
                     ? "bg-white border-[color:var(--accent)] text-[color:var(--primary)]"
                     : isActive
@@ -25,13 +25,13 @@ export default function DeliveryStepper({ current = 0, steps = ["Ordered", "Pack
                     : "bg-white border-[color:var(--accent)] text-[color:var(--muted)]"
                 }`}
               >
-                <span aria-hidden className={`inline-flex h-5 w-5 items-center justify-center rounded-full border text-[11px] ${dotClasses}`}>
+                <span aria-hidden className={`inline-flex h-5 w-5 items-center justify-center rounded-full border text-[10px] ${dotClasses}`}>
                   {isCompleted ? "✓" : idx + 1}
                 </span>
                 <span>{label}</span>
               </div>
               {idx < steps.length - 1 && (
-                <span aria-hidden className="mx-1 sm:mx-2 h-px w-6 sm:w-8 bg-[color:var(--accent)]" />
+                <span aria-hidden className="hidden h-px w-4 bg-[color:var(--accent)] sm:mx-2 sm:inline-block sm:w-6" />
               )}
             </li>
           );

@@ -181,11 +181,11 @@ export default function Home() {
               aria-hidden="true"
             />
             <div className="absolute bottom-0 left-0 right-0 flex flex-col gap-3 p-6 text-white sm:p-8">
-              <div className="flex w-full flex-col gap-2 rounded-2xl bg-black/65 p-5 shadow-lg shadow-black/30 backdrop-blur-sm sm:max-w-md">
-                <span className="text-xs font-semibold uppercase tracking-[0.35em] text-white/80">
+              <div className="flex w-full flex-col gap-2 rounded-2xl bg-black/65 p-5 text-white shadow-lg shadow-black/30 backdrop-blur-sm sm:max-w-md">
+                <span className="text-xs font-semibold uppercase tracking-[0.35em] !text-white text-white/80">
                   Field-to-market in one platform
                 </span>
-                <p className="text-lg font-semibold leading-snug text-white sm:text-xl">
+                <p className="text-lg font-semibold leading-snug !text-white text-white sm:text-xl">
                   Farmers and buyers collaborate through secure, transparent bidding.
                 </p>
               </div>
@@ -324,11 +324,11 @@ export default function Home() {
                   aria-hidden="true"
                 />
                 <div className="absolute inset-x-0 bottom-0 z-[2] p-5">
-                  <div className="flex flex-col gap-2 rounded-2xl bg-white/10 px-5 py-4 text-left text-white shadow-lg shadow-black/10 ring-1 ring-white/15 backdrop-blur-sm">
-                    <h3 className="text-3xl font-bold sm:text-3xl md:text-4xl">
-                      <span className="text-white">{category.title}</span>
+                  <div className="flex flex-col gap-2 rounded-2xl bg-white/10 px-5 py-4 text-left !text-white shadow-lg shadow-black/10 ring-1 ring-white/15 backdrop-blur-sm">
+                    <h3 className="text-3xl font-bold !text-white sm:text-3xl md:text-4xl">
+                      {category.title}
                     </h3>
-                    <p className="text-base font-medium leading-relaxed text-white sm:text-lg">
+                    <p className="text-base font-medium leading-relaxed !text-white sm:text-lg">
                       {category.description}
                     </p>
                   </div>

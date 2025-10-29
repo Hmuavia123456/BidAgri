@@ -1,0 +1,75 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        (request.auth.token.role == 'admin' ||
+         request.auth.token.email.matches('.*@bidagri\\.com$'));
+    }
+
+    match /users/{userId} {
+      allow read, write: if isAuthenticated() && request.auth.uid == userId;
+    }
+
+    match /watchlists/{userId}/items/{itemId} {
+      allow read, write: if isAuthenticated() && request.auth.uid == userId;
+    }
+
+    match /buyerDashboards/{userId} {
+      allow read: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
+      allow write: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
+    }
+
+    match /farmerDashboards/{userId} {
+      allow read: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
+      allow write: if isAdmin();
+    }
+
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /farmerSubmissions/{submissionId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /buyerRegistrations/{docId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /contactMessages/{docId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /deliveries/{deliveryId} {
+      allow read: if isAuthenticated() &&
+        ((resource.data.buyerUid == request.auth.uid) ||
+         (resource.data.farmerUid == request.auth.uid) ||
+         isAdmin());
+      allow write: if isAdmin();
+    }
+
+    match /notificationTokens/{tokenId} {
+      allow read: if isAdmin() || (isAuthenticated() && resource.data.uid == request.auth.uid);
+      allow write: if isAuthenticated() && request.auth.uid == request.resource.data.uid;
+      allow delete: if isAuthenticated() && (request.auth.uid == resource.data.uid || isAdmin());
+    }
+
+    match /mailQueue/{docId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /pushQueue/{docId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

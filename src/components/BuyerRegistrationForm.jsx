@@ -14,10 +14,16 @@ export default function BuyerRegistrationForm() {
     notes: "",
   });
   const [submitted, setSubmitted] = useState(false);
+  const [status, setStatus] = useState("idle");
+  const [submitError, setSubmitError] = useState("");
 
   const onChange = (e) => {
     const { name, value } = e.target;
     setForm((f) => ({ ...f, [name]: value }));
+    if (status !== "submitting") {
+      setStatus("idle");
+      setSubmitError("");
+    }
   };
 
   const validateEmail = (value) => /.+@.+\..+/.test(value);
@@ -25,13 +31,34 @@ export default function BuyerRegistrationForm() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!form.name.trim()) return alert("Please enter your full name.");
-    if (!validateEmail(form.email)) return alert("Please enter a valid email.");
-    if (!validatePhone(form.phone)) return alert("Please enter a valid contact number.");
-    if (!form.province.trim() || !form.city.trim()) return alert("Please enter your province and city.");
-    if (!form.category.trim()) return alert("Please select a preferred product category.");
-    if (!form.capacity.trim()) return alert("Please enter your purchase capacity or volume.");
-    setSubmitted(true);
+    if (!form.name.trim()) return setSubmitError("Please enter your full name.");
+    if (!validateEmail(form.email)) return setSubmitError("Please enter a valid email address.");
+    if (!validatePhone(form.phone)) return setSubmitError("Please enter a valid contact number.");
+    if (!form.province.trim() || !form.city.trim()) return setSubmitError("Please enter your province and city.");
+    if (!form.category.trim()) return setSubmitError("Please select a preferred product category.");
+    if (!form.capacity.trim()) return setSubmitError("Please enter your purchase capacity or volume.");
+
+    setStatus("submitting");
+    setSubmitError("");
+
+    fetch("/api/buyers/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(form),
+    })
+      .then(async (res) => {
+        if (!res.ok) {
+          const detail = await res.json().catch(() => null);
+          const message = detail?.message || "Unable to submit registration. Please try again.";
+          throw new Error(message);
+        }
+        setSubmitted(true);
+        setStatus("success");
+      })
+      .catch((error) => {
+        setStatus("error");
+        setSubmitError(error?.message || "Something went wrong. Please retry.");
+      });
   };
 
   if (submitted) {
@@ -53,6 +80,12 @@ export default function BuyerRegistrationForm() {
 
   return (
     <form onSubmit={handleSubmit} className="w-full max-w-xl mx-auto rounded-2xl bg-white p-6 shadow ring-1 ring-[color:var(--surface-2)]">
+      {submitError && (
+        <p className="mb-4 rounded-lg border border-[color:var(--accent)]/50 bg-[color:var(--accent)]/10 px-4 py-2 text-sm text-[color:var(--accent)]" role="alert">
+          {submitError}
+        </p>
+      )}
+
       <div className="grid grid-cols-1 gap-4">
         <div>
           <label htmlFor="name" className="block text-sm font-medium text-[color:var(--foreground)]">Full Name</label>
@@ -92,12 +125,17 @@ export default function BuyerRegistrationForm() {
 
         <div>
           <label htmlFor="notes" className="block text-sm font-medium text-[color:var(--foreground)]">Additional Notes (optional)</label>
-          <textarea id="notes" name="notes" value={form.notes} onChange={onChange} rows={4} className="mt-1 w/full rounded-lg bg-white px-3 py-2 text-sm text-[color:var(--foreground)] ring-1 ring-[color:var(--supporting)] placeholder:text-[color:var(--muted)] focus:outline-none focus:ring-2 focus:ring-[color:var(--accent)]" />
+          <textarea id="notes" name="notes" value={form.notes} onChange={onChange} rows={4} className="mt-1 w-full rounded-lg bg-white px-3 py-2 text-sm text-[color:var(--foreground)] ring-1 ring-[color:var(--supporting)] placeholder:text-[color:var(--muted)] focus:outline-none focus:ring-2 focus:ring-[color:var(--accent)]" />
         </div>
 
         <div className="pt-2">
-          <button type="submit" className="w-full rounded-full bg-[color:var(--primary)] text-[color:var(--background)] px-5 py-2.5 text-sm font-semibold shadow transition hover:bg-[color:var(--accent)] hover:text-[color:var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[color:var(--accent)]">
-            Submit Registration
+          <button
+            type="submit"
+            className="w-full rounded-full bg-[color:var(--primary)] text-[color:var(--background)] px-5 py-2.5 text-sm font-semibold shadow transition hover:bg-[color:var(--accent)] hover:text-[color:var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[color:var(--accent)] disabled:cursor-not-allowed disabled:opacity-60"
+            disabled={status === "submitting"}
+            aria-busy={status === "submitting"}
+          >
+            {status === "submitting" ? "Submitting…" : "Submit Registration"}
           </button>
         </div>
       </div>

@@ -1,9 +1,12 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { Check, FileCheck, Leaf, Loader2, MapPin, Phone, User, MessageSquare } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import FileUploader from "./FileUploader";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "@/lib/firebase";
 
 const steps = [
   { key: "profile", label: "Profile", icon: "👤" },
@@ -14,7 +17,15 @@ const steps = [
 
 const initialData = {
   profile: { fullName: "", phone: "", email: "", province: "", city: "" },
-  produce: { mainCrops: "", estimatedVolume: "", unit: "kg", harvestSeason: "", note: "" },
+  produce: {
+    mainCrops: "",
+    estimatedVolume: "",
+    unit: "kg",
+    harvestSeason: "",
+    note: "",
+    producePhotos: [],
+    listingPreference: "In Bidding",
+  },
   documents: { idDoc: null, farmProof: null },
 };
 
@@ -24,6 +35,17 @@ export default function FarmerOnboardingWizard() {
   const [data, setData] = useState(initialData);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState("");
+  const [authStatus, setAuthStatus] = useState("loading");
+  const [currentUser, setCurrentUser] = useState(null);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user);
+      setAuthStatus(user ? "authenticated" : "unauthenticated");
+    });
+    return () => unsubscribe();
+  }, []);
 
   // Hydrate client-only draft after mount to avoid hydration mismatch.
   useEffect(() => {
@@ -33,7 +55,18 @@ export default function FarmerOnboardingWizard() {
         const parsed = JSON.parse(saved);
         // Basic shape guard to avoid corrupt drafts
         if (parsed && typeof parsed === "object" && parsed.profile && parsed.produce && parsed.documents) {
-          setData(parsed);
+          const normalized = {
+            profile: { ...initialData.profile, ...parsed.profile },
+            produce: { ...initialData.produce, ...parsed.produce },
+            documents: { ...initialData.documents, ...parsed.documents },
+          };
+          if (!Array.isArray(normalized.produce.producePhotos)) {
+            normalized.produce.producePhotos = [];
+          }
+          if (!normalized.produce.listingPreference) {
+            normalized.produce.listingPreference = "In Bidding";
+          }
+          setData(normalized);
         }
       }
     } catch {
@@ -67,7 +100,9 @@ export default function FarmerOnboardingWizard() {
       pr.mainCrops.trim().length >= 2 &&
       pr.estimatedVolume.trim().length > 0 &&
       pr.unit.trim().length > 0 &&
-      ["Spring", "Summer", "Autumn", "Winter"].includes(pr.harvestSeason)
+      ["Spring", "Summer", "Autumn", "Winter"].includes(pr.harvestSeason) &&
+      Array.isArray(pr.producePhotos) &&
+      pr.producePhotos.length > 0
     );
   }, [data.produce]);
 
@@ -91,17 +126,65 @@ export default function FarmerOnboardingWizard() {
     return 3;
   }, [profileValid, produceValid, documentsValid]);
 
+  const fileMeta = (fileLike) =>
+    fileLike
+      ? {
+          name: fileLike.name || "",
+          size: Number(fileLike.size) || null,
+          type: fileLike.type || "",
+        }
+      : null;
+
   const submit = async () => {
+    if (!currentUser) {
+      setSubmitError("Please sign in before submitting your listing.");
+      return;
+    }
     setSubmitting(true);
-    // Simulate API
-    await new Promise((r) => setTimeout(r, 1200));
-    setSubmitting(false);
-    setSubmitted(true);
-    // Keep draft for retention; mark status
-    localStorage.setItem(
-      "farmer_onboarding_status",
-      JSON.stringify({ status: "pending_review", submittedAt: Date.now() })
-    );
+    setSubmitError("");
+    try {
+      const payload = {
+        source: "onboarding_wizard",
+        profile: data.profile,
+        produce: data.produce,
+        documents: {
+          idDoc: fileMeta(data.documents.idDoc),
+          farmProof: fileMeta(data.documents.farmProof),
+        },
+      };
+
+      const token = await currentUser.getIdToken().catch(() => null);
+      const emailHeader = currentUser.email?.toLowerCase() ?? "";
+      const uidHeader = currentUser.uid ?? "";
+
+      const response = await fetch("/api/farmers/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          ...(emailHeader ? { "X-User-Email": emailHeader } : {}),
+          ...(uidHeader ? { "X-User-Uid": uidHeader } : {}),
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const detail = await response.json().catch(() => null);
+        const message = detail?.message || "Unable to submit farmer onboarding. Please try again.";
+        throw new Error(message);
+      }
+
+      setSubmitted(true);
+      localStorage.removeItem("farmer_onboarding_draft");
+      localStorage.setItem(
+        "farmer_onboarding_status",
+        JSON.stringify({ status: "pending_review", submittedAt: Date.now() })
+      );
+    } catch (error) {
+      setSubmitError(error?.message || "Something went wrong. Please retry.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (submitted) {
@@ -142,6 +225,40 @@ export default function FarmerOnboardingWizard() {
     );
   }
 
+  if (authStatus === "loading") {
+    return (
+      <div className="rounded-2xl bg-[color:var(--surface)] p-6 shadow-md ring-1 ring-[color:var(--accent)] flex flex-col items-center justify-center gap-3">
+        <Loader2 className="h-5 w-5 animate-spin text-[color:var(--leaf)]" />
+        <p className="text-sm text-[color:var(--muted)]">Checking your account…</p>
+      </div>
+    );
+  }
+
+  if (authStatus === "unauthenticated") {
+    return (
+      <div className="rounded-2xl bg-[color:var(--surface)] p-6 shadow-md ring-1 ring-[color:var(--accent)] text-center">
+        <h2 className="text-xl font-semibold text-[color:var(--foreground)]">Sign in to continue</h2>
+        <p className="mt-2 text-sm text-[color:var(--muted)]">
+          Please sign in to your farmer account before submitting a new listing.
+        </p>
+        <div className="mt-4 flex flex-wrap justify-center gap-3">
+          <Link
+            href="/auth/login"
+            className="inline-flex items-center justify-center rounded-full bg-[color:var(--leaf)] px-5 py-2 text-sm font-semibold text-white shadow-md shadow-[rgba(var(--leaf-rgb),0.25)] transition hover:-translate-y-0.5"
+          >
+            Go to login
+          </Link>
+          <Link
+            href="/auth/signup"
+            className="inline-flex items-center justify-center rounded-full border border-[color:var(--leaf)] px-5 py-2 text-sm font-semibold text-[color:var(--leaf)] shadow-sm transition hover:bg-[color:var(--leaf)] hover:text-white"
+          >
+            Create account
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="rounded-2xl bg-[color:var(--surface)] p-4 sm:p-6 shadow-md ring-1 ring-[color:var(--accent)]">
       <ProgressHeader active={active} onGoto={(i) => i <= unlockedIndex && goto(i)} unlocked={unlockedIndex} />
@@ -170,6 +287,15 @@ export default function FarmerOnboardingWizard() {
           )}
         </AnimatePresence>
       </div>
+
+      {submitError && (
+        <div
+          className="mt-4 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700"
+          role="alert"
+        >
+          {submitError}
+        </div>
+      )}
 
       <div className="mt-6 flex items-center justify-between">
         <button
@@ -336,8 +462,54 @@ function ProduceStep({ data, onChange }) {
           </select>
         </div>
       </div>
-      <Field label="Optional Message" name="note" value={data.note} onChange={(v) => set("note", v)} icon={MessageSquare} placeholder="Anything buyers should know (optional)" />
-      <p className="text-xs text-[color:var(--muted)]">Share rough estimates to match with the right buyers.</p>
+          <Field label="Optional Message" name="note" value={data.note} onChange={(v) => set("note", v)} icon={MessageSquare} placeholder="Anything buyers should know (optional)" />
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <div className="flex flex-col">
+          <span className="mb-1 text-xs font-semibold text-[color:var(--secondary)]">
+            Listing preference
+          </span>
+          <div className="flex items-center gap-3 rounded-xl border border-[rgba(var(--leaf-rgb),0.25)] bg-white px-3 py-2">
+            <label className="flex items-center gap-2 text-xs font-semibold text-[color:var(--primary)]">
+              <input
+                type="radio"
+                name="listingPreference"
+                value="Available"
+                checked={data.listingPreference === "Available"}
+                onChange={(e) => set("listingPreference", e.target.value)}
+              />
+              Available (fixed offer)
+            </label>
+            <label className="flex items-center gap-2 text-xs font-semibold text-[color:var(--primary)]">
+              <input
+                type="radio"
+                name="listingPreference"
+                value="In Bidding"
+                checked={data.listingPreference === "In Bidding"}
+                onChange={(e) => set("listingPreference", e.target.value)}
+              />
+              In bidding (auction)
+            </label>
+          </div>
+          <p className="mt-1 text-xs text-[color:var(--muted)]">
+            Choose how buyers should engage with this lot once it goes live.
+          </p>
+        </div>
+        <div />
+      </div>
+      <div className="grid gap-3">
+        <FileUploader
+          label="Produce photos"
+          name="producePhotos"
+          value={data.producePhotos}
+          onChange={(files) => set("producePhotos", Array.isArray(files) ? files : files ? [files] : [])}
+          multiple
+          accept={["image/jpeg", "image/png", "image/webp"]}
+          hint="Upload at least one clear photo (JPG/PNG/WebP, max 5MB each)"
+        />
+        <p className="text-xs text-[color:var(--muted)]">
+          Share rough estimates and add crop photos to help buyers trust your listing.
+        </p>
+      </div>
     </div>
   );
 }
@@ -401,6 +573,7 @@ function ReviewStep({ data, progress, onEditStep }) {
         <DocPreview title="ID Document" file={data.documents.idDoc} onEdit={() => onEditStep(2)} />
         <DocPreview title="Farm Proof" file={data.documents.farmProof} onEdit={() => onEditStep(2)} />
       </div>
+      <GalleryPreview title="Produce photos" files={data.produce.producePhotos} onEdit={() => onEditStep(1)} />
       <p className="text-xs italic bg-[color:var(--surface-2)] text-[color:var(--foreground)]/90 p-3 rounded-md">
         Please confirm details before submitting. You can edit after submission during review.
       </p>
@@ -433,17 +606,60 @@ function SummaryCard({ title, items, onEdit }) {
   );
 }
 
+function getFileName(file) {
+  if (!file) return "";
+  if (typeof file.name === "string" && file.name) return file.name;
+  if (typeof file.key === "string" && file.key) {
+    const parts = file.key.split("/");
+    return parts[parts.length - 1];
+  }
+  return "";
+}
+
+function getIsImage(file, fileName) {
+  if (!file) return false;
+  if (typeof file.type === "string" && file.type.startsWith("image/")) return true;
+  const name = fileName || getFileName(file);
+  return /\.(png|jpe?g|webp|gif|bmp)$/i.test(name);
+}
+
+function usePreviewUrl(file) {
+  const [objectUrl, setObjectUrl] = useState(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return undefined;
+    if (file instanceof Blob) {
+      const nextUrl = URL.createObjectURL(file);
+      setObjectUrl(nextUrl);
+      return () => {
+        URL.revokeObjectURL(nextUrl);
+        setObjectUrl(null);
+      };
+    }
+    setObjectUrl(null);
+    return undefined;
+  }, [file]);
+
+  return objectUrl || file?.previewUrl || file?.url || null;
+}
+
 function DocPreview({ title, file, onEdit }) {
-  const isImage = file && (file.type?.startsWith("image/") || /\.(png|jpe?g|webp)$/i.test(file.name));
+  const fileName = getFileName(file);
+  const previewUrl = usePreviewUrl(file);
+  const isImage = getIsImage(file, fileName);
   return (
     <div className="rounded-lg ring-1 ring-[color:var(--surface-2)] bg-[color:var(--surface)] p-3">
       <h3 className="text-lg font-semibold text-[color:var(--primary)] mb-2 pb-1 border-b-2 border-[color:var(--accent)]">{title}</h3>
       <div className="aspect-video rounded-md bg-[color:var(--surface-2)] flex items-center justify-center overflow-hidden">
         {file ? (
           isImage ? (
-            <img src={URL.createObjectURL(file)} alt={file.name} className="h-full w-full object-cover" />
+            previewUrl ? (
+              <img src={previewUrl} alt={fileName || "Document preview"} className="h-full w-full object-cover" />
+            ) : (
+              <div className="text-xs text-[color:var(--muted)]">Preview unavailable</div>
+            )
           ) : (
-            <div className="text-xs text-[color:var(--foreground)]/80">{file.name}</div>
+            <div className="text-xs text-[color:var(--foreground)]/80 break-all px-3">{fileName || "Document ready"}</div>
           )
         ) : (
           <div className="text-xs text-[color:var(--muted)]">No file</div>
@@ -458,6 +674,46 @@ function DocPreview({ title, file, onEdit }) {
           Edit
         </button>
       )}
+    </div>
+  );
+}
+
+function GalleryPreview({ title, files, onEdit }) {
+  const items = Array.isArray(files) ? files : [];
+  return (
+    <div className="rounded-lg ring-1 ring-[color:var(--surface-2)] bg-[color:var(--surface)] p-3">
+      <h3 className="text-lg font-semibold text-[color:var(--primary)] mb-2 pb-1 border-b-2 border-[color:var(--accent)]">{title}</h3>
+      {items.length > 0 ? (
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+          {items.map((file, index) => (
+            <GalleryTile key={file?.key || file?.url || index} file={file} index={index} />
+          ))}
+        </div>
+      ) : (
+        <p className="text-xs text-[color:var(--muted)]">No photos added yet.</p>
+      )}
+      {onEdit && (
+        <button
+          type="button"
+          onClick={onEdit}
+          className="mt-3 inline-flex items-center rounded-md bg-[color:var(--secondary)] px-3 py-1 text-xs font-semibold text-[color:var(--surface)] transition-colors hover:bg-[rgba(var(--secondary-rgb),0.85)] focus:outline-none focus:ring-2 focus:ring-[rgba(var(--secondary-rgb),0.35)]"
+        >
+          Edit
+        </button>
+      )}
+    </div>
+  );
+}
+
+function GalleryTile({ file, index }) {
+  const previewUrl = usePreviewUrl(file);
+  const fileName = getFileName(file);
+  if (previewUrl) {
+    return <img src={previewUrl} alt={fileName || `Produce photo ${index + 1}`} className="h-32 w-full rounded-lg object-cover shadow-sm" />;
+  }
+  return (
+    <div className="flex h-32 items-center justify-center rounded-lg bg-[color:var(--surface-2)] text-xs text-[color:var(--muted)] shadow-sm">
+      {fileName || `Photo ${index + 1}`}
     </div>
   );
 }

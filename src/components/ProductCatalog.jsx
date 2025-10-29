@@ -13,9 +13,8 @@ import useQueryFilters from "@/hooks/useQueryFilters";
 import { getCategories, getCategoryBySlug } from "@/data/categoryUtils";
 
 import BidModal from "@/components/BidModal";
-
-import { PRODUCTS } from "@/data/products";
 import ProductList from "@/components/ProductList";
+import ProductSkeleton from "@/components/ProductSkeleton";
 
 const CATEGORY_DATA = getCategories();
 const CATEGORY_NAMES = CATEGORY_DATA.map((c) => c.name);
@@ -50,6 +49,9 @@ export default function ProductCatalog() {
   const filterTriggerRef = useRef(null);
   const [isBidOpen, setIsBidOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
+  const [baseItems, setBaseItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState("");
 
   const handleOpenBid = useCallback((item) => {
     setSelectedItem(item);
@@ -61,9 +63,59 @@ export default function ProductCatalog() {
     setSelectedItem(null);
   };
 
-  const baseItems = PRODUCTS;
+  useEffect(() => {
+    let ignore = false;
+    async function loadProducts() {
+      setLoading(true);
+      setFetchError("");
+      try {
+        const response = await fetch("/api/products");
+        if (!response.ok) {
+          const detail = await response.json().catch(() => null);
+          throw new Error(detail?.message || "Unable to load products.");
+        }
+        const json = await response.json();
+        if (!ignore) {
+          const normalized = Array.isArray(json?.items)
+            ? json.items.map((product) => {
+                const gallery = Array.isArray(product.gallery) ? product.gallery : [];
+                const galleryUrl = gallery
+                  .map((photo) => photo?.url || photo?.publicUrl)
+                  .find((value) => typeof value === "string" && value.startsWith("http"));
+                const docUrl = product.documents?.farmProof?.url || product.documents?.farmProof?.publicUrl;
+                const primaryImage = [galleryUrl, product.image, docUrl, product.imgUrl]
+                  .find((value) => typeof value === "string" && value.length > 0);
+                return {
+                  ...product,
+                  image: primaryImage || product.image || product.imgUrl,
+                  gallery,
+                };
+              })
+            : [];
+          setBaseItems(normalized);
+        }
+      } catch (error) {
+        if (!ignore) {
+          setBaseItems([]);
+          setFetchError(error?.message || "Failed to load products.");
+        }
+      } finally {
+        if (!ignore) {
+          setLoading(false);
+        }
+      }
+    }
 
-  const titleSuggestions = useMemo(() => PRODUCTS.map((p) => p.title), []);
+    loadProducts();
+    return () => {
+      ignore = true;
+    };
+  }, []);
+
+  const titleSuggestions = useMemo(
+    () => baseItems.map((p) => p?.title ?? ""),
+    [baseItems]
+  );
 
   const defaultOrder = useMemo(
     () => new Map(baseItems.map((product, index) => [product.id, index])),
@@ -73,18 +125,28 @@ export default function ProductCatalog() {
   const filteredItems = useMemo(() => {
     const trimmedSearch = (filters.q || "").trim().toLowerCase();
 
+    if (!baseItems.length) {
+      return [];
+    }
+
     let filtered = baseItems.filter((product) => {
+      const category = product.category || "Farmer Listings";
+      const subcategory = product.subcategory || "";
+      const title = (product.title || "").toLowerCase();
+      const location = (product.location || "").toLowerCase();
+      const pricePerKg = Number(product.pricePerKg ?? 0);
+
       const matchesCategory =
-        filters.category === "All" || product.category === filters.category;
+        filters.category === "All" || category === filters.category;
       const matchesSubcategory =
-        !filters.subcategory || product.subcategory === filters.subcategory;
+        !filters.subcategory || subcategory === filters.subcategory;
       const matchesSearch =
         trimmedSearch.length === 0 ||
-        product.title.toLowerCase().includes(trimmedSearch) ||
-        product.location.toLowerCase().includes(trimmedSearch);
+        title.includes(trimmedSearch) ||
+        location.includes(trimmedSearch);
       const matchesStatus = !filters.status || product.status === filters.status;
-      const priceOkMin = filters.minPrice === "" || product.pricePerKg >= Number(filters.minPrice);
-      const priceOkMax = filters.maxPrice === "" || product.pricePerKg <= Number(filters.maxPrice);
+      const priceOkMin = filters.minPrice === "" || pricePerKg >= Number(filters.minPrice);
+      const priceOkMax = filters.maxPrice === "" || pricePerKg <= Number(filters.maxPrice);
 
       return (
         matchesCategory &&
@@ -98,20 +160,26 @@ export default function ProductCatalog() {
 
     const sortOption = filters.sort;
     if (sortOption === "PriceLowHigh") {
-      filtered = [...filtered].sort((a, b) => a.pricePerKg - b.pricePerKg);
+      filtered = [...filtered].sort(
+        (a, b) => Number(a.pricePerKg ?? 0) - Number(b.pricePerKg ?? 0)
+      );
     } else if (sortOption === "PriceHighLow") {
-      filtered = [...filtered].sort((a, b) => b.pricePerKg - a.pricePerKg);
+      filtered = [...filtered].sort(
+        (a, b) => Number(b.pricePerKg ?? 0) - Number(a.pricePerKg ?? 0)
+      );
     } else if (sortOption === "Popular") {
       filtered = [...filtered].sort((a, b) => {
         const aHot = a.status === "In Bidding" ? 1 : 0;
         const bHot = b.status === "In Bidding" ? 1 : 0;
         if (bHot !== aHot) return bHot - aHot;
-        return b.pricePerKg - a.pricePerKg;
+        return Number(b.pricePerKg ?? 0) - Number(a.pricePerKg ?? 0);
       });
     } else {
-      filtered = [...filtered].sort(
-        (a, b) => defaultOrder.get(a.id) - defaultOrder.get(b.id)
-      );
+      filtered = [...filtered].sort((a, b) => {
+        const orderA = defaultOrder.get(a.id) ?? 0;
+        const orderB = defaultOrder.get(b.id) ?? 0;
+        return orderA - orderB;
+      });
     }
 
     return filtered;
@@ -151,7 +219,8 @@ export default function ProductCatalog() {
 
   const categoryTotals = useMemo(() => {
     return baseItems.reduce((acc, product) => {
-      acc[product.category] = (acc[product.category] || 0) + 1;
+      const category = product.category || "Farmer Listings";
+      acc[category] = (acc[category] || 0) + 1;
       return acc;
     }, {});
   }, [baseItems]);
@@ -231,22 +300,34 @@ export default function ProductCatalog() {
 
       <div className="text-sm text-[color:var(--muted)] mt-4" aria-live="polite" aria-atomic="true">{resultLabel}</div>
       <div ref={liveRef} className="sr-only" aria-live="polite" aria-atomic="true" />
-      <FilterChips
-        filters={filters}
-        onRemove={(key) => {
-          const next = { ...filters };
-          if (key === "category") next.category = "All";
-          else if (key === "subcategory") next.subcategory = "";
-          else if (key === "status") next.status = "";
-          else if (key === "minPrice") next.minPrice = "";
-          else if (key === "maxPrice") next.maxPrice = "";
-          else if (key === "q") next.q = "";
-          setFilters(next);
-          applyFilters(next);
-        }}
-      />
+  <FilterChips
+    filters={filters}
+    onRemove={(key) => {
+      const next = { ...filters };
+      if (key === "category") next.category = "All";
+      else if (key === "subcategory") next.subcategory = "";
+      else if (key === "status") next.status = "";
+      else if (key === "minPrice") next.minPrice = "";
+      else if (key === "maxPrice") next.maxPrice = "";
+      else if (key === "q") next.q = "";
+      setFilters(next);
+      applyFilters(next);
+    }}
+  />
 
-      <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-[320px_minmax(0,1fr)] md:items-start xl:gap-8">
+  {fetchError && (
+    <div className="mt-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 shadow-sm" role="alert">
+      {fetchError}
+    </div>
+  )}
+
+  {!loading && !fetchError && baseItems.length === 0 && (
+    <p className="mt-6 text-sm text-[color:var(--muted)]">
+      No farmer listings are live yet. Once submissions are approved they will appear here automatically.
+    </p>
+  )}
+
+  <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-[320px_minmax(0,1fr)] md:items-start xl:gap-8">
         <aside className="hidden md:block">
           <div className="sticky top-32 space-y-6">
             <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
@@ -316,7 +397,13 @@ export default function ProductCatalog() {
         </aside>
 
         <div className="min-h-[320px]">
-          {filteredItems.length === 0 ? (
+          {loading ? (
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {Array.from({ length: 6 }).map((_, idx) => (
+                <ProductSkeleton key={idx} />
+              ))}
+            </div>
+          ) : filteredItems.length === 0 ? (
             <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-[color:var(--surface-2)] bg-[color:var(--surface)]/60 p-10 text-center">
               <p className="text-base font-semibold text-[color:var(--foreground)]">
                 No matches found

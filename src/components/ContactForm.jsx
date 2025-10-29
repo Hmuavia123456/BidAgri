@@ -11,6 +11,8 @@ const initialForm = {
 export default function ContactForm() {
   const [formData, setFormData] = useState(initialForm);
   const [touched, setTouched] = useState({});
+  const [status, setStatus] = useState("idle");
+  const [submitError, setSubmitError] = useState("");
 
   const errors = {
     name: formData.name.trim() ? "" : "Please enter your name.",
@@ -27,6 +29,10 @@ export default function ContactForm() {
   const handleChange = (event) => {
     const { name, value } = event.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    if (status !== "submitting") {
+      setStatus("idle");
+      setSubmitError("");
+    }
   };
 
   const handleBlur = (event) => {
@@ -37,6 +43,30 @@ export default function ContactForm() {
   const handleSubmit = (event) => {
     event.preventDefault();
     setTouched({ name: true, email: true, message: true });
+    if (!isFormValid) return;
+
+    setStatus("submitting");
+    setSubmitError("");
+
+    fetch("/api/contact", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(formData),
+    })
+      .then(async (res) => {
+        if (!res.ok) {
+          const detail = await res.json().catch(() => null);
+          const message = detail?.message || "Unable to send message. Please try again.";
+          throw new Error(message);
+        }
+        setFormData(initialForm);
+        setTouched({});
+        setStatus("success");
+      })
+      .catch((error) => {
+        setStatus("error");
+        setSubmitError(error?.message || "Something went wrong. Please retry.");
+      });
   };
 
   return (
@@ -45,6 +75,17 @@ export default function ContactForm() {
       onSubmit={handleSubmit}
       noValidate
     >
+      {status === "success" && (
+        <p className="rounded-lg border border-[color:var(--leaf)]/40 bg-[color:var(--leaf)]/10 px-4 py-2 text-sm text-[color:var(--leaf)]">
+          Thanks! We received your message and will get back to you shortly.
+        </p>
+      )}
+      {submitError && (
+        <p className="rounded-lg border border-[color:var(--accent)]/50 bg-[color:var(--accent)]/10 px-4 py-2 text-sm text-[color:var(--accent)]" role="alert">
+          {submitError}
+        </p>
+      )}
+
       <div>
         <label htmlFor="name" className="block text-sm font-medium text-dark">
           Name
@@ -105,9 +146,10 @@ export default function ContactForm() {
       <button
         type="submit"
         className="inline-flex w-full items-center justify-center rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white shadow-md shadow-primary/20 transition-colors duration-200 hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 focus:ring-offset-base disabled:cursor-not-allowed disabled:opacity-60"
-        disabled={!isFormValid}
+        disabled={!isFormValid || status === "submitting"}
+        aria-busy={status === "submitting"}
       >
-        Send Message
+        {status === "submitting" ? "Sending…" : "Send Message"}
       </button>
     </form>
   );

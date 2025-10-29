@@ -4,7 +4,7 @@
   /* cache-busting theme version */
   --theme-version: 9;
   /* Global background requested */
-  --background: #FFFFFF;                 /* universal background */
+  --background: #F5F7FB;                 /* soft cloud background */
 
   /* Brand palette */
   --primary: #00B386;                    /* main accent / CTAs */
@@ -15,11 +15,16 @@
 
   /* Derived tokens for consistency */
   --supporting: var(--accent);           /* legacy alias kept for components */
-  --surface: var(--background);          /* base surface matches background */
-  --surface-2: var(--background);        /* uniform surfaces for minimal look */
-  --foreground: var(--dark);             /* default readable text */
-  --muted: rgba(34, 40, 49, 0.7);        /* softened dark for secondary text */
+  --surface: #FFFFFF;                    /* base elevated surface */
+  --surface-2: #F1F5F9;                  /* soft neutral surface */
+  --surface-3: #E4ECF5;                  /* subtle panels */
+  --foreground: #111827;                 /* default readable text */
+  --muted: rgba(17, 24, 39, 0.65);       /* softened dark for secondary text */
   --leaf: var(--primary);                /* alias used for buttons/icons */
+  --border-soft: rgba(17, 24, 39, 0.08); /* default border tint */
+  --border-strong: rgba(17, 24, 39, 0.18);
+  --shadow-soft: 0 18px 36px rgba(15, 23, 42, 0.08);
+  --shadow-strong: 0 30px 60px rgba(15, 23, 42, 0.12);
 
   /* Footer theme aligned to palette */
   --footer-bg-from: rgba(34, 40, 49, 0.95);
@@ -43,8 +48,8 @@
   --background-rgb: 255, 255, 255;
   --surface-rgb: var(--background-rgb);
   --surface-2-rgb: var(--background-rgb);
-  --foreground-rgb: var(--dark-rgb);
-  --muted-rgb: var(--dark-rgb);
+  --foreground-rgb: 17, 24, 39;
+  --muted-rgb: 71, 85, 105;
   --leaf-rgb: var(--primary-rgb);
 
   /* Back-compat alias */
@@ -71,8 +76,8 @@
     --background: #FFFFFF;
     --surface: #FFFFFF;
     --surface-2: #FFFFFF;
-    --foreground: var(--dark);
-    --muted: rgba(34, 40, 49, 0.7);
+    --foreground: #0F172A;
+    --muted: rgba(15, 23, 42, 0.68);
     --primary: #00B386;
     --secondary: #00C8A3;
     --accent: #A3E8D1;
@@ -86,8 +91,8 @@
     --background-rgb: 255, 255, 255;
     --surface-rgb: 255, 255, 255;
     --surface-2-rgb: 255, 255, 255;
-    --foreground-rgb: 34, 40, 49;
-    --muted-rgb: 34, 40, 49;
+    --foreground-rgb: 15, 23, 42;
+    --muted-rgb: 71, 85, 105;
     --leaf-rgb: 0, 179, 134;
     --brand: var(--primary);
 
@@ -109,30 +114,33 @@
 
 html {
   scroll-behavior: smooth;
-  /* Force universal background color */
-  background-color: #FFFFFF !important;
+  background: var(--background);
   overflow-x: hidden;
 }
 
 body {
-  /* Solid warm background as requested */
-  background-color: #FFFFFF !important;
+  background: radial-gradient(120% 120% at 50% 0%, #FFFFFF 0%, var(--background) 100%);
   color: var(--foreground);
   font-family: var(--font-sans);
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
+  line-height: 1.6;
 }
 
 /* Typography defaults aligned with palette */
 h1, h2 {
-  color: var(--dark);
+  color: var(--foreground);
   font-weight: 750; /* slightly heavier for presence */
 }
 h3, h4,
 h5, h6 {
-  color: rgba(var(--dark-rgb), 0.85);
+  color: rgba(var(--foreground-rgb), 0.85);
+}
+
+p, li, span, label {
+  color: rgba(var(--foreground-rgb), 0.92);
 }
 
 /* Smooth, consistent hovers site-wide */
@@ -144,7 +152,7 @@ a, button, .btn, .link, [role="button"] {
 button.bg-\[color\:var\(--leaf\)\],
 button.bg-primary,
 .btn-primary {
-  box-shadow: 0 6px 16px rgba(var(--accent-rgb), 0.25);
+  box-shadow: 0 6px 16px rgba(var(--leaf-rgb), 0.25);
 }
 
 /* Force component surfaces to universal background */
@@ -155,8 +163,7 @@ button.bg-primary,
 section,
 main,
 aside {
-  background-color: #FFFFFF !important;
-  background-image: none !important;
+  background: transparent;
 }
 
 /* Accessible skip-to-content link: visible on focus, hidden otherwise */
@@ -185,6 +192,54 @@ aside {
 .focus-ring {
   outline: none;
   box-shadow: 0 0 0 2px var(--brand);
+}
+
+@layer components {
+  .ui-card {
+    border-radius: 28px;
+    border: 1px solid var(--border-soft);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(246, 250, 255, 0.95));
+    box-shadow: var(--shadow-soft);
+    transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
+  }
+
+  .ui-card:hover,
+  .ui-card:focus-within {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-strong);
+    border-color: var(--border-strong);
+  }
+
+  .ui-section {
+    position: relative;
+    border-radius: 40px;
+    border: 1px solid rgba(var(--leaf-rgb), 0.08);
+    background: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 24px 50px rgba(15, 23, 42, 0.12);
+    backdrop-filter: blur(12px);
+  }
+
+  .ui-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.85rem;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    background: rgba(var(--leaf-rgb), 0.12);
+    color: rgba(var(--leaf-rgb), 1);
+  }
+
+  .ui-highlight {
+    background: linear-gradient(135deg, rgba(var(--leaf-rgb), 0.18), rgba(var(--accent-rgb), 0.26));
+    color: #0f172a;
+    border-radius: 22px;
+    padding: 1.5rem;
+    box-shadow: 0 16px 28px rgba(15, 23, 42, 0.08);
+  }
 }
 
 @layer utilities {

@@ -44,7 +44,7 @@ export default function PasswordInput({
 
   return (
     <div>
-      <label htmlFor={id} className="block text-sm font-medium text-[color:var(--primary)]">
+      <label htmlFor={id} className="block text-sm font-semibold text-[color:var(--foreground)]">
         {label}
       </label>
       <div className="mt-2 relative">
@@ -57,14 +57,14 @@ export default function PasswordInput({
           onBlur={onBlur}
           required={required}
           aria-describedby={describedBy}
-          className="w-full rounded-lg border border-[color:var(--surface-2)] bg-[color:var(--surface)] px-4 py-2 pr-12 text-sm text-[color:var(--foreground)] placeholder:text-[color:var(--muted)] focus:border-[color:var(--leaf)] focus:outline-none focus:ring-2 focus:ring-[color:var(--leaf)]/30"
+          className="w-full rounded-xl border border-[rgba(var(--leaf-rgb),0.18)] bg-white px-4 py-2.5 pr-12 text-sm text-[color:var(--foreground)] shadow-sm placeholder:text-[color:var(--muted)] focus:border-[color:var(--leaf)] focus:outline-none focus:ring-2 focus:ring-[color:var(--leaf)]/30"
           placeholder={placeholder}
         />
         <button
           type="button"
           onClick={() => setVisible((v) => !v)}
           aria-label={visible ? "Hide password" : "Show password"}
-          className="absolute inset-y-0 right-2 my-1 inline-flex items-center rounded-md px-2 text-xs text-[color:var(--leaf)] hover:bg-[color:var(--surface-2)] focus:outline-none focus:ring-2 focus:ring-[color:var(--leaf)]/30"
+          className="absolute inset-y-0 right-2 my-1 inline-flex items-center rounded-md px-2 text-xs font-semibold text-[color:var(--leaf)] hover:bg-[rgba(var(--leaf-rgb),0.1)] focus:outline-none focus:ring-2 focus:ring-[color:var(--leaf)]/30"
         >
           {visible ? "Hide" : "Show"}
         </button>

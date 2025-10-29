@@ -3,6 +3,9 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
+import { onAuthStateChanged, signOut } from "firebase/auth";
+import { auth } from "@/lib/firebase";
+import { getUserProfile } from "@/lib/userProfile";
 
 const navItems = [
   { href: "/", label: "Home" },
@@ -11,7 +14,6 @@ const navItems = [
   { href: "/buyers", label: "Buyers" },
   { href: "/checkout", label: "Checkout" },
   { href: "/contact", label: "Contact" },
-  { href: "/register", label: "Register" },
 ];
 
 export default function Navbar() {
@@ -19,6 +21,8 @@ export default function Navbar() {
   const [hasMounted, setHasMounted] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isHidden, setIsHidden] = useState(false);
+  const [user, setUser] = useState(null);
+  const [userRole, setUserRole] = useState("buyer");
   const lastScrollYRef = useRef(0);
   const tickingRef = useRef(false);
   const pathname = usePathname();
@@ -27,6 +31,28 @@ export default function Navbar() {
 
   useEffect(() => {
     setHasMounted(true);
+  }, []);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      setUser(firebaseUser);
+      if (firebaseUser) {
+        (async () => {
+          const storedRole =
+            (typeof window !== "undefined" && window.localStorage.getItem("bidagri:role")) || null;
+          const profile = await getUserProfile(firebaseUser.uid).catch(() => null);
+          const resolvedRole =
+            profile?.role || storedRole || (firebaseUser.email?.endsWith("@bidagri.com") ? "admin" : "buyer");
+          setUserRole(resolvedRole);
+          if (typeof window !== "undefined") {
+            window.localStorage.setItem("bidagri:role", resolvedRole);
+          }
+        })();
+      } else {
+        setUserRole("buyer");
+      }
+    });
+    return () => unsubscribe();
   }, []);
 
   useEffect(() => {
@@ -85,6 +111,28 @@ export default function Navbar() {
     : "focus-visible:ring-offset-transparent";
 
   const visibilityClasses = isHidden ? "-translate-y-full opacity-0" : "translate-y-0 opacity-100";
+  const filteredNavItems = user
+    ? navItems
+    : [...navItems, { href: "/register", label: "Register" }];
+
+  const workspaceHref =
+    userRole === "admin"
+      ? "/admin/dashboard"
+      : userRole === "buyer"
+      ? "/buyers/dashboard"
+      : "/farmers/dashboard";
+
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+      if (typeof window !== "undefined") {
+        window.localStorage.removeItem("bidagri:role");
+      }
+      setUserRole("buyer");
+    } catch (error) {
+      console.error("Sign out failed:", error);
+    }
+  };
 
   return (
     <header
@@ -103,30 +151,84 @@ export default function Navbar() {
             </span>
           </Link>
 
-          <div className="hidden flex-1 items-center justify-center lg:flex">
-            <div className="flex items-center gap-6">
-              {navItems.map(({ href, label }) => {
-                const isLinkActive = isActive(href);
-                const linkClass = isLinkActive
-                  ? isScrolled
-                    ? `font-semibold text-secondary hover:text-secondary ${linkHoverUnderline} after:w-full`
-                    : `font-semibold text-white hover:text-white ${linkHoverUnderline} after:w-full`
-                  : linkTextClass;
+          {hasMounted && (
+            <div className="hidden flex-1 items-center justify-center lg:flex">
+              <div className="flex items-center gap-6">
+                {filteredNavItems.map(({ href, label }) => {
+                  const isLinkActive = isActive(href);
+                  const linkClass = isLinkActive
+                    ? isScrolled
+                      ? `font-semibold text-secondary hover:text-secondary ${linkHoverUnderline} after:w-full`
+                      : `font-semibold text-white hover:text-white ${linkHoverUnderline} after:w-full`
+                    : linkTextClass;
 
-                return (
-                  <Link
-                    key={`${href}-${label}`}
-                    href={href}
-                    className={`inline-flex items-center rounded-full px-3 py-1.5 text-sm transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 ${linkFocusOffsetClass} ${linkClass}`}
-                  >
-                    {label}
-                  </Link>
-                );
-              })}
+                  return (
+                    <Link
+                      key={`${href}-${label}`}
+                      href={href}
+                      className={`inline-flex items-center rounded-full px-3 py-1.5 text-sm transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 ${linkFocusOffsetClass} ${linkClass}`}
+                    >
+                      {label}
+                    </Link>
+                  );
+                })}
+              </div>
             </div>
-          </div>
+          )}
 
           <div className="flex items-center gap-3">
+            {hasMounted && (
+              <div className="hidden items-center gap-2 lg:flex">
+                {user ? (
+                  <>
+                    <Link
+                      href={workspaceHref}
+                      className={`inline-flex items-center rounded-full px-4 py-2 text-sm font-semibold ${
+                        isScrolled
+                          ? "bg-[rgba(var(--leaf-rgb),0.12)] text-[color:var(--leaf)] hover:bg-[rgba(var(--leaf-rgb),0.18)]"
+                          : "bg-white/20 text-white hover:bg-white/30"
+                      }`}
+                    >
+                      Dashboard
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={handleSignOut}
+                      className={`inline-flex items-center rounded-full px-4 py-2 text-sm font-semibold ${
+                        isScrolled
+                          ? "border border-[rgba(var(--leaf-rgb),0.25)] text-[color:var(--leaf)] hover:text-[color:var(--secondary)]"
+                          : "border border-white/40 text-white hover:text-white/80"
+                      }`}
+                    >
+                      Sign out
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      href="/auth/login"
+                      className={`inline-flex items-center rounded-full px-4 py-2 text-sm font-semibold ${
+                        isScrolled
+                          ? "bg-[color:var(--leaf)] text-white shadow-md shadow-[rgba(var(--leaf-rgb),0.24)] hover:bg-[color:var(--secondary)]"
+                          : "bg-white/20 text-white hover:bg-white/30"
+                      }`}
+                    >
+                      Sign in
+                    </Link>
+                    <Link
+                      href="/register"
+                      className={`inline-flex items-center rounded-full px-4 py-2 text-sm font-semibold ${
+                        isScrolled
+                          ? "border border-[rgba(var(--leaf-rgb),0.25)] text-[color:var(--leaf)] hover:text-[color:var(--secondary)]"
+                          : "border border-white/40 text-white hover:text-white/80"
+                      }`}
+                    >
+                      Register
+                    </Link>
+                  </>
+                )}
+              </div>
+            )}
             <button
               type="button"
               className={`${toggleButtonClass} lg:hidden`}
@@ -168,7 +270,7 @@ export default function Navbar() {
         aria-hidden={!(hasMounted && isOpen)}
       >
           <div className="mx-auto flex w-full max-w-3xl flex-col items-center gap-3 rounded-3xl border border-accent/30 bg-base/95 px-6 py-6 text-primary shadow-xl shadow-primary/20 backdrop-blur supports-[backdrop-filter]:bg-base/90 max-h-[calc(100vh-96px)] overflow-y-auto">
-            {navItems.map(({ href, label }) => (
+            {filteredNavItems.map(({ href, label }) => (
               <Link
                 key={`mobile-${href}-${label}`}
                 href={href}
@@ -182,6 +284,44 @@ export default function Navbar() {
             <span className="mt-2 inline-flex w-full items-center justify-center rounded-full bg-accent/30 px-4 py-3 text-sm font-medium text-primary shadow-sm ring-1 ring-accent/50">
               info@bidagri.com
             </span>
+            {user ? (
+              <div className="flex w-full flex-col gap-2 pt-3">
+                <Link
+                  href={workspaceHref}
+                  onClick={() => setIsOpen(false)}
+                  className="w-full rounded-full bg-[color:var(--leaf)] px-5 py-3 text-center text-sm font-semibold text-white shadow-md shadow-[rgba(var(--leaf-rgb),0.24)] transition hover:bg-[color:var(--secondary)]"
+                >
+                  Dashboard
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleSignOut();
+                    setIsOpen(false);
+                  }}
+                  className="w-full rounded-full border border-[rgba(var(--leaf-rgb),0.3)] px-5 py-3 text-center text-sm font-semibold text-[color:var(--leaf)] transition hover:text-[color:var(--secondary)]"
+                >
+                  Sign out
+                </button>
+              </div>
+            ) : (
+              <div className="flex w-full flex-col gap-2 pt-3">
+                <Link
+                  href="/auth/login"
+                  onClick={() => setIsOpen(false)}
+                  className="w-full rounded-full bg-[color:var(--leaf)] px-5 py-3 text-center text-sm font-semibold text-white shadow-md shadow-[rgba(var(--leaf-rgb),0.24)] transition hover:bg-[color:var(--secondary)]"
+                >
+                  Sign in
+                </Link>
+                <Link
+                  href="/register"
+                  onClick={() => setIsOpen(false)}
+                  className="w-full rounded-full border border-[rgba(var(--leaf-rgb),0.3)] px-5 py-3 text-center text-sm font-semibold text-[color:var(--leaf)] transition hover:text-[color:var(--secondary)]"
+                >
+                  Register
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       )}

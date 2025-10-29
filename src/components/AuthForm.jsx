@@ -4,13 +4,21 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import InlineError from "@/components/InlineError";
 import PasswordInput from "@/components/PasswordInput";
 import { auth } from "@/lib/firebase";
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { getAllowedAdmins } from "@/lib/adminEmails";
+import { getUserProfile, upsertUserProfile } from "@/lib/userProfile";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  updateProfile,
+} from "firebase/auth";
 
 // Reusable Auth Form: supports login and signup modes
 // Props:
 // - mode: "login" | "signup"
 // - onSuccess: function
-export default function AuthForm({ mode = "login", onSuccess }) {
+// - selectedRole: preferred role (for signup or fallback)
+// - onProfile: callback with Firestore profile data
+export default function AuthForm({ mode = "login", onSuccess, selectedRole, onProfile }) {
   const isSignup = mode === "signup";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -19,6 +27,7 @@ export default function AuthForm({ mode = "login", onSuccess }) {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const firstFieldRef = useRef(null);
+  const allowedAdmins = useMemo(() => getAllowedAdmins(["admin@bidagri.com"]), []);
 
   useEffect(() => {
     const t = setTimeout(() => firstFieldRef.current?.focus(), 0);
@@ -56,11 +65,36 @@ export default function AuthForm({ mode = "login", onSuccess }) {
       }
 
       const { user } = credential;
-      const displayName = user.displayName || name.trim() || user.email?.split("@")[0] || "";
+      const displayName =
+        user.displayName || name.trim() || user.email?.split("@")[0] || "";
+      const emailLower = (user.email || email).toLowerCase();
+
+      let resolvedRole = allowedAdmins.includes(emailLower)
+        ? "admin"
+        : selectedRole || "buyer";
+
+      if (!isSignup) {
+        const existing = await getUserProfile(user.uid);
+        resolvedRole = allowedAdmins.includes(emailLower)
+          ? "admin"
+          : existing?.role || selectedRole || "buyer";
+      }
+
+      const profile = await upsertUserProfile({
+        uid: user.uid,
+        email: emailLower,
+        displayName,
+        role: resolvedRole,
+        photoURL: user.photoURL ?? "",
+        phoneNumber: user.phoneNumber ?? "",
+      });
+
+      onProfile?.(profile);
       onSuccess?.({
         uid: user.uid,
         email: user.email,
         name: displayName,
+        role: profile?.role || resolvedRole,
         mode,
       });
     } catch (err) {
@@ -88,25 +122,32 @@ export default function AuthForm({ mode = "login", onSuccess }) {
     }
   };
 
+  const headerTitle = isSignup ? "Create your BidAgri account" : "Welcome back";
+  const headerSubtitle = isSignup
+    ? "Set a secure password to reach your tailored farmer or buyer workspace."
+    : "Sign in with your BidAgri credentials to continue where you left off.";
+
   return (
     <form
       onSubmit={handleSubmit}
-      className="w-full max-w-md space-y-6 rounded-2xl border border-[color:var(--surface-2)] bg-[color:var(--surface)] p-6 shadow-sm"
+      className="w-full max-w-md space-y-7 rounded-2xl border border-[rgba(var(--leaf-rgb),0.18)] bg-white/95 p-7 shadow-[0_18px_36px_rgba(15,23,42,0.12)] backdrop-blur"
       noValidate
     >
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-[color:var(--primary)]">
-          {isSignup ? "Create an Account" : "Sign in to BidAgri"}
+      <header className="space-y-2 text-center sm:text-left">
+        <span className="inline-flex items-center gap-2 rounded-full bg-[rgba(var(--leaf-rgb),0.1)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.28em] text-[color:var(--leaf)]">
+          BidAgri access
+        </span>
+        <h2 className="text-2xl font-bold tracking-tight text-[color:var(--foreground)] sm:text-3xl">
+          {headerTitle}
         </h2>
-        <div className="flex items-center gap-2 text-xs text-[color:var(--muted)]">
-          <span aria-hidden>🔒</span>
-          <span>We protect your data — encrypted</span>
-        </div>
-      </div>
+        <p className="text-sm leading-relaxed text-[color:var(--muted)] sm:text-base">
+          {headerSubtitle}
+        </p>
+      </header>
 
       {isSignup && (
         <div>
-          <label htmlFor="name" className="block text-sm font-medium text-[color:var(--primary)]">
+          <label htmlFor="name" className="block text-sm font-semibold text-[color:var(--foreground)]">
             Name
           </label>
           <input
@@ -118,7 +159,7 @@ export default function AuthForm({ mode = "login", onSuccess }) {
             onChange={(e) => setName(e.target.value)}
             onBlur={() => setTouched((t) => ({ ...t, name: true }))}
             aria-describedby="name-error"
-            className="mt-2 w-full rounded-lg border border-[color:var(--surface-2)] bg-[color:var(--surface)] px-4 py-2 text-sm text-[color:var(--foreground)] placeholder:text-[color:var(--muted)] focus:border-[color:var(--leaf)] focus:outline-none focus:ring-2 focus:ring-[color:var(--leaf)]/40"
+            className="mt-2 w-full rounded-xl border border-[rgba(var(--leaf-rgb),0.18)] bg-white px-4 py-2.5 text-sm text-[color:var(--foreground)] shadow-sm placeholder:text-[color:var(--muted)] focus:border-[color:var(--leaf)] focus:outline-none focus:ring-2 focus:ring-[color:var(--leaf)]/35"
             placeholder="Jane Doe"
           />
           {touched.name && <InlineError id="name-error" message={errors.name} />}
@@ -127,7 +168,7 @@ export default function AuthForm({ mode = "login", onSuccess }) {
 
       {!isSignup && (
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-[color:var(--primary)]">
+          <label htmlFor="email" className="block text-sm font-semibold text-[color:var(--foreground)]">
             Email
           </label>
           <input
@@ -139,7 +180,7 @@ export default function AuthForm({ mode = "login", onSuccess }) {
             onChange={(e) => setEmail(e.target.value)}
             onBlur={() => setTouched((t) => ({ ...t, email: true }))}
             aria-describedby="email-error"
-            className="mt-2 w-full rounded-lg border border-[color:var(--surface-2)] bg-[color:var(--surface)] px-4 py-2 text-sm text-[color:var(--foreground)] placeholder:text-[color:var(--muted)] focus:border-[color:var(--leaf)] focus:outline-none focus:ring-2 focus:ring-[color:var(--leaf)]/40"
+            className="mt-2 w-full rounded-xl border border-[rgba(var(--leaf-rgb),0.18)] bg-white px-4 py-2.5 text-sm text-[color:var(--foreground)] shadow-sm placeholder:text-[color:var(--muted)] focus:border-[color:var(--leaf)] focus:outline-none focus:ring-2 focus:ring-[color:var(--leaf)]/35"
             placeholder="you@bidagri.com"
           />
           {touched.email && <InlineError id="email-error" message={errors.email} />}
@@ -148,7 +189,7 @@ export default function AuthForm({ mode = "login", onSuccess }) {
 
       {isSignup && (
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-[color:var(--primary)]">
+          <label htmlFor="email" className="block text-sm font-semibold text-[color:var(--foreground)]">
             Email
           </label>
           <input
@@ -159,7 +200,7 @@ export default function AuthForm({ mode = "login", onSuccess }) {
             onChange={(e) => setEmail(e.target.value)}
             onBlur={() => setTouched((t) => ({ ...t, email: true }))}
             aria-describedby="email-error"
-            className="mt-2 w-full rounded-lg border border-[color:var(--surface-2)] bg-[color:var(--surface)] px-4 py-2 text-sm text-[color:var(--foreground)] placeholder:text-[color:var(--muted)] focus:border-[color:var(--leaf)] focus:outline-none focus:ring-2 focus:ring-[color:var(--leaf)]/40"
+            className="mt-2 w-full rounded-xl border border-[rgba(var(--leaf-rgb),0.18)] bg-white px-4 py-2.5 text-sm text-[color:var(--foreground)] shadow-sm placeholder:text-[color:var(--muted)] focus:border-[color:var(--leaf)] focus:outline-none focus:ring-2 focus:ring-[color:var(--leaf)]/35"
             placeholder="you@company.com"
           />
           {touched.email && <InlineError id="email-error" message={errors.email} />}
@@ -174,18 +215,26 @@ export default function AuthForm({ mode = "login", onSuccess }) {
       />
       {touched.password && <InlineError id="password-error" message={errors.password} />}
 
-      <div className="flex items-center justify-between">
-        <a
-          href="/auth/forgot-password"
-          className="text-sm font-medium text-primary transition-colors hover:text-secondary"
-        >
-          Forgot password?
-        </a>
-        <p className="text-xs text-[color:var(--muted)]">By continuing you agree to our terms and privacy.</p>
-      </div>
+      {isSignup ? (
+        <p className="rounded-xl bg-[rgba(var(--leaf-rgb),0.08)] px-4 py-3 text-center text-sm text-[color:var(--foreground)]/85">
+          By creating an account you agree to our Terms of Service and Privacy Policy.
+        </p>
+      ) : (
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <a
+            href="/auth/forgot-password"
+            className="text-sm font-semibold text-[color:var(--leaf)] transition-colors hover:text-[color:var(--secondary)]"
+          >
+            Forgot password?
+          </a>
+          <p className="text-sm text-[color:var(--muted)]">
+            By continuing you agree to our Terms of Service and Privacy Policy.
+          </p>
+        </div>
+      )}
 
       {error && (
-        <div className="rounded-md bg-white border border-[color:var(--accent)]/40 p-3 text-sm text-[color:var(--foreground)]" role="alert">
+        <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700 shadow-sm" role="alert">
           {error}
         </div>
       )}
@@ -193,13 +242,14 @@ export default function AuthForm({ mode = "login", onSuccess }) {
       <button
         type="submit"
         disabled={!isValid || submitting}
-        className="inline-flex w-full items-center justify-center rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white shadow-md shadow-primary/20 transition-colors duration-200 hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 focus:ring-offset-base disabled:cursor-not-allowed disabled:opacity-60"
+        className="inline-flex w-full items-center justify-center rounded-full bg-[color:var(--leaf)] px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-[rgba(var(--leaf-rgb),0.28)] transition-colors duration-200 hover:bg-[color:var(--secondary)] focus:outline-none focus:ring-2 focus:ring-[color:var(--secondary)] focus:ring-offset-2 focus:ring-offset-white disabled:cursor-not-allowed disabled:opacity-60"
       >
         {submitting ? "Please wait…" : isSignup ? "Create Account" : "Sign In"}
       </button>
 
-      <div className="text-center text-xs text-[color:var(--muted)]">
-        <span aria-hidden>🔐</span> Secure login — encrypted transport
+      <div className="flex items-center justify-center gap-2 text-xs text-[color:var(--muted)]">
+        <span aria-hidden>🔐</span>
+        <span>Encrypted transport keeps your data safe.</span>
       </div>
     </form>
   );

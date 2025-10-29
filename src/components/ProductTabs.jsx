@@ -152,10 +152,22 @@ function QualityTab({ product }) {
   return (
     <div className="space-y-3">
       <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <li className="flex items-center gap-2"><span className="text-[color:var(--leaf)]">✔</span> Verified quality checks</li>
-        <li className="flex items-center gap-2"><span className="text-[color:var(--leaf)]">✔</span> Moisture within acceptable range</li>
-        <li className="flex items-center gap-2"><span className="text-[color:var(--leaf)]">✔</span> Standardized packaging</li>
-        <li className="flex items-center gap-2"><span className="text-[color:var(--leaf)]">✔</span> Seller reputation available</li>
+        <li className="flex items-center gap-2">
+          <span className="inline-block h-1.5 w-1.5 rounded-full bg-[color:var(--leaf)]" aria-hidden />
+          <span>Verified quality checks</span>
+        </li>
+        <li className="flex items-center gap-2">
+          <span className="inline-block h-1.5 w-1.5 rounded-full bg-[color:var(--leaf)]" aria-hidden />
+          <span>Moisture within acceptable range</span>
+        </li>
+        <li className="flex items-center gap-2">
+          <span className="inline-block h-1.5 w-1.5 rounded-full bg-[color:var(--leaf)]" aria-hidden />
+          <span>Standardized packaging</span>
+        </li>
+        <li className="flex items-center gap-2">
+          <span className="inline-block h-1.5 w-1.5 rounded-full bg-[color:var(--leaf)]" aria-hidden />
+          <span>Seller reputation available</span>
+        </li>
       </ul>
       <div className="grid grid-cols-3 gap-2">
         {[0, 1, 2].map((i) => (
@@ -190,9 +202,9 @@ function LogisticsTab() {
 function ReviewsTab() {
   return (
     <div className="space-y-3">
-      <div className="flex items-center gap-2">
-        <span className="text-[color:var(--accent)]">★★★★★</span>
-        <span className="text-sm text-[color:var(--muted)]">4.8 average (12 reviews)</span>
+      <div className="flex items-center gap-2 text-sm text-[color:var(--muted)]">
+        <span className="font-semibold text-[color:var(--foreground)]">Rating: 4.8/5</span>
+        <span>(12 reviews)</span>
       </div>
       <div className="space-y-2">
         <Review name="Buyer 1" text="Excellent quality and timely delivery." />

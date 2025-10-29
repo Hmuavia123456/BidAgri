@@ -1,32 +1,66 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { onAuthStateChanged } from "firebase/auth";
 import AuctionTimer from "@/components/AuctionTimer";
 import PriceStepper from "@/components/PriceStepper";
+import { auth } from "@/lib/firebase";
 
 const STORAGE_KEYS = {
   bidderName: "agribids:bidderName",
   phone: "agribids:phone",
 };
 
+async function fetchBids(productId, limit = 10) {
+  const params = new URLSearchParams({ productId, limit: String(limit) });
+  const response = await fetch(`/api/bids?${params.toString()}`, { cache: "no-store" });
+  if (!response.ok) {
+    const detail = await response.json().catch(() => null);
+    throw new Error(detail?.message || "Unable to load bids.");
+  }
+  const json = await response.json();
+  return Array.isArray(json?.items) ? json.items : [];
+}
+
+async function submitBid(token, payload) {
+  const response = await fetch("/api/bids", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(payload),
+  });
+  if (!response.ok) {
+    const detail = await response.json().catch(() => null);
+    throw new Error(detail?.message || "Unable to place bid.");
+  }
+  const json = await response.json();
+  return json?.bid || null;
+}
+
 export default function BidModal({ open, onClose, item }) {
   const dialogRef = useRef(null);
   const firstFieldRef = useRef(null);
   const lastFocusedRef = useRef(null);
+
   const [bidderName, setBidderName] = useState("");
   const [phone, setPhone] = useState("");
   const [pricePerKg, setPricePerKg] = useState("");
   const [quantity, setQuantity] = useState("");
   const [deliveryOption, setDeliveryOption] = useState("Pickup");
   const [notes, setNotes] = useState("");
-  const [submitted, setSubmitted] = useState(false);
-  const hydratedRef = useRef(false);
-  const [highestBid, setHighestBid] = useState(0);
   const [announcement, setAnnouncement] = useState("");
-  const [demoNote, setDemoNote] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+  const [loadingBids, setLoadingBids] = useState(false);
+  const [error, setError] = useState("");
+  const [user, setUser] = useState(null);
+  const [highestBid, setHighestBid] = useState(0);
+  const bidsRef = useRef([]);
+  const hydratedRef = useRef(false);
   const [closed, setClosed] = useState(false);
-  const step = 10; // Rs increment step
   const endTimeRef = useRef(null);
+  const step = 10;
 
   const resetForm = useCallback(
     (preserveContact = true) => {
@@ -35,6 +69,7 @@ export default function BidModal({ open, onClose, item }) {
       setDeliveryOption("Pickup");
       setNotes("");
       setSubmitted(false);
+      setAnnouncement("");
       if (!preserveContact) {
         setBidderName("");
         setPhone("");
@@ -48,37 +83,40 @@ export default function BidModal({ open, onClose, item }) {
     onClose();
   }, [onClose, resetForm]);
 
-  const minRequiredBid = useMemo(() => {
-    if (!item) return 1;
-    return Math.max(highestBid + step, item.pricePerKg + step);
-  }, [item, highestBid]);
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      setUser(firebaseUser);
+    });
+    return () => unsubscribe();
+  }, []);
 
-  // Initialize auction end time: 5 minutes from open
   useEffect(() => {
     if (!open) return;
     endTimeRef.current = Date.now() + 5 * 60 * 1000;
     setClosed(false);
   }, [open]);
 
-  // Initialize highest bid and simulate concurrent bids
+  const loadExistingBids = useCallback(async () => {
+    if (!item) return;
+    try {
+      setLoadingBids(true);
+      setError("");
+      const bids = await fetchBids(item.id);
+      bidsRef.current = bids;
+      const topBid = bids[0];
+      const derivedHighest = Number(topBid?.bidPerKg || item.highestBid || item.pricePerKg || 0);
+      setHighestBid(derivedHighest);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to load bids.");
+    } finally {
+      setLoadingBids(false);
+    }
+  }, [item]);
+
   useEffect(() => {
-    if (!open || !item) return;
-    setHighestBid(item.pricePerKg);
-    setDemoNote("Demo: bids are simulated client-side.");
-    const tick = () => {
-      // random chance to place a simulated bid
-      const chance = Math.random();
-      if (chance < 0.45) {
-        setHighestBid((prev) => {
-          const next = prev + step * (1 + Math.floor(Math.random() * 2));
-          setAnnouncement(`Another buyer placed a bid at Rs ${next.toLocaleString()}.`);
-          return next;
-        });
-      }
-    };
-    const id = window.setInterval(tick, 7000 + Math.random() * 5000);
-    return () => window.clearInterval(id);
-  }, [open, item]);
+    if (!open) return;
+    loadExistingBids();
+  }, [open, loadExistingBids]);
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -107,9 +145,7 @@ export default function BidModal({ open, onClose, item }) {
       const timer = window.setTimeout(() => {
         firstFieldRef.current?.focus();
       }, 0);
-      return () => {
-        window.clearTimeout(timer);
-      };
+      return () => window.clearTimeout(timer);
     }
     document.body.style.overflow = "";
     if (lastFocusedRef.current instanceof HTMLElement) {
@@ -148,13 +184,6 @@ export default function BidModal({ open, onClose, item }) {
   }, [open, closeAndReset]);
 
   useEffect(() => {
-    if (!open) return undefined;
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [open]);
-
-  useEffect(() => {
     if (!hydratedRef.current) return;
     window.localStorage.setItem(STORAGE_KEYS.bidderName, bidderName);
   }, [bidderName]);
@@ -164,6 +193,12 @@ export default function BidModal({ open, onClose, item }) {
     window.localStorage.setItem(STORAGE_KEYS.phone, phone);
   }, [phone]);
 
+  const highlightedMinBid = useMemo(() => {
+    const base = Number(highestBid || item?.highestBid || item?.pricePerKg || 0);
+    if (!base && !item) return step;
+    return base > 0 ? base + step : (item?.pricePerKg || 0) + step;
+  }, [highestBid, item, step]);
+
   if (!open || !item) {
     return null;
   }
@@ -171,11 +206,14 @@ export default function BidModal({ open, onClose, item }) {
   const bidPerKgNumber = Number(pricePerKg);
   const quantityNumber = Number(quantity);
   const itemTotal = bidPerKgNumber > 0 && quantityNumber > 0 ? bidPerKgNumber * quantityNumber : 0;
-  const deliveryCost = deliveryOption === "Delivery" && quantityNumber > 0 ? 1500 + Math.ceil(quantityNumber / 100) * 500 : 0;
+  const deliveryCost =
+    deliveryOption === "Delivery" && quantityNumber > 0
+      ? 1500 + Math.ceil(quantityNumber / 100) * 500
+      : 0;
   const total = itemTotal + deliveryCost;
 
   const isPhoneValid = /^03\d{9}$/.test(phone);
-  const isPriceValid = pricePerKg !== "" && bidPerKgNumber >= minRequiredBid;
+  const isPriceValid = pricePerKg !== "" && bidPerKgNumber >= highlightedMinBid;
   const isQuantityValid = quantity !== "" && quantityNumber >= 1;
   const isNameValid = bidderName.trim().length > 0;
 
@@ -184,8 +222,12 @@ export default function BidModal({ open, onClose, item }) {
   const titleId = `bid-modal-title-${item.id}`;
   const subTitleId = `bid-modal-subtitle-${item.id}`;
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
+    if (!user) {
+      setAnnouncement("Please sign in to place a bid.");
+      return;
+    }
     if (closed) {
       setAnnouncement("Auction closed. Bidding is disabled.");
       return;
@@ -194,9 +236,39 @@ export default function BidModal({ open, onClose, item }) {
       setAnnouncement("Bid not submitted. Please fix the errors.");
       return;
     }
-    setSubmitted(true);
-    setAnnouncement("Bid submitted successfully (demo). You are the provisional highest bidder.");
-    setHighestBid(bidPerKgNumber);
+    try {
+      setAnnouncement("Submitting bid…");
+      const token = await user.getIdToken();
+      const payload = {
+        productId: item.id,
+        pricePerKg: bidPerKgNumber,
+        quantity: quantityNumber,
+        deliveryOption,
+        notes,
+        bidderName,
+        phone,
+      };
+      const newBid = await submitBid(token, payload);
+      if (newBid) {
+        bidsRef.current = [newBid, ...bidsRef.current];
+        setHighestBid(Number(newBid.bidPerKg || bidPerKgNumber));
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(
+            new CustomEvent("bid:placed", {
+              detail: { productId: item.id },
+            })
+          );
+        }
+      }
+      setSubmitted(true);
+      setAnnouncement("Bid submitted successfully. You are the provisional highest bidder.");
+      setPricePerKg("");
+      setQuantity("");
+      setNotes("");
+      await loadExistingBids();
+    } catch (err) {
+      setAnnouncement(err instanceof Error ? err.message : "Bid failed. Try again.");
+    }
   };
 
   return (
@@ -218,227 +290,154 @@ export default function BidModal({ open, onClose, item }) {
           className="w-full max-w-md bg-[color:var(--surface)] rounded-2xl shadow-2xl p-5 md:p-6"
         >
           <header className="relative pb-5 border-b border-[color:var(--supporting)]">
-            <h2 id={titleId} className="text-lg font-semibold text-[color:var(--foreground)]">
-              {`Place Bid — ${item.title}`}
-            </h2>
-            <p id={subTitleId} className="mt-1 text-sm text-[color:var(--muted)]">
-              {`${item.category} - ${item.location}`}
-            </p>
-            <div className="mt-3 flex items-center justify-between">
-              <AuctionTimer
-                endTime={endTimeRef.current}
-                onExpire={() => setClosed(true)}
-                className=""
-              />
-              <div className="text-xs text-[color:var(--muted)]" aria-live="polite">
-                {demoNote}
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <h2 id={titleId} className="text-xl font-semibold text-[color:var(--foreground)]">
+                  Place your bid
+                </h2>
+                <p id={subTitleId} className="text-sm text-[color:var(--muted)]">
+                  Highest bid so far: Rs {highestBid.toLocaleString()} / kg
+                </p>
               </div>
-            </div>
-            <button
-              type="button"
-              onClick={closeAndReset}
-              className="absolute top-1 right-1 rounded-full p-2 text-[color:var(--muted)] hover:bg-[color:var(--surface-2)] focus:outline-none focus:ring-2 focus:ring-[color:var(--leaf)]"
-              aria-label="Close bid modal"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                className="h-4 w-4"
+              <button
+                type="button"
+                onClick={closeAndReset}
+                className="rounded-full border border-[color:var(--supporting)]/50 px-2 py-1 text-sm text-[color:var(--muted)] hover:text-[color:var(--foreground)]"
+                aria-label="Close"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
-              </svg>
-            </button>
+                ✕
+              </button>
+            </div>
+            <div className="mt-3 flex items-center justify-between text-xs text-[color:var(--muted)]">
+              <span>Lot price: Rs {Number(item.pricePerKg || 0).toLocaleString()} / kg</span>
+              <AuctionTimer endTime={endTimeRef.current} onExpire={() => setClosed(true)} />
+            </div>
           </header>
 
-          {!submitted ? (
-            <form className="mt-5 space-y-4" onSubmit={handleSubmit}>
-              <div className="sr-only" aria-live="assertive" role="alert">{announcement}</div>
-              <div className="space-y-3">
-                <label className="block text-xs font-medium text-[color:var(--muted)]">
-                  Bidder Name
-                  <input
-                    ref={firstFieldRef}
-                    type="text"
-                    value={bidderName}
-                    onChange={(event) => setBidderName(event.target.value)}
-                    className="mt-1 w-full rounded-lg ring-1 ring-[color:var(--supporting)] focus:ring-2 focus:ring-[color:var(--leaf)] px-3 py-2 bg-[color:var(--surface)] text-[color:var(--foreground)] placeholder:text-[color:var(--muted)]"
-                    required
-                  />
-                </label>
+          {error && <p className="mt-3 text-sm text-rose-600">{error}</p>}
 
-                <label className="block text-xs font-medium text-[color:var(--muted)]">
-                  Phone
-                  <input
-                    type="tel"
-                    inputMode="numeric"
-                    pattern="03\\d{9}"
-                    placeholder="03XXXXXXXXX"
-                    value={phone}
-                    onChange={(event) => setPhone(event.target.value)}
-                    className="mt-1 w-full rounded-lg ring-1 ring-[color:var(--supporting)] focus:ring-2 focus:ring-[color:var(--leaf)] px-3 py-2 bg-[color:var(--surface)] text-[color:var(--foreground)] placeholder:text-[color:var(--muted)]"
-                    required
-                  />
-                  <span className="mt-1 block text-[11px] text-[color:var(--muted)]">
-                    Format: 03XXXXXXXXX
-                  </span>
-                  {!isPhoneValid && phone.length > 0 && (
-                    <span className="mt-1 block text-[11px] text-[color:var(--accent)]">
-                      Enter a valid Pakistani mobile number.
-                    </span>
-                  )}
-                </label>
-
-                <div className="block text-xs font-medium text-[color:var(--muted)]">
-                  <div className="flex items-center justify-between">
-                    <span>Bid Price per kg</span>
-                    <span className="inline-flex items-center gap-1 text-[11px] text-[color:var(--muted)]" title="To outbid, offer at least the highest bid plus the minimum increment.">
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-3 w-3"><path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.019.857l-.665 2.327a.75.75 0 001.02.858l.04-.02M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 4.5h.008v.008H12V16.5z" /></svg>
-                      Guidance
-                    </span>
-                  </div>
-                  <div className="mt-1">
-                    <PriceStepper
-                      value={pricePerKg}
-                      onChange={setPricePerKg}
-                      min={minRequiredBid}
-                      step={step}
-                      currency="Rs"
-                    />
-                  </div>
-                  <div className="mt-1 text-[11px] text-[color:var(--muted)]">
-                    Current highest bid: Rs {highestBid.toLocaleString()} — Minimum increment: Rs {step}. Offer at least Rs {(minRequiredBid).toLocaleString()} to outbid.
-                  </div>
-                  {!isPriceValid && pricePerKg !== "" && (
-                    <span className="mt-1 block text-[11px] text-[color:var(--accent)]">
-                      Bid must be at least Rs {minRequiredBid}.
-                    </span>
-                  )}
-                </div>
-
-                <label className="block text-xs font-medium text-[color:var(--muted)]">
-                  Quantity (kg)
-                  <input
-                    type="number"
-                    min={1}
-                    value={quantity}
-                    onChange={(event) => setQuantity(event.target.value)}
-                    className="mt-1 w-full rounded-lg ring-1 ring-[color:var(--supporting)] focus:ring-2 focus:ring-[color:var(--leaf)] px-3 py-2 bg-[color:var(--surface)] text-[color:var(--foreground)] placeholder:text-[color:var(--muted)]"
-                    required
-                  />
-                  {!isQuantityValid && quantity !== "" && (
-                    <span className="mt-1 block text-[11px] text-[color:var(--accent)]">
-                      Quantity must be at least 1 kg.
-                    </span>
-                  )}
-                </label>
-
-                <label className="block text-xs font-medium text-[color:var(--muted)]">
-                  Delivery Option
-                  <select
-                    value={deliveryOption}
-                    onChange={(event) => setDeliveryOption(event.target.value)}
-                    className="mt-1 w-full rounded-lg ring-1 ring-[color:var(--supporting)] focus:ring-2 focus:ring-[color:var(--leaf)] px-3 py-2 bg-[color:var(--surface)] text-[color:var(--foreground)] placeholder:text-[color:var(--muted)]"
-                  >
-                    <option value="Pickup">Pickup</option>
-                    <option value="Delivery">Delivery</option>
-                  </select>
-                </label>
-
-                <label className="block text-xs font-medium text-[color:var(--muted)]">
-                  Notes (optional)
-                  <textarea
-                    value={notes}
-                    onChange={(event) => setNotes(event.target.value)}
-                    rows={3}
-                    className="mt-1 w-full rounded-lg ring-1 ring-[color:var(--supporting)] focus:ring-2 focus:ring-[color:var(--leaf)] px-3 py-2 bg-[color:var(--surface)] text-[color:var(--foreground)]"
-                  />
-                </label>
-              </div>
-
-              <div className="mt-3 rounded-xl bg-white text-[color:var(--foreground)] border border-[color:var(--accent)]/40 p-3 text-sm">
-                <div className="flex justify-between"><span>Items subtotal</span><span>Rs {itemTotal.toLocaleString() || "0"}</span></div>
-                <div className="flex justify-between"><span>Estimated delivery</span><span>{deliveryOption === "Delivery" ? `Rs ${deliveryCost.toLocaleString()}` : "Rs 0"}</span></div>
-                <div className="mt-1 border-t border-[color:var(--accent)]/40 pt-2 flex justify-between font-medium"><span>Estimated total</span><span>Rs {total.toLocaleString() || "0"}</span></div>
-              </div>
-
-              {closed && (
-                <div className="rounded-xl bg-[color:var(--surface-2)] text-[color:var(--foreground)] border border-[color:var(--supporting)] p-3 text-sm">
-                  Auction closed. You can no longer place bids. Next steps: contact the seller to discuss availability and future lots.
-                </div>
-              )}
-
-              <div className="flex justify-end gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={closeAndReset}
-                  className="bg-[color:var(--surface-2)] text-[color:var(--foreground)] rounded-full px-4 py-2 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[color:var(--leaf)]"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={!formIsValid || closed}
-                  className="bg-[color:var(--leaf)] text-[color:var(--surface)] rounded-full px-5 py-2.5 hover:bg-[color:var(--primary)] transition disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-[color:var(--leaf)]"
-                >
-                  Submit Bid
-                </button>
-              </div>
-            </form>
-          ) : (
-            <div className="mt-6 space-y-5 text-center">
-              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[color:var(--surface)] text-[color:var(--leaf)] ring-1 ring-[color:var(--accent)]/50">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth="1.5"
-                  stroke="currentColor"
-                  className="h-8 w-8"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-                </svg>
-              </div>
-              <div className="space-y-1">
-                <p className="text-lg font-semibold text-[color:var(--foreground)]">Bid submitted (demo)!</p>
-                <p className="text-sm text-[color:var(--muted)]">We’ve noted your interest. This is a demo; in production, bids are processed securely with escrow protection and refundable pre-authorizations as needed.</p>
-              </div>
-              <dl className="space-y-2 text-sm text-[color:var(--foreground)] text-left mx-auto max-w-sm">
-                <div className="flex justify-between"><dt className="font-medium">Item</dt><dd>{item.title}</dd></div>
-                <div className="flex justify-between"><dt className="font-medium">Bid / kg</dt><dd>Rs {bidPerKgNumber.toLocaleString()}</dd></div>
-                <div className="flex justify-between"><dt className="font-medium">Quantity</dt><dd>{quantityNumber.toLocaleString()} kg</dd></div>
-                <div className="flex justify-between"><dt className="font-medium">Items subtotal</dt><dd>Rs {itemTotal.toLocaleString()}</dd></div>
-                <div className="flex justify-between"><dt className="font-medium">Estimated delivery</dt><dd>Rs {deliveryCost.toLocaleString()}</dd></div>
-                <div className="flex justify-between"><dt className="font-medium">Estimated total</dt><dd>Rs {total.toLocaleString()}</dd></div>
-                <div className="flex justify-between"><dt className="font-medium">Phone</dt><dd>{phone}</dd></div>
-              </dl>
-              <div className="mx-auto max-w-sm text-xs text-[color:var(--muted)]">
-                How bidding works: highest valid bid before timer expiry provisionally wins. Platform fees are transparent and delivery is coordinated with seller. Learn more in our help center (placeholder).
-              </div>
-              <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
-                <a
-                  href="/products"
-                  className="bg-[color:var(--surface-2)] text-[color:var(--foreground)] rounded-full px-4 py-2 text-sm font-medium hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[color:var(--leaf)] text-center"
-                >
-                  View Products
-                </a>
-                <button
-                  type="button"
-                  onClick={() => {
-                    resetForm();
-                    window.setTimeout(() => {
-                      firstFieldRef.current?.focus();
-                    }, 0);
-                  }}
-                  className="bg-[color:var(--leaf)] text-[color:var(--surface)] rounded-full px-5 py-2.5 text-sm font-medium hover:bg-[color:var(--secondary)] focus:outline-none focus:ring-2 focus:ring-[color:var(--leaf)]"
-                >
-                  Place another bid
-                </button>
-              </div>
+          <form className="mt-5 space-y-4" onSubmit={handleSubmit}>
+            <div className="sr-only" aria-live="assertive" role="alert">
+              {announcement}
             </div>
-          )}
+
+            <label className="block text-xs font-medium text-[color:var(--muted)]">
+              Bidder Name
+              <input
+                ref={firstFieldRef}
+                type="text"
+                value={bidderName}
+                onChange={(event) => setBidderName(event.target.value)}
+                className="mt-1 w-full rounded-lg ring-1 ring-[color:var(--supporting)] focus:ring-2 focus:ring-[color:var(--leaf)] px-3 py-2 bg-[color:var(--surface)] text-[color:var(--foreground)] placeholder:text-[color:var(--muted)]"
+                required
+              />
+            </label>
+
+            <label className="block text-xs font-medium text-[color:var(--muted)]">
+              Phone
+              <input
+                type="tel"
+                inputMode="numeric"
+                placeholder="03XXXXXXXXX"
+                value={phone}
+                onChange={(event) => setPhone(event.target.value)}
+                className="mt-1 w-full rounded-lg ring-1 ring-[color:var(--supporting)] focus:ring-2 focus:ring-[color:var(--leaf)] px-3 py-2 bg-[color:var(--surface)] text-[color:var(--foreground)] placeholder:text-[color:var(--muted)]"
+                required
+              />
+              <span className="mt-1 block text-[11px] text-[color:var(--foreground)]/70">
+                Format: 03XXXXXXXXX
+              </span>
+              {!isPhoneValid && phone.length > 0 && (
+                <span className="mt-1 block text-[11px] text-rose-600">
+                  Enter a valid Pakistani mobile number.
+                </span>
+              )}
+            </label>
+
+            <div className="block text-xs font-medium text-[color:var(--muted)]">
+              <div className="flex items-center justify-between">
+                <span>Bid Price per kg</span>
+                <span className="inline-flex items-center gap-1 text-[11px] text-[color:var(--muted)]">
+                  Min bid Rs {highlightedMinBid.toLocaleString()}
+                </span>
+              </div>
+              <div className="mt-1">
+                <PriceStepper
+                  value={pricePerKg}
+                  onChange={setPricePerKg}
+                  min={highlightedMinBid}
+                  step={step}
+                  currency="Rs"
+                />
+              </div>
+              {!isPriceValid && pricePerKg !== "" && (
+                <span className="mt-1 block text-[11px] text-rose-600">
+                  Bid must be at least Rs {highlightedMinBid.toLocaleString()} per kg.
+                </span>
+              )}
+            </div>
+
+            <label className="block text-xs font-medium text-[color:var(--muted)]">
+              Quantity (kg)
+              <input
+                type="number"
+                min={1}
+                value={quantity}
+                onChange={(event) => setQuantity(event.target.value)}
+                className="mt-1 w-full rounded-lg ring-1 ring-[color:var(--supporting)] focus:ring-2 focus:ring-[color:var(--leaf)] px-3 py-2 bg-[color:var(--surface)] text-[color:var(--foreground)] placeholder:text-[color:var(--muted)]"
+                required
+              />
+              {!isQuantityValid && quantity !== "" && (
+                <span className="mt-1 block text-[11px] text-rose-600">
+                  Quantity must be at least 1 kg.
+                </span>
+              )}
+            </label>
+
+            <label className="block text-xs font-medium text-[color:var(--muted)]">
+              Delivery Option
+              <select
+                value={deliveryOption}
+                onChange={(event) => setDeliveryOption(event.target.value)}
+                className="mt-1 w-full rounded-lg ring-1 ring-[color:var(--supporting)] focus:ring-2 focus:ring-[color:var(--leaf)] px-3 py-2 bg-[color:var(--surface)] text-[color:var(--foreground)]"
+              >
+                <option value="Pickup">Pickup</option>
+                <option value="Delivery">Delivery</option>
+              </select>
+            </label>
+
+            <label className="block text-xs font-medium text-[color:var(--muted)]">
+              Notes (optional)
+              <textarea
+                value={notes}
+                onChange={(event) => setNotes(event.target.value)}
+                rows={3}
+                className="mt-1 w-full rounded-lg ring-1 ring-[color:var(--supporting)] focus:ring-2 focus:ring-[color:var(--leaf)] px-3 py-2 bg-[color:var(--surface)] text-[color:var(--foreground)] placeholder:text-[color:var(--muted)]"
+              />
+            </label>
+
+            <div className="rounded-xl border border-[color:var(--supporting)]/30 bg-[color:var(--surface-2)]/60 px-3 py-2 text-xs text-[color:var(--muted)]">
+              Total (est.): Rs {total.toLocaleString()}
+            </div>
+
+            <button
+              type="submit"
+              className="w-full rounded-full bg-[color:var(--leaf)] px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-[rgba(var(--leaf-rgb),0.24)] transition-colors hover:bg-[color:var(--secondary)] focus:outline-none focus:ring-2 focus:ring-[color:var(--secondary)] focus:ring-offset-2 focus:ring-offset-[color:var(--surface)] disabled:cursor-not-allowed disabled:opacity-60"
+              disabled={loadingBids}
+            >
+              Place bid
+            </button>
+
+            {announcement && (
+              <p className="text-sm text-[color:var(--muted)]">{announcement}</p>
+            )}
+
+            {submitted && (
+              <p className="text-xs text-[color:var(--leaf)]">
+                We have received your bid. Our team will reach out if you are the highest bidder.
+              </p>
+            )}
+          </form>
         </div>
       </div>
     </>

@@ -27,10 +27,13 @@ const initialFormState = {
   terms: false,
 };
 
+const MAX_PHOTOS = 3;
+
 export default function FarmerForm() {
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState(initialFormState);
   const [photoPreviews, setPhotoPreviews] = useState([]);
+  const [photoError, setPhotoError] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   useEffect(() => {
@@ -49,22 +52,26 @@ export default function FarmerForm() {
 
   const handleFileChange = (event) => {
     const { files } = event.target;
+    const selectedFiles = Array.from(files || []);
+    const limitedFiles = selectedFiles.slice(0, MAX_PHOTOS);
+
     setPhotoPreviews((prev) => {
       prev.forEach((preview) => URL.revokeObjectURL(preview.url));
-      return [];
+      return limitedFiles.map((file) => ({
+        url: URL.createObjectURL(file),
+        name: file.name,
+      }));
     });
-
-    const newFiles = Array.from(files || []);
-    const newPreviews = newFiles.map((file) => ({
-      url: URL.createObjectURL(file),
-      name: file.name,
-    }));
 
     setFormData((prev) => ({
       ...prev,
-      photos: newFiles,
+      photos: limitedFiles,
     }));
-    setPhotoPreviews(newPreviews);
+    setPhotoError(
+      selectedFiles.length > MAX_PHOTOS
+        ? `You can upload up to ${MAX_PHOTOS} photos. Only the first ${MAX_PHOTOS} were kept.`
+        : ""
+    );
   };
 
   const validateStep = (stepIndex) => {
@@ -143,6 +150,7 @@ export default function FarmerForm() {
     photoPreviews.forEach((preview) => URL.revokeObjectURL(preview.url));
     setFormData(initialFormState);
     setPhotoPreviews([]);
+    setPhotoError("");
     setCurrentStep(0);
     setIsSubmitted(false);
   };
@@ -426,7 +434,7 @@ export default function FarmerForm() {
             </div>
             <div>
               <label htmlFor="photos" className="block text-sm font-medium text-[color:var(--primary)]">
-                Photos
+                Photos (up to {MAX_PHOTOS})
               </label>
               <input
                 id="photos"
@@ -438,6 +446,14 @@ export default function FarmerForm() {
                 onChange={handleFileChange}
                 className="mt-2 w-full rounded-lg border border-[color:var(--surface-2)] bg-[color:var(--surface)] px-3 py-2 text-sm text-[color:var(--foreground)] placeholder:text-[color:var(--muted)] focus:outline-none focus:ring-2 focus:ring-[color:var(--leaf)]/60 focus:border-[color:var(--leaf)]/70"
               />
+              <p className="mt-2 text-xs text-[color:var(--muted)]">
+                Selected {photoPreviews.length} of {MAX_PHOTOS} photos to showcase your produce.
+              </p>
+              {photoError && (
+                <p className="mt-1 text-xs text-rose-600" role="alert">
+                  {photoError}
+                </p>
+              )}
               {photoPreviews.length > 0 && (
                 <div className="grid grid-cols-3 md:grid-cols-4 gap-3 mt-3">
                   {photoPreviews.map((preview) => (

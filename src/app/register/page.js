@@ -18,7 +18,6 @@ export default function RegisterPage() {
   const router = useRouter();
   const [role, setRole] = useState("farmer");
   const [mode, setMode] = useState("signup");
-
   useEffect(() => {
     if (typeof window === "undefined") return;
     const storedRole = window.localStorage.getItem("bidagri:role");
@@ -40,13 +39,20 @@ export default function RegisterPage() {
     [mode]
   );
 
-  const handleSuccess = (user) => {
+  const handleSuccess = (payload) => {
+    const resolvedRole = payload?.role && typeof payload.role === "string"
+      ? payload.role
+      : role;
     if (typeof window !== "undefined") {
-      window.localStorage.setItem("bidagri:role", role);
+      window.localStorage.setItem("bidagri:role", resolvedRole);
     }
-    const destination = role === "farmer" ? "/farmers/dashboard" : "/buyers/dashboard";
+    const destination = resolvedRole === "admin"
+      ? "/admin/dashboard"
+      : resolvedRole === "farmer"
+      ? "/farmers/dashboard"
+      : "/buyers/dashboard";
     router.replace(destination);
-    return user;
+    return payload;
   };
 
   return (
@@ -146,7 +152,7 @@ export default function RegisterPage() {
           </div>
 
           <div className="rounded-[28px] border border-[rgba(var(--leaf-rgb),0.2)] bg-white/95 p-6 shadow-[0_18px_40px_rgba(15,23,42,0.12)] backdrop-blur">
-            <AuthForm mode={mode} onSuccess={handleSuccess} />
+            <AuthForm mode={mode} onSuccess={handleSuccess} selectedRole={role} />
           </div>
         </div>
       </div>

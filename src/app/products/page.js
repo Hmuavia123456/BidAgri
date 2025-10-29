@@ -20,8 +20,13 @@ export default function ProductsPage() {
           <h1 className="text-3xl font-extrabold tracking-tight text-[color:var(--primary)] md:text-4xl">
             Product Marketplace
           </h1>
-          <p className="mt-4 text-base text-[color:var(--muted)] md:text-lg">
-            Explore upcoming listings and prepare for bids as we build out the full catalog experience.
+          <p
+            className="mt-4 inline-flex max-w-2xl items-center gap-2 rounded-xl bg-[color:var(--leaf)] px-4 py-2 text-base font-semibold text-white !text-white shadow-sm shadow-[rgba(var(--leaf-rgb),0.25)] md:text-lg [&_*]:!text-white"
+            style={{ color: "#ffffff" }}
+          >
+            <span className="text-white !text-white" style={{ color: "#ffffff" }}>
+              Explore upcoming listings and prepare for bids as we build out the full catalog experience.
+            </span>
           </p>
           <div className="mt-4 flex flex-wrap gap-3">
             {categories.slice(0, 6).flatMap((cat) =>

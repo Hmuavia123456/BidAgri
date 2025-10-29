@@ -1,9 +1,9 @@
+import Link from "next/link";
 import FarmerAnimations from "@/components/FarmerAnimations";
 import { FadeIn, AnimatedHeading } from "@/components/FarmerMotionWrapper";
 import AnimatedTestimonial from "@/components/AnimatedTestimonial";
 // import EnhancedFarmerRegistrationForm from "@/components/EnhancedFarmerRegistrationForm";
 import FarmerOnboardingWizard from "@/components/FarmerOnboardingWizard";
-import RedesignedFarmerForm from "@/components/RedesignedFarmerForm";
 import { ShieldCheck, ShoppingBag } from "lucide-react";
 
 export const metadata = {
@@ -56,13 +56,19 @@ export default function FarmersPage() {
               middlemen, no unfair pricing. Set your own price, connect with
               verified buyers, and receive secure payments seamlessly.
             </p>
-            <div className="space-x-4">
-              <button className="rounded-full bg-primary px-6 py-3 font-semibold text-white shadow-md shadow-primary/25 transition-colors duration-200 hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 focus:ring-offset-base">
+            <div className="flex flex-wrap gap-4">
+              <Link
+                href="#farmer-onboarding"
+                className="inline-flex items-center justify-center rounded-full bg-primary px-6 py-3 text-sm font-semibold text-white shadow-md shadow-primary/25 transition-colors duration-200 hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 focus:ring-offset-base"
+              >
                 Start Selling
-              </button>
-              <button className="rounded-full border border-accent/60 bg-accent/30 px-6 py-3 font-semibold text-primary transition-colors duration-200 hover:bg-secondary hover:text-white focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 focus:ring-offset-base">
+              </Link>
+              <Link
+                href="#why-bidagri"
+                className="inline-flex items-center justify-center rounded-full border border-accent/60 bg-accent/30 px-6 py-3 text-sm font-semibold text-primary transition-colors duration-200 hover:bg-secondary hover:text-white focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 focus:ring-offset-base"
+              >
                 Learn More
-              </button>
+              </Link>
             </div>
           </div>
           <div className="flex justify-center">
@@ -75,7 +81,7 @@ export default function FarmersPage() {
         </div>
       </section>
 
-      <section className="bg-white py-20">
+      <section id="why-bidagri" className="bg-white py-20">
         <div className="max-w-6xl mx-auto px-6 text-center">
           <FarmerAnimations>
             <AnimatedHeading
@@ -255,12 +261,11 @@ export default function FarmersPage() {
               Share your profile, produce, and documents in a few guided steps.
             </p>
           </div>
-          {/* Switched to redesigned single-step farmer form for clarity and alignment */}
-          <RedesignedFarmerForm />
+          <FarmerOnboardingWizard />
         </div>
       </section>
 
-      <section className="bg-white py-20">
+      <section id="farmer-onboarding" className="bg-white py-20 scroll-mt-36">
         <div className="max-w-6xl mx-auto px-6">
           <h2 className="text-3xl md:text-4xl font-bold text-[color:var(--foreground)] text-center mb-10">
             Farmers Success Stories

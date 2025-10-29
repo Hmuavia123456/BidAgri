@@ -35,7 +35,6 @@ export default function ShareActions({ product }) {
         onClick={copyLink}
         className="inline-flex items-center gap-2 rounded-full border border-[color:var(--supporting)] px-3 py-1.5 text-sm text-[color:var(--foreground)] bg-[color:var(--surface)] hover:bg-[color:var(--surface-2)] focus:outline-none focus:ring-2 focus:ring-[color:var(--accent)]"
       >
-        <span aria-hidden>🔗</span>
         {copied ? "Link copied" : "Copy Link"}
       </button>
       <button
@@ -49,7 +48,6 @@ export default function ShareActions({ product }) {
             : "bg-[color:var(--surface-2)] text-[color:var(--muted)] focus:ring-[color:var(--supporting)]"
         }`}
       >
-        <span aria-hidden>📣</span>
         {canShare ? "Share" : "Share (unsupported)"}
       </button>
     </div>

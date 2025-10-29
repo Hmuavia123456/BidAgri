@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useId, useRef, useState } from "react";
-import { Camera, File, ImageIcon, Trash2, Upload } from "lucide-react";
+import { Camera, File, ImageIcon, Loader2, Trash2, Upload } from "lucide-react";
 
 const ACCEPT_DEFAULT = [
   "image/*",
@@ -25,11 +25,17 @@ export default function FileUploader({
   const fileInputRef = useRef(null);
   const [files, setFiles] = useState([]);
   const [errors, setErrors] = useState([]);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState("");
 
   useEffect(() => {
-    if (Array.isArray(value)) setFiles(value);
-    else if (value) setFiles([value]);
-    else setFiles([]);
+    if (Array.isArray(value)) {
+      setFiles(value.filter(Boolean));
+    } else if (value && typeof value === "object") {
+      setFiles([value]);
+    } else {
+      setFiles([]);
+    }
   }, [value]);
 
   const validateFiles = useCallback(
@@ -61,24 +67,87 @@ export default function FileUploader({
     [accept, maxSizeMB]
   );
 
-  const update = useCallback(
-    (nextFiles, errs = []) => {
+  const updateFiles = useCallback(
+    (nextFiles) => {
       setFiles(nextFiles);
-      setErrors(errs);
       if (onChange) {
         onChange(multiple ? nextFiles : nextFiles[0] || null);
       }
     },
-    [onChange, multiple]
+    [multiple, onChange]
+  );
+
+  const requestUpload = useCallback(
+    async (file) => {
+      const body = {
+        fileName: file.name,
+        fileType: file.type,
+        fileSize: file.size,
+        folder: name ? `uploads/${name}` : "uploads",
+      };
+
+      const res = await fetch("/api/storage/presign", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      if (!res.ok) {
+        const detail = await res.json().catch(() => null);
+        const message = detail?.message || "Unable to get upload URL.";
+        throw new Error(message);
+      }
+
+      const data = await res.json();
+      const uploadResponse = await fetch(data.url, {
+        method: "PUT",
+        headers: { "Content-Type": file.type },
+        body: file,
+      });
+
+      if (!uploadResponse.ok) {
+        throw new Error("Upload to storage failed.");
+      }
+
+      return {
+        key: data.key,
+        url: data.publicUrl,
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        uploadedAt: new Date().toISOString(),
+      };
+    },
+    [name]
   );
 
   const handleFiles = useCallback(
-    (fileList) => {
+    async (fileList) => {
       const incoming = Array.from(fileList || []);
       const { next, errs } = validateFiles(incoming);
-      update(multiple ? [...files, ...next] : next.slice(0, 1), errs);
+      setErrors(errs);
+      if (!next.length) return;
+
+      setUploading(true);
+      setUploadError("");
+      try {
+        const uploaded = [];
+        for (const file of next) {
+          // upload sequentially to surface errors clearly
+          // eslint-disable-next-line no-await-in-loop
+          const result = await requestUpload(file);
+          uploaded.push(result);
+        }
+
+        const combined = multiple ? [...files, ...uploaded] : uploaded.slice(0, 1);
+        updateFiles(combined);
+      } catch (error) {
+        setUploadError(error?.message || "File upload failed. Please try again.");
+      } finally {
+        setUploading(false);
+      }
     },
-    [files, multiple, update, validateFiles]
+    [files, multiple, requestUpload, updateFiles, validateFiles]
   );
 
   const onDrop = useCallback(
@@ -91,20 +160,21 @@ export default function FileUploader({
   );
 
   const openCamera = () => {
-      fileInputRef.current?.setAttribute("capture", "environment");
-      fileInputRef.current?.click();
+    fileInputRef.current?.setAttribute("capture", "environment");
+    fileInputRef.current?.click();
   };
 
   const removeAt = (idx) => {
     const next = files.filter((_, i) => i !== idx);
-    update(next);
+    updateFiles(next);
   };
 
-  const isImage = (file) => file.type.startsWith("image/") || /\.(png|jpe?g|webp)$/i.test(file.name);
+  const isImage = (file) =>
+    (file?.type || "").startsWith("image/") || /\.(png|jpe?g|webp)$/i.test(file?.name || "");
 
   return (
     <div className="w-full">
-  <label htmlFor={inputId} className="block text-sm font-semibold text-[color:var(--secondary)] mb-2">
+      <label htmlFor={inputId} className="mb-2 block text-sm font-semibold text-[color:var(--secondary)]">
         {label}
       </label>
       <div
@@ -117,17 +187,21 @@ export default function FileUploader({
         onDragOver={(e) => e.preventDefault()}
         className={`group flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-[color:var(--accent)] p-6 text-center outline-none transition-colors duration-[250ms] ease-in-out focus-within:bg-white focus:ring-2 focus:ring-[color:var(--secondary)] focus:ring-offset-2 hover:border-[color:var(--secondary)] ${
           files.length > 0 ? "bg-[color:var(--surface)]" : "bg-[color:var(--surface)]"
-        }`}
+        } ${uploading ? "opacity-75" : ""}`}
         onClick={() => fileInputRef.current?.click()}
+        aria-busy={uploading}
       >
-        <Upload
-          className={`h-6 w-6 transition-colors duration-[250ms] text-[color:var(--primary)] group-focus:text-[color:var(--primary)]`}
-          aria-hidden
-        />
-        <p className={`text-sm transition-colors duration-[250ms] ${files.length > 0 ? "text-[color:var(--foreground)]" : "text-[color:var(--foreground)]"} group-focus:text-[color:var(--foreground)]`}>
-          Drag & drop files here, or click to browse
-        </p>
-        <p className={`text-xs transition-colors duration-[250ms] ${files.length > 0 ? "text-[color:var(--muted)]" : "text-[color:var(--muted)]"} group-focus:text-[color:var(--muted)]`}>{hint}</p>
+        <div className="flex flex-col items-center gap-3">
+          {uploading ? (
+            <Loader2 className="h-6 w-6 animate-spin text-[color:var(--primary)]" aria-hidden />
+          ) : (
+            <Upload className="h-6 w-6 text-[color:var(--primary)]" aria-hidden />
+          )}
+          <p className="text-sm text-[color:var(--foreground)]">
+            Drag & drop files here, or click to browse
+          </p>
+          <p className="text-xs text-[color:var(--muted)]">{hint}</p>
+        </div>
         <div className="flex gap-3 mt-2">
           <button
             type="button"
@@ -165,6 +239,12 @@ export default function FileUploader({
         </ul>
       )}
 
+      {uploadError && (
+        <p className="mt-3 rounded-lg border border-[color:var(--accent)]/40 bg-[color:var(--accent)]/10 px-3 py-2 text-sm text-[color:var(--accent)]" role="alert">
+          {uploadError}
+        </p>
+      )}
+
       {files.length > 0 && (
         <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
           {files.map((f, idx) => (
@@ -180,7 +260,7 @@ export default function FileUploader({
               <div className="aspect-video overflow-hidden rounded-md bg-[rgba(var(--accent-rgb),0.08)] flex items-center justify-center">
                 {isImage(f) ? (
                   <img
-                    src={URL.createObjectURL(f)}
+                    src={f.url || f.previewUrl || ""}
                     alt={f.name}
                     className="h-full w-full object-cover"
                   />

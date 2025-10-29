@@ -1,9 +1,12 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Player } from "@lottiefiles/react-lottie-player";
 import { FileText, Leaf, Mail, MapPin, Phone, User } from "lucide-react";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "@/lib/firebase";
 
 const initialFormState = {
   fullName: "",
@@ -65,6 +68,9 @@ export default function EnhancedFarmerRegistrationForm() {
   const [errors, setErrors] = useState({});
   const [showToast, setShowToast] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
+  const [authStatus, setAuthStatus] = useState("loading");
+  const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
     let toastTimer;
@@ -77,6 +83,14 @@ export default function EnhancedFarmerRegistrationForm() {
       }
     };
   }, [showToast]);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user);
+      setAuthStatus(user ? "authenticated" : "unauthenticated");
+    });
+    return () => unsubscribe();
+  }, []);
 
   const isFormValid = useMemo(() => {
     return (
@@ -109,7 +123,7 @@ export default function EnhancedFarmerRegistrationForm() {
     return newErrors;
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const validationErrors = validate();
     setErrors(validationErrors);
@@ -117,12 +131,70 @@ export default function EnhancedFarmerRegistrationForm() {
       return;
     }
     setIsSubmitting(true);
-    setTimeout(() => {
+    setSubmitError("");
+    try {
+      if (!currentUser) {
+        throw new Error("Please sign in before submitting your registration.");
+      }
+      const token = await currentUser.getIdToken().catch(() => null);
+      const emailHeader = currentUser.email?.toLowerCase() ?? "";
+      const uidHeader = currentUser.uid ?? "";
+      const response = await fetch("/api/farmers/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          ...(emailHeader ? { "X-User-Email": emailHeader } : {}),
+          ...(uidHeader ? { "X-User-Uid": uidHeader } : {}),
+        },
+        body: JSON.stringify({ source: "quick_form", ...formData }),
+      });
+      if (!response.ok) {
+        const detail = await response.json().catch(() => null);
+        const message = detail?.message || "Unable to submit registration. Please try again.";
+        throw new Error(message);
+      }
       setShowToast(true);
-      setIsSubmitting(false);
       setFormData(initialFormState);
-    }, 800);
+    } catch (error) {
+      setSubmitError(error?.message || "Something went wrong. Please retry.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
+  if (authStatus === "loading") {
+    return (
+      <div className="relative mx-auto my-8 flex max-w-4xl items-center justify-center rounded-2xl bg-[color:var(--surface)] p-8 text-center shadow-lg ring-1 ring-[color:var(--accent)]/40">
+        <p className="text-sm text-[color:var(--muted)]">Checking your account…</p>
+      </div>
+    );
+  }
+
+  if (authStatus === "unauthenticated") {
+    return (
+      <div className="relative mx-auto my-8 max-w-3xl rounded-2xl bg-[color:var(--surface)] p-8 text-center shadow-lg ring-1 ring-[color:var(--accent)]/40">
+        <h2 className="text-2xl font-semibold text-[color:var(--foreground)]">Sign in to continue</h2>
+        <p className="mt-2 text-sm text-[color:var(--muted)]">
+          Please log in before submitting your registration.
+        </p>
+        <div className="mt-4 flex flex-wrap justify-center gap-3">
+          <Link
+            href="/auth/login"
+            className="inline-flex items-center justify-center rounded-full bg-[color:var(--leaf)] px-5 py-2 text-sm font-semibold text-white shadow-md shadow-[rgba(var(--leaf-rgb),0.3)] transition hover:-translate-y-0.5"
+          >
+            Go to login
+          </Link>
+          <Link
+            href="/auth/signup"
+            className="inline-flex items-center justify-center rounded-full border border-[color:var(--leaf)] px-5 py-2 text-sm font-semibold text-[color:var(--leaf)] shadow-sm transition hover:bg-[color:var(--leaf)] hover:text-white"
+          >
+            Create account
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <motion.div
@@ -202,6 +274,15 @@ export default function EnhancedFarmerRegistrationForm() {
             </motion.span>
           </motion.div>
         </motion.div>
+
+        {submitError && (
+          <div
+            className="mb-6 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700"
+            role="alert"
+          >
+            {submitError}
+          </div>
+        )}
 
         <motion.form
           onSubmit={handleSubmit}

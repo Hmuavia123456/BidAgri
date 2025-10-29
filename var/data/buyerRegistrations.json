@@ -1,0 +1,26 @@
+[
+  {
+    "id": "db37e1fd-aba5-4bfd-8047-67c6cd38582d",
+    "name": "hassan muavia",
+    "email": "hassanmuavia932@gmail.com",
+    "phone": "03076449296",
+    "province": "punjab",
+    "city": "sialkot",
+    "category": "grains",
+    "capacity": "76kg",
+    "notes": "",
+    "createdAt": "2025-10-22T10:26:20.739Z"
+  },
+  {
+    "id": "fcf7efeb-c34f-4c6f-84b7-258a1a415ae4",
+    "name": "hassan muavia",
+    "email": "hassanmuavia932@gmail.com",
+    "phone": "03076449296",
+    "province": "pnjab",
+    "city": "sialkot",
+    "category": "grains",
+    "capacity": "40ton",
+    "notes": "",
+    "createdAt": "2025-10-22T11:05:18.885Z"
+  }
+]

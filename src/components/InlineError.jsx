@@ -12,7 +12,7 @@ export default function InlineError({ id, message, className = "" }) {
       id={id}
       role="alert"
       aria-live="polite"
-      className={`mt-2 text-xs text-[color:var(--accent)] ${className}`}
+      className={`mt-2 text-sm font-semibold text-rose-600 ${className}`}
     >
       {message}
     </p>

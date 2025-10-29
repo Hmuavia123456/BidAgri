@@ -66,77 +66,92 @@ export default function CheckoutSummary({
 
   return (
     <section
-      className={`rounded-2xl border border-[color:var(--surface-2)] bg-[color:var(--surface)] shadow-sm ${className}`}
+      className={`ui-card border border-[rgba(15,23,42,0.08)] bg-white/95 ${className}`}
       aria-labelledby="order-summary-heading"
     >
-      <div className="p-5 sm:p-6">
-        <h2 id="order-summary-heading" className="text-xl font-semibold tracking-tight text-[color:var(--primary)]">
-          Order Summary
-        </h2>
+      <div className="p-6 sm:p-7">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <span className="ui-badge bg-[rgba(var(--leaf-rgb),0.12)] text-[color:var(--leaf)]">Cart</span>
+            <h2 id="order-summary-heading" className="mt-3 text-2xl font-semibold tracking-tight text-[#0f172a] sm:text-[28px]">
+              Order Summary
+            </h2>
+          </div>
+          <div className="rounded-xl bg-[rgba(var(--leaf-rgb),0.12)] px-3 py-2 text-right text-xs font-semibold uppercase tracking-[0.18em] text-[rgba(var(--leaf-rgb),0.9)]">
+            Secure Checkout
+          </div>
+        </div>
 
-        <ul className="mt-4 divide-y divide-[color:var(--surface-2)]/80" role="list">
+        <ul className="mt-6 divide-y divide-[rgba(15,23,42,0.08)]" role="list">
           {items.map((it, idx) => (
             <li key={idx} className="flex items-start justify-between py-3">
               <div>
-                <p className="font-medium text-[color:var(--foreground)]">{it.name}</p>
-                <p className="text-sm text-[color:var(--muted)]">Qty: {it.qty}</p>
+                <p className="font-semibold text-[#0f172a]">{it.name}</p>
+                <p className="text-sm text-slate-500">Qty: {it.qty}</p>
               </div>
               <div className="text-right">
-                <p className="text-[color:var(--foreground)]">
+                <p className="font-semibold text-[#0f172a]">
                   {currency} {(it.price * it.qty).toFixed(2)}
                 </p>
-                <p className="text-xs text-[color:var(--muted)]">@ {currency} {it.price.toFixed(2)}</p>
+                <p className="text-xs text-slate-500">@ {currency} {it.price.toFixed(2)}</p>
               </div>
             </li>
           ))}
         </ul>
 
-        <div className="mt-4 space-y-2 text-sm">
-          <div className="flex justify-between">
-            <span className="text-[color:var(--foreground)]/90">Subtotal</span>
-            <span className="font-medium">
+        <div className="mt-5 space-y-3 rounded-2xl bg-[rgba(241,245,249,0.6)] p-4 text-sm text-[#0f172a]">
+          <div className="flex justify-between text-base">
+            <span className="font-medium text-slate-600">Subtotal</span>
+            <span className="font-semibold">
               {currency} {subtotal.toFixed(2)}
             </span>
           </div>
-          <div className="flex justify-between">
-            <span className="text-[color:var(--foreground)]/90">Shipping</span>
-            <span className="font-medium">
+          <div className="flex justify-between text-base">
+            <span className="font-medium text-slate-600">Shipping</span>
+            <span className="font-semibold">
               {currency} {(fees.shipping || 0).toFixed(2)}
             </span>
           </div>
-          <div className="flex justify-between">
-            <span className="text-[color:var(--foreground)]/90">Service Fee</span>
-            <span className="font-medium">
+          <div className="flex justify-between text-base">
+            <span className="font-medium text-slate-600">Service Fee</span>
+            <span className="font-semibold">
               {currency} {(fees.service || 0).toFixed(2)}
             </span>
           </div>
-          <div className="flex justify-between border-t pt-2 text-base">
-            <span className="font-semibold">Total</span>
-            <span className="font-semibold">
-              {currency} {total.toFixed(2)}
+          <div className="flex justify-between border-t border-white/60 pt-3 text-lg font-semibold text-[#0f172a]">
+            <span>Total</span>
+            <span>
+              {discountPercent > 0 ? (
+                <span className="flex items-center gap-2">
+                  <span className="text-sm font-normal text-slate-500 line-through">{currency} {total.toFixed(2)}</span>
+                  <span>{currency} {discountedTotal.toFixed(2)}</span>
+                </span>
+              ) : (
+                `${currency} ${total.toFixed(2)}`
+              )}
             </span>
           </div>
         </div>
 
-        <form className="mt-5" onSubmit={handleApply}>
-          <label htmlFor="promo" className="block text-sm font-medium text-[color:var(--primary)]">
+        <form className="mt-6" onSubmit={handleApply}>
+          <label htmlFor="promo" className="block text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">
             Have a promo code?
           </label>
-          <div className="mt-1 flex gap-2">
+          <div className="mt-2 flex gap-2">
             <input
               id="promo"
               name="promo"
               type="text"
               value={promo}
               onChange={(e) => setPromo(e.target.value)}
-              className="flex-1 rounded-lg border border-[color:var(--surface-2)] bg-[color:var(--surface)] px-3 py-2 text-[color:var(--foreground)] placeholder:text-[color:var(--muted)] shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--leaf)]/50"
+              className="flex-1 rounded-xl border border-[rgba(15,23,42,0.12)] bg-white px-3 py-3 text-sm font-medium text-[#0f172a] placeholder:text-slate-400 shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--leaf)]/60"
               placeholder="e.g., SAVE10"
               aria-invalid={!!error}
               aria-describedby={error ? "promo-error" : undefined}
             />
             <button
               type="submit"
-              className="rounded-lg bg-[color:var(--leaf)] px-4 py-2 text-[color:var(--surface)] shadow-sm transition hover:bg-[color:var(--primary)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--leaf)]/60 disabled:opacity-50"
+              className="rounded-xl bg-[color:var(--leaf)] px-5 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-white shadow-[0_14px_28px_rgba(0,179,134,0.28)] transition hover:bg-[color:var(--secondary)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--leaf)]/60 disabled:opacity-50"
               disabled={applying}
             >
               {applying ? "Applying…" : "Apply"}
@@ -153,30 +168,30 @@ export default function CheckoutSummary({
         </form>
 
         {discountPercent > 0 && (
-          <div className="mt-5 rounded-xl border border-[color:var(--surface-2)] bg-[color:var(--surface-2)] p-4 text-sm text-[color:var(--foreground)] shadow-sm">
+          <div className="mt-6 rounded-2xl border border-[rgba(15,23,42,0.08)] bg-[rgba(0,179,134,0.08)] p-4 text-sm text-[#0f172a] shadow-inner">
             <div className="flex items-center justify-between">
-              <span className="font-medium">
+              <span className="font-semibold">
                 Discount Applied ({discountPercent}%)
                 {appliedCode ? ` — ${appliedCode}` : ""}
               </span>
-              <span className="line-through opacity-70">
+              <span className="text-sm font-medium text-slate-500 line-through">
                 {currency} {total.toFixed(2)}
               </span>
             </div>
-            <div className="mt-2 flex items-center justify-between text-base">
-              <span className="font-semibold">New Total</span>
-              <span className="font-semibold">
+            <div className="mt-3 flex items-center justify-between text-lg font-semibold">
+              <span>New Total</span>
+              <span>
                 {currency} {discountedTotal.toFixed(2)}
               </span>
             </div>
           </div>
         )}
 
-        <div className="mt-6 rounded-xl border border-[color:var(--surface-2)] bg-[color:var(--surface)] p-3 text-xs text-[color:var(--foreground)] shadow-sm">
-          <p>
+        <div className="mt-7 rounded-2xl border border-[rgba(15,23,42,0.08)] bg-white/90 p-4 text-xs text-slate-600 shadow-sm">
+          <p className="text-sm text-[#0f172a]">
             Payments are protected by SSL and tokenization. We do not store card details. Trusted by farmers and buyers across Pakistan.
           </p>
-          <div className="mt-2 flex items-center gap-2 text-[color:var(--foreground)]/80">
+          <div className="mt-3 flex items-center gap-3 text-slate-500">
             <ShieldCheck className="h-5 w-5 text-[color:var(--leaf)]" aria-hidden />
             <Lock className="h-5 w-5" aria-hidden />
             <span className="sr-only">Security and trust badges</span>

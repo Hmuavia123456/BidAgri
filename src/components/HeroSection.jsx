@@ -35,15 +35,26 @@ export default function HeroSection() {
   const anyClipPlaying = videoReady.some((isReady) => isReady);
 
   useEffect(() => {
+    const testLink = document.createElement("link");
+    const canPreloadVideo =
+      typeof testLink.relList?.supports === "function" ? testLink.relList.supports("preload") : true;
+
+    if (!canPreloadVideo) {
+      return undefined;
+    }
+
     const preloadLinks = VIDEO_SOURCES.flatMap((video) =>
       video.sources
         .filter((source) => source.src.toLowerCase().endsWith(".mp4"))
         .map((source) => {
           const link = document.createElement("link");
-          link.rel = "preload";
-          link.as = "video";
-          link.type = source.type || "video/mp4";
-          link.href = source.src;
+          link.setAttribute("rel", "preload");
+          link.setAttribute("as", "video");
+          link.setAttribute("href", source.src);
+          link.setAttribute("type", source.type || "video/mp4");
+          if (/^https?:\/\//i.test(source.src)) {
+            link.setAttribute("crossorigin", "anonymous");
+          }
           document.head.appendChild(link);
           return link;
         }),

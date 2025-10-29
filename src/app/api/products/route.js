@@ -1,12 +1,20 @@
 import { adminAuth, adminDb } from "@/lib/firebaseAdmin";
 import { Timestamp } from "firebase-admin/firestore";
 import { getAllowedAdmins } from "@/lib/adminEmails";
+import { PRODUCTS as FALLBACK_PRODUCTS } from "@/data/products";
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 const ALLOWED_ADMINS = getAllowedAdmins(["admin@bidagri.com"]);
 
 async function maybeRequireAdmin(request, includeDrafts) {
   if (!includeDrafts) {
     return null;
+  }
+
+  if (!adminAuth) {
+    throw Object.assign(new Error("Admin authentication unavailable."), { status: 503 });
   }
 
   const authHeader = request.headers.get("authorization") || "";
@@ -49,16 +57,45 @@ export async function GET(request) {
 
   let items = [];
 
-  if (!includeDrafts) {
-    const statusBuckets = ["Available", "In Bidding"];
-    const snapshots = await Promise.all(
-      statusBuckets.map((status) =>
-        adminDb.collection("products").where("status", "==", status).get()
-      )
-    );
-    const seen = new Map();
-    snapshots.forEach((snapshot) => {
-      snapshot.docs.forEach((doc) => {
+  try {
+    if (!includeDrafts) {
+      const statusBuckets = ["Available", "In Bidding"];
+      const snapshots = await Promise.all(
+        statusBuckets.map((status) =>
+          adminDb.collection("products").where("status", "==", status).get()
+        )
+      );
+      const seen = new Map();
+      snapshots.forEach((snapshot) => {
+        snapshot.docs.forEach((doc) => {
+          const data = doc.data();
+          const createdAt =
+            data.createdAt instanceof Timestamp ? data.createdAt.toDate().toISOString() : null;
+          const updatedAt =
+            data.updatedAt instanceof Timestamp ? data.updatedAt.toDate().toISOString() : null;
+          const publishedAt =
+            data.publishedAt instanceof Timestamp ? data.publishedAt.toDate().toISOString() : null;
+          seen.set(doc.id, {
+            id: doc.id,
+            ...data,
+            createdAt,
+            updatedAt,
+            publishedAt,
+          });
+        });
+      });
+      items = Array.from(seen.values()).sort((a, b) => {
+        const aTime = new Date(a.createdAt || 0).getTime();
+        const bTime = new Date(b.createdAt || 0).getTime();
+        return bTime - aTime;
+      });
+    } else {
+      let query = adminDb.collection("products").orderBy("createdAt", "desc");
+      if (statusFilter) {
+        query = query.where("status", "==", statusFilter);
+      }
+      const snapshot = await query.get();
+      items = snapshot.docs.map((doc) => {
         const data = doc.data();
         const createdAt =
           data.createdAt instanceof Timestamp ? data.createdAt.toDate().toISOString() : null;
@@ -66,42 +103,24 @@ export async function GET(request) {
           data.updatedAt instanceof Timestamp ? data.updatedAt.toDate().toISOString() : null;
         const publishedAt =
           data.publishedAt instanceof Timestamp ? data.publishedAt.toDate().toISOString() : null;
-        seen.set(doc.id, {
+
+        return {
           id: doc.id,
           ...data,
           createdAt,
           updatedAt,
           publishedAt,
-        });
+        };
       });
-    });
-    items = Array.from(seen.values()).sort((a, b) => {
-      const aTime = new Date(a.createdAt || 0).getTime();
-      const bTime = new Date(b.createdAt || 0).getTime();
-      return bTime - aTime;
-    });
-  } else {
-    let query = adminDb.collection("products").orderBy("createdAt", "desc");
-    if (statusFilter) {
-      query = query.where("status", "==", statusFilter);
     }
-    const snapshot = await query.get();
-    items = snapshot.docs.map((doc) => {
-      const data = doc.data();
-      const createdAt =
-        data.createdAt instanceof Timestamp ? data.createdAt.toDate().toISOString() : null;
-      const updatedAt =
-        data.updatedAt instanceof Timestamp ? data.updatedAt.toDate().toISOString() : null;
-      const publishedAt =
-        data.publishedAt instanceof Timestamp ? data.publishedAt.toDate().toISOString() : null;
-
-      return {
-        id: doc.id,
-        ...data,
-        createdAt,
-        updatedAt,
-        publishedAt,
-      };
+  } catch (error) {
+    console.error("Failed to load products from Firestore:", error);
+    if (!includeDrafts) {
+      return Response.json({ items: FALLBACK_PRODUCTS, source: "fallback" }, { status: 200 });
+    }
+    return new Response(JSON.stringify({ message: "Failed to load products." }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
     });
   }
 

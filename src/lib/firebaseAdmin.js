@@ -33,15 +33,41 @@ function initApp() {
     });
   }
 
-  return initializeApp();
+  const projectId = process.env.FIREBASE_ADMIN_PROJECT_ID || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
+  try {
+    return initializeApp(projectId ? { projectId } : {});
+  } catch (error) {
+    console.error("Failed to initialise Firebase app:", error);
+    return null;
+  }
 }
 
 const adminApp = initApp();
 
-export const adminAuth = getAuth(adminApp);
-export const adminDb = getFirestore(adminApp);
+export const adminAuth = (() => {
+  if (!adminApp) return null;
+  try {
+    return getAuth(adminApp);
+  } catch (error) {
+    console.error("Failed to initialise Firebase auth:", error);
+    return null;
+  }
+})();
+
+export const adminDb = (() => {
+  if (!adminApp) return null;
+  try {
+    return getFirestore(adminApp);
+  } catch (error) {
+    console.error("Failed to initialise Firebase Firestore:", error);
+    return null;
+  }
+})();
+
 export const adminTimestamp = FieldValue.serverTimestamp;
+
 export const adminMessaging = (() => {
+  if (!adminApp) return null;
   try {
     return getMessaging(adminApp);
   } catch (error) {

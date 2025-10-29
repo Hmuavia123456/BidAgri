@@ -25,6 +25,8 @@ export default function Navbar() {
   const [userRole, setUserRole] = useState("buyer");
   const lastScrollYRef = useRef(0);
   const tickingRef = useRef(false);
+  const mobileNavRef = useRef(null);
+  const toggleButtonRef = useRef(null);
   const pathname = usePathname();
 
   const isActive = (href) => (href === "/" ? pathname === href : pathname?.startsWith(href));
@@ -85,6 +87,17 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [pathname]);
 
+  useEffect(() => {
+    const node = mobileNavRef.current;
+    if (!node) return;
+    if (isOpen) {
+      node.removeAttribute("inert");
+    } else {
+      node.setAttribute("inert", "");
+      returnFocusToToggle();
+    }
+  }, [isOpen]);
+
   const navClassName = [
     "relative z-[61] mx-auto flex w-[95%] max-w-6xl items-center justify-between gap-4 rounded-full border px-5 py-2 transition-all duration-300 backdrop-blur-md",
     isScrolled
@@ -121,6 +134,14 @@ export default function Navbar() {
       : userRole === "buyer"
       ? "/buyers/dashboard"
       : "/farmers/dashboard";
+
+  const returnFocusToToggle = () => {
+    if (typeof document === "undefined") return;
+    const active = document.activeElement;
+    if (mobileNavRef.current?.contains(active)) {
+      toggleButtonRef.current?.focus();
+    }
+  };
 
   const handleSignOut = async () => {
     try {
@@ -235,7 +256,15 @@ export default function Navbar() {
               aria-label="Toggle navigation"
               aria-expanded={isOpen}
               aria-controls="mobile-nav"
-              onClick={() => setIsOpen((value) => !value)}
+              ref={toggleButtonRef}
+              onClick={() =>
+                setIsOpen((value) => {
+                  if (value) {
+                    returnFocusToToggle();
+                  }
+                  return !value;
+                })
+              }
             >
               <svg
                 className="h-5 w-5"
@@ -268,6 +297,7 @@ export default function Navbar() {
             hasMounted && isOpen ? "pointer-events-auto opacity-100 translate-y-0" : "pointer-events-none opacity-0 -translate-y-3"
           }`}
         aria-hidden={!(hasMounted && isOpen)}
+        ref={mobileNavRef}
       >
           <div className="mx-auto flex w-full max-w-3xl flex-col items-center gap-3 rounded-3xl border border-accent/30 bg-base/95 px-6 py-6 text-primary shadow-xl shadow-primary/20 backdrop-blur supports-[backdrop-filter]:bg-base/90 max-h-[calc(100vh-96px)] overflow-y-auto">
             {filteredNavItems.map(({ href, label }) => (
@@ -275,7 +305,10 @@ export default function Navbar() {
                 key={`mobile-${href}-${label}`}
                 href={href}
                 className="w-full rounded-full px-5 py-3 text-center text-sm font-semibold transition-colors duration-200 hover:bg-accent/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 focus-visible:ring-offset-base"
-                onClick={() => setIsOpen(false)}
+                onClick={() => {
+                  returnFocusToToggle();
+                  setIsOpen(false);
+                }}
               >
                 {label}
               </Link>
@@ -297,6 +330,7 @@ export default function Navbar() {
                   type="button"
                   onClick={() => {
                     handleSignOut();
+                    returnFocusToToggle();
                     setIsOpen(false);
                   }}
                   className="w-full rounded-full border border-[rgba(var(--leaf-rgb),0.3)] px-5 py-3 text-center text-sm font-semibold text-[color:var(--leaf)] transition hover:text-[color:var(--secondary)]"
@@ -308,14 +342,20 @@ export default function Navbar() {
               <div className="flex w-full flex-col gap-2 pt-3">
                 <Link
                   href="/auth/login"
-                  onClick={() => setIsOpen(false)}
+                  onClick={() => {
+                    returnFocusToToggle();
+                    setIsOpen(false);
+                  }}
                   className="w-full rounded-full bg-[color:var(--leaf)] px-5 py-3 text-center text-sm font-semibold text-white shadow-md shadow-[rgba(var(--leaf-rgb),0.24)] transition hover:bg-[color:var(--secondary)]"
                 >
                   Sign in
                 </Link>
                 <Link
                   href="/register"
-                  onClick={() => setIsOpen(false)}
+                  onClick={() => {
+                    returnFocusToToggle();
+                    setIsOpen(false);
+                  }}
                   className="w-full rounded-full border border-[rgba(var(--leaf-rgb),0.3)] px-5 py-3 text-center text-sm font-semibold text-[color:var(--leaf)] transition hover:text-[color:var(--secondary)]"
                 >
                   Register

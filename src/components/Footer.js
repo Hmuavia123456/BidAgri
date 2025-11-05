@@ -83,7 +83,7 @@ export default function Footer() {
             style={{ transitionDelay: "0.1s" }}
           >
             <div className="flex items-center gap-3 text-white">
-              <span className="text-4xl font-extrabold tracking-wide text-white drop-shadow-[0_0_12px_rgba(0,179,134,0.45)]">
+              <span className="text-4xl font-extrabold tracking-wide text-white drop-shadow-[0_0_12px_rgba(var(--leaf-rgb),0.45)]">
                 BidAgri
               </span>
               <span aria-hidden className="text-2xl text-white">🌿</span>

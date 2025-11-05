@@ -77,7 +77,7 @@ export default function PaymentMethods({ onSelect, selected, disabled = false, o
               key={m.id}
               className={`relative flex cursor-pointer items-start gap-4 rounded-3xl border bg-white/95 p-5 shadow-sm transition-all duration-300 ${
                 isSelected
-                  ? "border-[color:var(--leaf)]/70 shadow-[0_24px_40px_rgba(0,179,134,0.15)] ring-2 ring-[color:var(--leaf)]/40"
+                  ? "border-[color:var(--leaf)]/70 shadow-[0_24px_40px_rgba(var(--leaf-rgb),0.15)] ring-2 ring-[color:var(--leaf)]/40"
                   : "border-[rgba(15,23,42,0.08)] hover:border-[rgba(15,23,42,0.16)] hover:shadow-[0_18px_32px_rgba(15,23,42,0.08)]"
               } ${disabled ? "cursor-not-allowed opacity-60" : ""}`}
             >

@@ -2,54 +2,54 @@
 
 :root {
   /* cache-busting theme version */
-  --theme-version: 9;
-  /* Global background requested */
-  --background: #F5F7FB;                 /* soft cloud background */
+  --theme-version: 10;
+  /* Updated global palette */
+  --background: #FAFAFA;                 /* soft off-white requested */
 
   /* Brand palette */
-  --primary: #00B386;                    /* main accent / CTAs */
-  --secondary: #00C8A3;                  /* hover and secondary buttons */
-  --accent: #A3E8D1;                     /* light accents and badges */
-  --dark: #222831;                       /* base text / deep contrast */
-  --light: #F2F2F2;                      /* subtle dividers, light surfaces */
+  --primary: #4CAF50;                    /* main CTA (50% usage) */
+  --secondary: #1976D2;                  /* supporting actions (20% usage) */
+  --accent: #FDD835;                     /* highlight accents (10% usage) */
+  --dark: #1F2933;                       /* base text / deep contrast */
+  --light: #FFFFFF;                      /* elevated surfaces */
 
   /* Derived tokens for consistency */
   --supporting: var(--accent);           /* legacy alias kept for components */
   --surface: #FFFFFF;                    /* base elevated surface */
-  --surface-2: #F1F5F9;                  /* soft neutral surface */
-  --surface-3: #E4ECF5;                  /* subtle panels */
-  --foreground: #111827;                 /* default readable text */
-  --muted: rgba(17, 24, 39, 0.65);       /* softened dark for secondary text */
+  --surface-2: #F2F4F7;                  /* soft neutral surface */
+  --surface-3: #E6F0FF;                  /* subtle panel tint */
+  --foreground: #1C1F26;                 /* default readable text */
+  --muted: rgba(28, 31, 38, 0.68);       /* softened for secondary text */
   --leaf: var(--primary);                /* alias used for buttons/icons */
-  --border-soft: rgba(17, 24, 39, 0.08); /* default border tint */
-  --border-strong: rgba(17, 24, 39, 0.18);
-  --shadow-soft: 0 18px 36px rgba(15, 23, 42, 0.08);
-  --shadow-strong: 0 30px 60px rgba(15, 23, 42, 0.12);
+  --border-soft: rgba(25, 118, 210, 0.1);
+  --border-strong: rgba(31, 41, 51, 0.18);
+  --shadow-soft: 0 18px 36px rgba(25, 118, 210, 0.1);
+  --shadow-strong: 0 30px 60px rgba(31, 41, 51, 0.14);
 
   /* Footer theme aligned to palette */
-  --footer-bg-from: rgba(34, 40, 49, 0.95);
-  --footer-bg-to: rgba(34, 40, 49, 0.88);
-  --footer-fg: #F2F2F2;
+  --footer-bg-from: rgba(25, 118, 210, 0.95);
+  --footer-bg-to: rgba(76, 175, 80, 0.9);
+  --footer-fg: #F1F5F9;
   --footer-heading: #FFFFFF;
-  --footer-muted: rgba(255, 255, 255, 0.7);
+  --footer-muted: rgba(241, 245, 249, 0.75);
   --footer-link: var(--accent);
   --footer-link-hover: var(--secondary);
-  --footer-border: rgba(163, 232, 209, 0.35);
-  --footer-icon-border: rgba(163, 232, 209, 0.5);
+  --footer-border: rgba(76, 175, 80, 0.35);
+  --footer-icon-border: rgba(76, 175, 80, 0.45);
   --footer-icon-color: var(--accent);
   --footer-accent: var(--accent);
 
   /* RGB tokens (derived strictly from the palette) */
-  --primary-rgb: 0, 179, 134;
-  --secondary-rgb: 0, 200, 163;
-  --accent-rgb: 163, 232, 209;
-  --dark-rgb: 34, 40, 49;
-  --light-rgb: 242, 242, 242;
-  --background-rgb: 255, 255, 255;
-  --surface-rgb: var(--background-rgb);
-  --surface-2-rgb: var(--background-rgb);
-  --foreground-rgb: 17, 24, 39;
-  --muted-rgb: 71, 85, 105;
+  --primary-rgb: 76, 175, 80;
+  --secondary-rgb: 25, 118, 210;
+  --accent-rgb: 253, 216, 53;
+  --dark-rgb: 31, 41, 51;
+  --light-rgb: 255, 255, 255;
+  --background-rgb: 250, 250, 250;
+  --surface-rgb: 255, 255, 255;
+  --surface-2-rgb: 242, 244, 247;
+  --foreground-rgb: 28, 31, 38;
+  --muted-rgb: 97, 97, 97;
   --leaf-rgb: var(--primary-rgb);
 
   /* Back-compat alias */
@@ -72,40 +72,40 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    /* Force same universal background in dark mode */
-    --background: #FFFFFF;
+    /* Keep light brand experience in dark-preference environments */
+    --background: #FAFAFA;
     --surface: #FFFFFF;
-    --surface-2: #FFFFFF;
-    --foreground: #0F172A;
-    --muted: rgba(15, 23, 42, 0.68);
-    --primary: #00B386;
-    --secondary: #00C8A3;
-    --accent: #A3E8D1;
-    --leaf: #00B386;
+    --surface-2: #F2F4F7;
+    --foreground: #1C1F26;
+    --muted: rgba(28, 31, 38, 0.72);
+    --primary: #4CAF50;
+    --secondary: #1976D2;
+    --accent: #FDD835;
+    --leaf: #4CAF50;
 
-    --primary-rgb: 0, 179, 134;
-    --secondary-rgb: 0, 200, 163;
-    --accent-rgb: 163, 232, 209;
-    --dark-rgb: 34, 40, 49;
-    --light-rgb: 242, 242, 242;
-    --background-rgb: 255, 255, 255;
+    --primary-rgb: 76, 175, 80;
+    --secondary-rgb: 25, 118, 210;
+    --accent-rgb: 253, 216, 53;
+    --dark-rgb: 31, 41, 51;
+    --light-rgb: 255, 255, 255;
+    --background-rgb: 250, 250, 250;
     --surface-rgb: 255, 255, 255;
-    --surface-2-rgb: 255, 255, 255;
-    --foreground-rgb: 15, 23, 42;
-    --muted-rgb: 71, 85, 105;
-    --leaf-rgb: 0, 179, 134;
+    --surface-2-rgb: 242, 244, 247;
+    --foreground-rgb: 28, 31, 38;
+    --muted-rgb: 97, 97, 97;
+    --leaf-rgb: 76, 175, 80;
     --brand: var(--primary);
 
     /* Footer theme (dark) stays on brand */
-    --footer-bg-from: rgba(34, 40, 49, 0.95);
-    --footer-bg-to: rgba(34, 40, 49, 0.88);
-    --footer-fg: #F2F2F2;
+    --footer-bg-from: rgba(25, 118, 210, 0.95);
+    --footer-bg-to: rgba(76, 175, 80, 0.9);
+    --footer-fg: #F1F5F9;
     --footer-heading: #FFFFFF;
-    --footer-muted: rgba(255, 255, 255, 0.7);
+    --footer-muted: rgba(241, 245, 249, 0.75);
     --footer-link: var(--accent);
     --footer-link-hover: var(--secondary);
-    --footer-border: rgba(163, 232, 209, 0.3);
-    --footer-icon-border: rgba(163, 232, 209, 0.5);
+    --footer-border: rgba(76, 175, 80, 0.3);
+    --footer-icon-border: rgba(76, 175, 80, 0.45);
     --footer-icon-color: var(--accent);
     --footer-accent: var(--accent);
     --footer-accent-rgb: var(--accent-rgb);
@@ -119,7 +119,7 @@ html {
 }
 
 body {
-  background: radial-gradient(120% 120% at 50% 0%, #FFFFFF 0%, var(--background) 100%);
+  background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
   text-rendering: optimizeLegibility;
@@ -141,6 +141,32 @@ h5, h6 {
 
 p, li, span, label {
   color: rgba(var(--foreground-rgb), 0.92);
+}
+
+input,
+textarea,
+select {
+  color: var(--foreground);
+  background-color: var(--surface);
+  border-color: rgba(var(--foreground-rgb), 0.16);
+  -webkit-text-fill-color: var(--foreground);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: rgba(var(--foreground-rgb), 0.55);
+  opacity: 1;
+}
+
+@supports (-webkit-appearance: none) {
+  input:-webkit-autofill,
+  textarea:-webkit-autofill,
+  select:-webkit-autofill {
+    -webkit-text-fill-color: var(--foreground);
+    -webkit-box-shadow: 0 0 0px 1000px var(--surface) inset;
+    box-shadow: 0 0 0px 1000px var(--surface) inset;
+    caret-color: var(--leaf);
+  }
 }
 
 /* Smooth, consistent hovers site-wide */

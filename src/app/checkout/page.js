@@ -150,7 +150,7 @@ export default function CheckoutPage() {
           <form className="mt-4" onSubmit={handlePay}>
             <button
               type="submit"
-              className="group w-full rounded-2xl bg-primary px-6 py-3.5 font-semibold text-white shadow-[0_18px_36px_rgba(0,179,134,0.28)] transition-colors duration-200 hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 focus:ring-offset-white disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:shadow-none"
+              className="group w-full rounded-2xl bg-primary px-6 py-3.5 font-semibold text-white shadow-[0_18px_36px_rgba(var(--leaf-rgb),0.28)] transition-colors duration-200 hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 focus:ring-offset-white disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:shadow-none"
               disabled={processing || !isMethodValid}
               aria-busy={processing}
             >

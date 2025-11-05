@@ -24,7 +24,7 @@ const VIDEO_SOURCES = [
   },
 ];
 
-const SWITCH_INTERVAL_MS = 10000;
+const SWITCH_INTERVAL_MS = 6500;
 
 export default function HeroSection() {
   const videoRefs = useRef([]);

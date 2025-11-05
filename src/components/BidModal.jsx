@@ -61,6 +61,8 @@ export default function BidModal({ open, onClose, item }) {
   const [closed, setClosed] = useState(false);
   const endTimeRef = useRef(null);
   const step = 10;
+  const baseFieldClass =
+    "mt-1 w-full rounded-lg border border-[rgba(var(--foreground-rgb),0.16)] bg-[color:var(--surface)] px-3 py-2 md:px-4 md:py-3 text-sm sm:text-base md:text-lg text-[color:var(--foreground)] placeholder:text-[rgba(var(--foreground-rgb),0.55)] caret-[color:var(--leaf)] shadow-sm focus:outline-none focus:border-[color:var(--leaf)] focus:ring-2 focus:ring-[rgba(var(--leaf-rgb),0.45)] transition-colors";
 
   const resetForm = useCallback(
     (preserveContact = true) => {
@@ -279,165 +281,163 @@ export default function BidModal({ open, onClose, item }) {
         aria-hidden="true"
       />
       <div
-        className="fixed inset-0 z-[70] grid place-items-center px-4"
+        className="fixed inset-0 z-[70] overflow-y-auto"
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={subTitleId}
       >
-        <div
-          ref={dialogRef}
-          className="w-full max-w-md bg-[color:var(--surface)] rounded-2xl shadow-2xl p-5 md:p-6"
-        >
-          <header className="relative pb-5 border-b border-[color:var(--supporting)]">
-            <div className="flex items-center justify-between gap-4">
-              <div>
-                <h2 id={titleId} className="text-xl font-semibold text-[color:var(--foreground)]">
-                  Place your bid
-                </h2>
-                <p id={subTitleId} className="text-sm text-[color:var(--muted)]">
-                  Highest bid so far: Rs {highestBid.toLocaleString()} / kg
-                </p>
+        <div className="flex min-h-full items-center justify-center px-4 py-8 sm:px-6 md:px-8 lg:px-10">
+          <div
+            ref={dialogRef}
+            className="w-full max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl bg-[color:var(--surface)] rounded-2xl shadow-2xl p-5 sm:p-6 md:p-7 lg:p-8 max-h-[calc(100vh-3rem)] overflow-y-auto"
+          >
+            <header className="relative pb-5 border-b border-[color:var(--supporting)]">
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <h2 id={titleId} className="text-xl sm:text-2xl md:text-3xl font-semibold text-[color:var(--foreground)]">
+                    Place your bid
+                  </h2>
+                  <p id={subTitleId} className="text-sm md:text-base text-[color:var(--muted)]">
+                    Highest bid so far: Rs {highestBid.toLocaleString()} / kg
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={closeAndReset}
+                  className="rounded-full border border-[color:var(--supporting)]/50 px-2 py-1 text-sm text-[color:var(--muted)] hover:text-[color:var(--foreground)]"
+                  aria-label="Close"
+                >
+                  ✕
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={closeAndReset}
-                className="rounded-full border border-[color:var(--supporting)]/50 px-2 py-1 text-sm text-[color:var(--muted)] hover:text-[color:var(--foreground)]"
-                aria-label="Close"
-              >
-                ✕
-              </button>
-            </div>
-            <div className="mt-3 flex items-center justify-between text-xs text-[color:var(--muted)]">
-              <span>Lot price: Rs {Number(item.pricePerKg || 0).toLocaleString()} / kg</span>
-              <AuctionTimer endTime={endTimeRef.current} onExpire={() => setClosed(true)} />
-            </div>
-          </header>
-
-          {error && <p className="mt-3 text-sm text-rose-600">{error}</p>}
-
-          <form className="mt-5 space-y-4" onSubmit={handleSubmit}>
-            <div className="sr-only" aria-live="assertive" role="alert">
-              {announcement}
-            </div>
-
-            <label className="block text-xs font-medium text-[color:var(--muted)]">
-              Bidder Name
-              <input
-                ref={firstFieldRef}
-                type="text"
-                value={bidderName}
-                onChange={(event) => setBidderName(event.target.value)}
-                className="mt-1 w-full rounded-lg ring-1 ring-[color:var(--supporting)] focus:ring-2 focus:ring-[color:var(--leaf)] px-3 py-2 bg-[color:var(--surface)] text-[color:var(--foreground)] placeholder:text-[color:var(--muted)]"
-                required
-              />
-            </label>
-
-            <label className="block text-xs font-medium text-[color:var(--muted)]">
-              Phone
-              <input
-                type="tel"
-                inputMode="numeric"
-                placeholder="03XXXXXXXXX"
-                value={phone}
-                onChange={(event) => setPhone(event.target.value)}
-                className="mt-1 w-full rounded-lg ring-1 ring-[color:var(--supporting)] focus:ring-2 focus:ring-[color:var(--leaf)] px-3 py-2 bg-[color:var(--surface)] text-[color:var(--foreground)] placeholder:text-[color:var(--muted)]"
-                required
-              />
-              <span className="mt-1 block text-[11px] text-[color:var(--foreground)]/70">
-                Format: 03XXXXXXXXX
-              </span>
-              {!isPhoneValid && phone.length > 0 && (
-                <span className="mt-1 block text-[11px] text-rose-600">
-                  Enter a valid Pakistani mobile number.
-                </span>
-              )}
-            </label>
-
-            <div className="block text-xs font-medium text-[color:var(--muted)]">
-              <div className="flex items-center justify-between">
-                <span>Bid Price per kg</span>
-                <span className="inline-flex items-center gap-1 text-[11px] text-[color:var(--muted)]">
-                  Min bid Rs {highlightedMinBid.toLocaleString()}
-                </span>
+              <div className="mt-3 flex items-center justify-between text-xs sm:text-sm md:text-base text-[color:var(--muted)]">
+                <span>Lot price: Rs {Number(item.pricePerKg || 0).toLocaleString()} / kg</span>
+                <AuctionTimer endTime={endTimeRef.current} onExpire={() => setClosed(true)} />
               </div>
-              <div className="mt-1">
-                <PriceStepper
-                  value={pricePerKg}
-                  onChange={setPricePerKg}
-                  min={highlightedMinBid}
-                  step={step}
-                  currency="Rs"
+            </header>
+
+            {error && <p className="mt-3 text-sm text-rose-600">{error}</p>}
+
+            <form className="mt-5 space-y-4 md:space-y-5" onSubmit={handleSubmit}>
+              <div className="sr-only" aria-live="assertive" role="alert">
+                {announcement}
+              </div>
+
+              <label className="block text-xs sm:text-sm md:text-base font-semibold text-[color:var(--foreground)]">
+                Bidder Name
+                <input
+                  ref={firstFieldRef}
+                  type="text"
+                  value={bidderName}
+                  onChange={(event) => setBidderName(event.target.value)}
+                  className={baseFieldClass}
+                  required
                 />
+              </label>
+
+              <label className="block text-xs sm:text-sm md:text-base font-semibold text-[color:var(--foreground)]">
+                Phone
+                <input
+                  type="tel"
+                  inputMode="numeric"
+                  placeholder="03XXXXXXXXX"
+                  value={phone}
+                  onChange={(event) => setPhone(event.target.value)}
+                  className={baseFieldClass}
+                  required
+                />
+                <span className="mt-1 block text-[11px] sm:text-xs md:text-sm text-[color:var(--foreground)]/70">
+                  Format: 03XXXXXXXXX
+                </span>
+                {!isPhoneValid && phone.length > 0 && (
+                  <span className="mt-1 block text-[11px] sm:text-xs md:text-sm text-rose-600">
+                    Enter a valid Pakistani mobile number.
+                  </span>
+                )}
+              </label>
+
+              <div className="block text-xs sm:text-sm md:text-base font-semibold text-[color:var(--foreground)]">
+                <div className="flex items-center justify-between">
+                  <span>Bid Price per kg</span>
+                  <span className="inline-flex items-center gap-1 text-[11px] sm:text-xs md:text-sm text-[rgba(var(--foreground-rgb),0.68)]">
+                    Min bid Rs {highlightedMinBid.toLocaleString()}
+                  </span>
+                </div>
+                <div className="mt-1">
+                  <PriceStepper
+                    value={pricePerKg}
+                    onChange={setPricePerKg}
+                    min={highlightedMinBid}
+                    step={step}
+                    currency="Rs"
+                  />
+                </div>
+                {!isPriceValid && pricePerKg !== "" && (
+                  <span className="mt-1 block text-[11px] sm:text-xs md:text-sm text-rose-600">
+                    Bid must be at least Rs {highlightedMinBid.toLocaleString()} per kg.
+                  </span>
+                )}
               </div>
-              {!isPriceValid && pricePerKg !== "" && (
-                <span className="mt-1 block text-[11px] text-rose-600">
-                  Bid must be at least Rs {highlightedMinBid.toLocaleString()} per kg.
-                </span>
-              )}
-            </div>
 
-            <label className="block text-xs font-medium text-[color:var(--muted)]">
-              Quantity (kg)
-              <input
-                type="number"
-                min={1}
-                value={quantity}
-                onChange={(event) => setQuantity(event.target.value)}
-                className="mt-1 w-full rounded-lg ring-1 ring-[color:var(--supporting)] focus:ring-2 focus:ring-[color:var(--leaf)] px-3 py-2 bg-[color:var(--surface)] text-[color:var(--foreground)] placeholder:text-[color:var(--muted)]"
-                required
-              />
-              {!isQuantityValid && quantity !== "" && (
-                <span className="mt-1 block text-[11px] text-rose-600">
-                  Quantity must be at least 1 kg.
-                </span>
-              )}
-            </label>
+              <label className="block text-xs sm:text-sm md:text-base font-semibold text-[color:var(--foreground)]">
+                Quantity (kg)
+                <input
+                  type="number"
+                  min={1}
+                  value={quantity}
+                  onChange={(event) => setQuantity(event.target.value)}
+                  className={baseFieldClass}
+                  required
+                />
+                {!isQuantityValid && quantity !== "" && (
+                  <span className="mt-1 block text-[11px] sm:text-xs md:text-sm text-rose-600">
+                    Quantity must be at least 1 kg.
+                  </span>
+                )}
+              </label>
 
-            <label className="block text-xs font-medium text-[color:var(--muted)]">
-              Delivery Option
-              <select
-                value={deliveryOption}
-                onChange={(event) => setDeliveryOption(event.target.value)}
-                className="mt-1 w-full rounded-lg ring-1 ring-[color:var(--supporting)] focus:ring-2 focus:ring-[color:var(--leaf)] px-3 py-2 bg-[color:var(--surface)] text-[color:var(--foreground)]"
+              <label className="block text-xs sm:text-sm md:text-base font-semibold text-[color:var(--foreground)]">
+                Delivery Option
+                <select value={deliveryOption} onChange={(event) => setDeliveryOption(event.target.value)} className={baseFieldClass}>
+                  <option value="Pickup">Pickup</option>
+                  <option value="Delivery">Delivery</option>
+                </select>
+              </label>
+
+              <label className="block text-xs sm:text-sm md:text-base font-semibold text-[color:var(--foreground)]">
+                Notes (optional)
+                <textarea
+                  value={notes}
+                  onChange={(event) => setNotes(event.target.value)}
+                  rows={3}
+                  className={baseFieldClass}
+                />
+              </label>
+
+              <div className="rounded-xl border border-[color:var(--supporting)]/30 bg-[color:var(--surface-2)]/60 px-3 py-2 md:px-4 md:py-3 text-xs sm:text-sm md:text-base text-[color:var(--muted)]">
+                Total (est.): Rs {total.toLocaleString()}
+              </div>
+
+              <button
+                type="submit"
+                className="w-full rounded-full bg-[color:var(--leaf)] px-5 md:px-6 py-2.5 md:py-3 text-sm sm:text-base md:text-lg font-semibold text-white shadow-lg shadow-[rgba(var(--leaf-rgb),0.24)] transition-colors hover:bg-[color:var(--secondary)] focus:outline-none focus:ring-2 focus:ring-[color:var(--secondary)] focus:ring-offset-2 focus:ring-offset-[color:var(--surface)] disabled:cursor-not-allowed disabled:opacity-60"
+                disabled={loadingBids}
               >
-                <option value="Pickup">Pickup</option>
-                <option value="Delivery">Delivery</option>
-              </select>
-            </label>
+                Place bid
+              </button>
 
-            <label className="block text-xs font-medium text-[color:var(--muted)]">
-              Notes (optional)
-              <textarea
-                value={notes}
-                onChange={(event) => setNotes(event.target.value)}
-                rows={3}
-                className="mt-1 w-full rounded-lg ring-1 ring-[color:var(--supporting)] focus:ring-2 focus:ring-[color:var(--leaf)] px-3 py-2 bg-[color:var(--surface)] text-[color:var(--foreground)] placeholder:text-[color:var(--muted)]"
-              />
-            </label>
+              {announcement && (
+                <p className="text-sm sm:text-base md:text-lg text-[color:var(--muted)]">{announcement}</p>
+              )}
 
-            <div className="rounded-xl border border-[color:var(--supporting)]/30 bg-[color:var(--surface-2)]/60 px-3 py-2 text-xs text-[color:var(--muted)]">
-              Total (est.): Rs {total.toLocaleString()}
-            </div>
-
-            <button
-              type="submit"
-              className="w-full rounded-full bg-[color:var(--leaf)] px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-[rgba(var(--leaf-rgb),0.24)] transition-colors hover:bg-[color:var(--secondary)] focus:outline-none focus:ring-2 focus:ring-[color:var(--secondary)] focus:ring-offset-2 focus:ring-offset-[color:var(--surface)] disabled:cursor-not-allowed disabled:opacity-60"
-              disabled={loadingBids}
-            >
-              Place bid
-            </button>
-
-            {announcement && (
-              <p className="text-sm text-[color:var(--muted)]">{announcement}</p>
-            )}
-
-            {submitted && (
-              <p className="text-xs text-[color:var(--leaf)]">
-                We have received your bid. Our team will reach out if you are the highest bidder.
-              </p>
-            )}
-          </form>
+              {submitted && (
+                <p className="text-xs sm:text-sm md:text-base text-[color:var(--leaf)]">
+                  We have received your bid. Our team will reach out if you are the highest bidder.
+                </p>
+              )}
+            </form>
+          </div>
         </div>
       </div>
     </>

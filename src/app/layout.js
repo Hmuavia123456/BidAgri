@@ -20,10 +20,10 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className="bg-white">
+    <html lang="en" className="bg-[#FAFAFA]">
       <head></head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col bg-white`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col bg-[#FAFAFA]`}
       >
         {/* Skip to main content for keyboard and screen-reader users */}
         <a href="#main-content" className="skip-link">Skip to content</a>

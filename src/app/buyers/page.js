@@ -9,7 +9,7 @@ import BuyerRegistrationForm from "@/components/BuyerRegistrationForm";
 
 export default function BuyersPage() {
   return (
-    <section className="w-full min-h-screen bg-white pt-24 pb-16">
+    <section className="w-full min-h-screen bg-[color:var(--background)] pt-24 pb-16">
       <div className="max-w-6xl mx-auto px-4 md:px-8 space-y-14">
         <header className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
           <div className="space-y-6">
@@ -157,7 +157,7 @@ export default function BuyersPage() {
           </div>
         </section>
 
-        <section className="py-12 bg-white">
+        <section className="py-12 bg-[color:var(--background)]">
           <div className="max-w-6xl mx-auto px-4 md:px-8 text-center space-y-8">
             <h3 className="text-lg md:text-xl font-semibold text-[color:var(--foreground)]">
               Trusted by leading organizations and agricultural partners
@@ -185,13 +185,13 @@ export default function BuyersPage() {
               />
               <div className="flex h-10 w-auto items-center justify-center">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 120" className="h-10">
-                  <text x="0" y="80" fontSize="60" fontFamily="Arial, sans-serif" fill="#00B386" fontWeight="bold">
+                  <text x="0" y="80" fontSize="60" fontFamily="Arial, sans-serif" fill="#4CAF50" fontWeight="bold">
                     Farmers
                   </text>
-                  <text x="260" y="80" fontSize="60" fontFamily="Arial, sans-serif" fill="#00C8A3" fontWeight="bold">
+                  <text x="260" y="80" fontSize="60" fontFamily="Arial, sans-serif" fill="#1976D2" fontWeight="bold">
                     Insurance
                   </text>
-                  <circle cx="230" cy="45" r="10" fill="#00B386" />
+                  <circle cx="230" cy="45" r="10" fill="#4CAF50" />
                 </svg>
               </div>
             </div>

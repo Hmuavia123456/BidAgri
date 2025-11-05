@@ -7,7 +7,7 @@ import ContactForm from "@/components/ContactForm";
 
 export default function ContactPage() {
   return (
-    <div className="min-h-screen bg-white text-[color:var(--foreground)]">
+    <div className="min-h-screen bg-[color:var(--background)] text-[color:var(--foreground)]">
       <section className="pt-24 sm:pt-28 md:pt-32">
         <div className="mx-auto w-full max-w-6xl px-4 py-8 text-center sm:px-6 sm:py-10 md:px-8 md:py-12">
           <h1 className="text-3xl font-semibold text-[color:var(--primary)] sm:text-4xl md:text-5xl">

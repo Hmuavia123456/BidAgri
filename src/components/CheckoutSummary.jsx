@@ -151,7 +151,7 @@ export default function CheckoutSummary({
             />
             <button
               type="submit"
-              className="rounded-xl bg-[color:var(--leaf)] px-5 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-white shadow-[0_14px_28px_rgba(0,179,134,0.28)] transition hover:bg-[color:var(--secondary)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--leaf)]/60 disabled:opacity-50"
+              className="rounded-xl bg-[color:var(--leaf)] px-5 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-white shadow-[0_14px_28px_rgba(var(--leaf-rgb),0.28)] transition hover:bg-[color:var(--secondary)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--leaf)]/60 disabled:opacity-50"
               disabled={applying}
             >
               {applying ? "Applying…" : "Apply"}
@@ -168,7 +168,7 @@ export default function CheckoutSummary({
         </form>
 
         {discountPercent > 0 && (
-          <div className="mt-6 rounded-2xl border border-[rgba(15,23,42,0.08)] bg-[rgba(0,179,134,0.08)] p-4 text-sm text-[#0f172a] shadow-inner">
+          <div className="mt-6 rounded-2xl border border-[rgba(15,23,42,0.08)] bg-[rgba(var(--leaf-rgb),0.08)] p-4 text-sm text-[#0f172a] shadow-inner">
             <div className="flex items-center justify-between">
               <span className="font-semibold">
                 Discount Applied ({discountPercent}%)

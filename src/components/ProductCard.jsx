@@ -105,7 +105,7 @@ function ProductCard({ item, onBid }) {
         <button
           type="button"
           onClick={() => onBid(item)}
-          className="inline-flex items-center justify-center gap-2 rounded-full bg-[color:var(--leaf)] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_14px_28px_rgba(0,179,134,0.28)] transition-all duration-300 hover:bg-[color:var(--secondary)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--leaf)]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-white disabled:cursor-not-allowed disabled:opacity-50"
+          className="inline-flex items-center justify-center gap-2 rounded-full bg-[color:var(--leaf)] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_14px_28px_rgba(var(--leaf-rgb),0.28)] transition-all duration-300 hover:bg-[color:var(--secondary)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--leaf)]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-white disabled:cursor-not-allowed disabled:opacity-50"
         >
           Bid Now
         </button>

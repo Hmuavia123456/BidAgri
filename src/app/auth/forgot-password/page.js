@@ -5,7 +5,7 @@ import { useState } from "react";
 
 export default function ForgotPasswordPage() {
   return (
-    <div className="min-h-screen bg-white text-[color:var(--foreground)]">
+    <div className="min-h-screen bg-[color:var(--background)] text-[color:var(--foreground)]">
       <section className="pt-24">
         <div className="w-full px-4 md:px-8 max-w-6xl mx-auto text-center py-12 md:py-16">
           <h1 className="text-3xl md:text-4xl font-semibold text-[color:var(--primary)]">Forgot your password?</h1>

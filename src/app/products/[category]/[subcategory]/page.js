@@ -19,7 +19,7 @@ export default function SubcategoryPage({ params }) {
   const { category: cat, subcategory: sub } = getSubcategoryBySlugs(category, subcategory);
 
   return (
-    <section className="w-full min-h-screen bg-white overflow-x-hidden pt-24 pb-16">
+    <section className="w-full min-h-screen bg-[color:var(--background)] overflow-x-hidden pt-24 pb-16">
       <div className="max-w-7xl mx-auto px-4 md:px-8">
         <Breadcrumbs />
         <header className="mb-6 md:mb-8">

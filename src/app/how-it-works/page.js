@@ -27,7 +27,7 @@ const STEPS = [
 
 export default function HowItWorksPage() {
   return (
-    <div className="min-h-screen bg-white text-[color:var(--foreground)]">
+    <div className="min-h-screen bg-[color:var(--background)] text-[color:var(--foreground)]">
       <section className="pt-[108px] sm:pt-32 md:pt-36">
         <div className="mx-auto w-full max-w-6xl px-4 py-10 text-center sm:px-6 sm:py-12 md:px-8 md:py-16">
           <span className="inline-flex items-center gap-2 rounded-full border border-[rgba(var(--leaf-rgb),0.2)] bg-[rgba(var(--leaf-rgb),0.08)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[color:var(--leaf)] sm:text-[13px]">

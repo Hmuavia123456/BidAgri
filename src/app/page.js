@@ -153,7 +153,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="flex min-h-screen flex-col overflow-x-hidden bg-white text-[color:var(--foreground)]">
+    <div className="flex min-h-screen flex-col overflow-x-hidden bg-[color:var(--background)] text-[color:var(--foreground)]">
       <HeroSection />
 
       <section
@@ -165,13 +165,13 @@ export default function Home() {
           aria-hidden="true"
         />
 
-        <div className="mx-auto grid max-w-6xl gap-12 lg:grid-cols-[1.05fr_1fr]">
-          <div className="relative overflow-hidden rounded-3xl border border-[rgba(var(--leaf-rgb),0.15)] bg-white shadow-xl shadow-[rgba(var(--leaf-rgb),0.12)]">
+        <div className="mx-auto grid max-w-6xl items-stretch gap-10 lg:auto-rows-fr lg:grid-cols-[1.05fr_1fr] lg:gap-12">
+          <div className="relative h-full min-h-[320px] w-full overflow-hidden rounded-3xl border border-[rgba(var(--leaf-rgb),0.15)] bg-white shadow-xl shadow-[rgba(var(--leaf-rgb),0.12)] sm:min-h-[400px] lg:min-h-[520px] xl:min-h-[560px]">
             <Image
               src="https://images.unsplash.com/photo-1621788240870-ecd5a58ac8e3?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=960"
               alt="Farmer reviewing harvest with buyer, symbolizing trustful farm-to-market connections"
               fill
-              sizes="(max-width: 768px) 100vw, 50vw"
+              sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 45vw"
               className="object-cover"
               placeholder="blur"
               blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAICAgICAgICAgIDAwMDBAQEBAQEBAgIBAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgP/2wCEAAQEBAQIBAgICAwICAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwP/wAARCAAQABADASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAgP/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCkAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/2Q=="
@@ -192,9 +192,9 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="flex flex-col gap-10 rounded-3xl border border-[rgba(var(--leaf-rgb),0.3)] bg-white/90 p-8 shadow-lg shadow-[rgba(var(--leaf-rgb),0.08)] backdrop-blur">
-            <div className="space-y-4">
-              <span className="text-xs font-semibold uppercase tracking-[0.3em] text-[color:var(--leaf)]">
+          <div className="flex flex-col gap-10 rounded-3xl border border-[rgba(var(--leaf-rgb),0.3)] bg-white/95 p-6 shadow-lg shadow-[rgba(var(--leaf-rgb),0.08)] backdrop-blur sm:p-8 lg:p-10">
+            <div className="space-y-4 max-w-3xl">
+              <span className="text-base font-semibold uppercase tracking-[0.24em] text-[color:var(--leaf)] sm:text-lg">
                 Why BidAgri
               </span>
               <h2 className="text-3xl font-bold leading-tight text-[color:var(--primary)] sm:text-4xl">
@@ -205,77 +205,79 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="grid gap-4 sm:grid-cols-2">
-              {highlightColumns.map(({ eyebrow, title, description, bullets }) => (
-                <article
-                  key={eyebrow}
-                  className="flex h-full flex-col gap-4 rounded-2xl border border-[rgba(var(--leaf-rgb),0.3)] bg-white p-5 shadow-sm shadow-[rgba(var(--leaf-rgb),0.07)]"
-                >
-                  <div className="space-y-2">
-                    <span className="text-[10px] font-semibold uppercase tracking-[0.35em] text-[color:var(--leaf)]/80">
-                      {eyebrow}
-                    </span>
-                    <h3 className="text-xl font-semibold text-[color:var(--foreground)]">{title}</h3>
-                    <p className="text-sm leading-relaxed text-[color:var(--muted)]">{description}</p>
-                  </div>
-                  <ul className="mt-auto space-y-2 text-sm text-[color:var(--foreground)]">
-                    {bullets.map((item) => (
-                      <li key={item} className="flex items-start gap-2">
-                        <span className="mt-1 inline-flex h-6 w-6 items-center justify-center rounded-full bg-[rgba(var(--leaf-rgb),0.1)] text-[color:var(--leaf)]">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 20 20"
-                            fill="currentColor"
-                            className="h-4 w-4"
-                            aria-hidden="true"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M16.704 5.29a1 1 0 0 1 .063 1.414l-7.2 7.8a1 1 0 0 1-1.45.03l-3.2-3.2a1 1 0 1 1 1.414-1.414l2.44 2.44 6.502-7.042a1 1 0 0 1 1.43-.028Z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                        </span>
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </article>
-              ))}
-            </div>
+            <div className="grid gap-8 lg:grid-cols-2 lg:items-start">
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-1">
+                {highlightColumns.map(({ eyebrow, title, description, bullets }) => (
+                  <article
+                    key={eyebrow}
+                    className="flex h-full flex-col gap-4 rounded-2xl border border-[rgba(var(--leaf-rgb),0.25)] bg-white p-5 shadow-sm shadow-[rgba(var(--leaf-rgb),0.08)]"
+                  >
+                    <div className="space-y-2">
+                      <span className="text-[11px] font-semibold uppercase tracking-[0.32em] text-[color:var(--leaf)]/75">
+                        {eyebrow}
+                      </span>
+                      <h3 className="text-xl font-semibold text-[color:var(--foreground)]">{title}</h3>
+                      <p className="text-sm leading-relaxed text-[color:var(--muted)]">{description}</p>
+                    </div>
+                    <ul className="mt-auto space-y-2 text-sm text-[color:var(--foreground)]">
+                      {bullets.map((item) => (
+                        <li key={item} className="flex items-start gap-2">
+                          <span className="mt-1 inline-flex h-6 w-6 items-center justify-center rounded-full bg-[rgba(var(--leaf-rgb),0.1)] text-[color:var(--leaf)]">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              viewBox="0 0 20 20"
+                              fill="currentColor"
+                              className="h-4 w-4"
+                              aria-hidden="true"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M16.704 5.29a1 1 0 0 1 .063 1.414l-7.2 7.8a1 1 0 0 1-1.45.03l-3.2-3.2a1 1 0 1 1 1.414-1.414l2.44 2.44 6.502-7.042a1 1 0 0 1 1.43-.028Z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                          </span>
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </article>
+                ))}
+              </div>
 
-            <div className="grid gap-4 sm:grid-cols-2">
-              {quickStats.map(({ label, value }) => (
-                <div
-                  key={label}
-                  className="relative overflow-hidden rounded-3xl border border-[rgba(var(--leaf-rgb),0.25)] bg-gradient-to-br from-[rgba(var(--leaf-rgb),0.14)] via-white to-white p-6 shadow-lg shadow-[rgba(var(--leaf-rgb),0.15)] transition-transform duration-300 hover:-translate-y-1 hover:shadow-xl"
-                >
-                  <span
-                    className="pointer-events-none absolute -top-16 -right-10 h-32 w-32 rounded-full bg-[rgba(var(--secondary-rgb),0.18)] blur-3xl"
-                    aria-hidden
-                  />
-                  <span className="inline-flex items-center gap-2 rounded-full bg-white/80 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.32em] text-[color:var(--leaf)] shadow-[0_6px_18px_rgba(0,0,0,0.06)]">
-                    {label}
-                  </span>
-                  <div className="mt-4 flex items-end gap-2">
-                    <span className="text-3xl font-extrabold tracking-tight text-[color:var(--foreground)] sm:text-4xl">
-                      {value}
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
+                {quickStats.map(({ label, value }) => (
+                  <div
+                    key={label}
+                    className="relative overflow-hidden rounded-3xl border border-[rgba(var(--leaf-rgb),0.2)] bg-gradient-to-br from-[rgba(var(--leaf-rgb),0.12)] via-white to-white p-6 shadow-lg shadow-[rgba(var(--leaf-rgb),0.15)] transition-transform duration-300 hover:-translate-y-1 hover:shadow-xl"
+                  >
+                    <span
+                      className="pointer-events-none absolute -top-16 -right-10 h-32 w-32 rounded-full bg-[rgba(var(--secondary-rgb),0.18)] blur-3xl"
+                      aria-hidden
+                    />
+                    <span className="inline-flex items-center gap-2 rounded-full bg-white/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.32em] text-[color:var(--leaf)] shadow-[0_6px_18px_rgba(0,0,0,0.05)]">
+                      {label}
                     </span>
+                    <div className="mt-4 flex items-end gap-2">
+                      <span className="text-3xl font-extrabold tracking-tight text-[color:var(--foreground)] sm:text-4xl">
+                        {value}
+                      </span>
+                    </div>
+                    <div className="mt-3 h-[2px] w-12 rounded-full bg-[rgba(var(--leaf-rgb),0.45)]" />
+                    <p className="mt-3 text-sm leading-relaxed text-[color:var(--muted)]">
+                      Our teams track this milestone every single day.
+                    </p>
                   </div>
-                  <div className="mt-3 h-[2px] w-12 rounded-full bg-[rgba(var(--leaf-rgb),0.45)]" />
-                  <p className="mt-3 text-sm leading-relaxed text-[color:var(--muted)]">
-                    Our teams track this milestone every single day.
-                  </p>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
         </div>
 
         <div className="mx-auto mt-12 w-full max-w-4xl text-center">
-          <span className="inline-flex items-center gap-2 rounded-full border border-[rgba(var(--leaf-rgb),0.2)] bg-[rgba(var(--leaf-rgb),0.08)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[color:var(--leaf)] sm:text-[13px]">
-            Browse by category
-          </span>
+            <span className="text-base font-semibold uppercase tracking-[0.24em] text-[color:var(--leaf)] sm:text-lg">
+              Browse by category
+            </span>
           <h2 className="mt-4 text-3xl font-bold text-[color:var(--primary)] sm:text-4xl md:text-5xl">
             Fresh Produce Highlights
           </h2>
@@ -346,12 +348,12 @@ export default function Home() {
 
         <div
           ref={ctaRef}
-          className={`mx-auto flex w-full max-w-6xl flex-col gap-10 rounded-[32px] border border-[rgba(var(--leaf-rgb),0.35)] bg-white/90 px-6 py-10 text-[color:var(--foreground)] shadow-2xl shadow-[rgba(var(--leaf-rgb),0.15)] backdrop-blur-lg transition-all duration-700 ease-out sm:px-10 sm:py-12 lg:flex-row lg:items-center lg:gap-12 lg:px-16 ${
+          className={`mx-auto flex w-full max-w-6xl flex-col gap-10 px-6 py-10 text-[color:var(--foreground)] transition-all duration-700 ease-out sm:px-10 sm:py-12 lg:flex-row lg:items-center lg:gap-12 lg:px-16 ${
             ctaVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
           }`}
         >
           <div className="flex-1 text-center lg:text-left">
-            <span className="inline-flex items-center gap-2 rounded-full border border-[rgba(var(--leaf-rgb),0.4)] bg-[rgba(var(--leaf-rgb),0.08)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[color:var(--leaf)] sm:text-[13px]">
+            <span className="text-base font-semibold uppercase tracking-[0.24em] text-[color:var(--leaf)] sm:text-lg">
               The marketplace built on trust
             </span>
             <h2 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">

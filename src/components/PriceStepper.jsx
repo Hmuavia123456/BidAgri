@@ -37,14 +37,14 @@ const PriceStepper = forwardRef(function PriceStepper(
 
   return (
     <div className="block">
-      <label className="block text-xs font-medium text-[color:var(--muted)]">
+      <label className="block text-xs font-semibold text-[color:var(--foreground)]">
         {label}
-        <div className="mt-1 flex rounded-lg ring-1 ring-[color:var(--accent)] focus-within:ring-2 focus-within:ring-[color:var(--primary)] overflow-hidden">
+        <div className="mt-1 flex rounded-lg border border-[rgba(var(--foreground-rgb),0.16)] bg-[color:var(--surface)] focus-within:border-[color:var(--leaf)] focus-within:ring-2 focus-within:ring-[rgba(var(--leaf-rgb),0.45)] overflow-hidden shadow-sm transition-colors">
           <button
             type="button"
             onClick={dec}
             aria-label="Decrease price"
-            className="px-3 py-2 text-[color:var(--foreground)] hover:bg-[color:var(--surface-2)] disabled:opacity-50"
+            className="px-3 py-2 text-[color:var(--foreground)] hover:bg-[rgba(var(--leaf-rgb),0.08)] disabled:opacity-50 transition-colors"
           >
             –
           </button>
@@ -67,19 +67,19 @@ const PriceStepper = forwardRef(function PriceStepper(
               }
             }}
             aria-describedby="price-guidance"
-            className="w-full px-3 py-2 bg-[color:var(--surface)] text-[color:var(--foreground)] outline-none"
+            className="w-full bg-transparent px-3 py-2 text-[color:var(--foreground)] caret-[color:var(--leaf)] outline-none"
           />
           <button
             type="button"
             onClick={inc}
             aria-label="Increase price"
-            className="px-3 py-2 text-[color:var(--foreground)] hover:bg-[color:var(--surface-2)] disabled:opacity-50"
+            className="px-3 py-2 text-[color:var(--foreground)] hover:bg-[rgba(var(--leaf-rgb),0.08)] disabled:opacity-50 transition-colors"
           >
             +
           </button>
         </div>
       </label>
-      <div id="price-guidance" className="mt-1 text-[11px] text-[color:var(--muted)]">
+        <div id="price-guidance" className="mt-1 text-[11px] text-[rgba(var(--foreground-rgb),0.68)]">
         Use arrows or buttons to adjust. Minimum {currency} {min}, step {currency} {step}.
       </div>
     </div>

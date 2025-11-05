@@ -33,8 +33,8 @@ export default function LoginPage() {
   };
 
   return (
-    <section className="relative min-h-screen bg-white pb-20 pt-24">
-      <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-br from-[rgba(var(--leaf-rgb),0.12)] via-white to-white" />
+    <section className="relative min-h-screen bg-[color:var(--background)] pb-20 pt-24">
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-br from-[rgba(var(--leaf-rgb),0.12)] via-[color:var(--background)] to-[color:var(--background)]" />
 
       <div className="mx-auto flex w-full max-w-4xl flex-col gap-10 px-4 md:px-8">
         <header className="relative overflow-hidden rounded-[32px] border border-[rgba(var(--leaf-rgb),0.18)] bg-white/92 px-6 py-10 text-center shadow-[0_24px_48px_rgba(15,23,42,0.12)] backdrop-blur sm:px-12">

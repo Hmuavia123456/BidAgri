@@ -101,22 +101,22 @@ export default function Navbar() {
   const navClassName = [
     "relative z-[61] mx-auto flex w-[95%] max-w-6xl items-center justify-between gap-4 rounded-full border px-5 py-2 transition-all duration-300 backdrop-blur-md",
     isScrolled
-      ? "border-accent/40 bg-base text-primary shadow-lg shadow-primary/20 hover:shadow-primary/30"
+      ? "border-2 border-[color:var(--accent)] bg-base text-primary"
       : "border-white/20 bg-transparent text-white shadow-none hover:shadow-none",
   ].join(" ");
 
   const linkHoverUnderline =
     "relative overflow-visible after:absolute after:left-0 after:bottom-0 after:h-[2px] after:w-0 after:rounded-full after:bg-current after:transition-all after:duration-300 after:ease-out hover:after:w-full";
   const linkTextClass = isScrolled
-    ? `text-primary hover:text-secondary ${linkHoverUnderline}`
+    ? `text-primary hover:text-[#2E7D32] ${linkHoverUnderline}`
     : `text-white hover:text-white/80 ${linkHoverUnderline}`;
   const brandFocusOffsetClass = isScrolled
     ? "focus-visible:ring-offset-base"
     : "focus-visible:ring-offset-transparent";
   const toggleButtonClass = [
-    "inline-flex h-10 w-10 items-center justify-center rounded-full border transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2",
+    "inline-flex h-10 w-10 items-center justify-center rounded-full border transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
     isScrolled
-      ? "border-accent/60 bg-base text-primary shadow-sm hover:text-secondary focus-visible:ring-offset-base"
+      ? "border-accent/60 bg-base text-primary shadow-sm hover:text-[#2E7D32] focus-visible:ring-offset-base"
       : "border-white/30 bg-black/20 text-white backdrop-blur hover:text-white focus-visible:ring-offset-transparent",
   ].join(" ");
   const linkFocusOffsetClass = isScrolled
@@ -164,7 +164,7 @@ export default function Navbar() {
         <nav role="navigation" aria-label="Primary" className={navClassName}>
           <Link
             href="/"
-            className={`group inline-flex items-center gap-3 rounded-full px-2 py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 ${brandFocusOffsetClass}`}
+            className={`group inline-flex items-center gap-3 rounded-full px-2 py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${brandFocusOffsetClass}`}
           >
             <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-base font-semibold text-white shadow-md shadow-primary/30 transition-transform duration-300 group-hover:scale-105">
               <span aria-hidden="true">B</span>
@@ -179,7 +179,7 @@ export default function Navbar() {
                   const isLinkActive = isActive(href);
                   const linkClass = isLinkActive
                     ? isScrolled
-                      ? `font-semibold text-secondary hover:text-secondary ${linkHoverUnderline} after:w-full`
+                      ? `font-semibold text-[#2E7D32] hover:text-[#2E7D32] ${linkHoverUnderline} after:w-full`
                       : `font-semibold text-white hover:text-white ${linkHoverUnderline} after:w-full`
                     : linkTextClass;
 
@@ -187,7 +187,7 @@ export default function Navbar() {
                     <Link
                       key={`${href}-${label}`}
                       href={href}
-                      className={`inline-flex items-center rounded-full px-3 py-1.5 text-sm transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 ${linkFocusOffsetClass} ${linkClass}`}
+                      className={`inline-flex items-center rounded-full px-3 py-1.5 text-sm transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${linkFocusOffsetClass} ${linkClass}`}
                     >
                       {label}
                     </Link>
@@ -217,7 +217,7 @@ export default function Navbar() {
                       onClick={handleSignOut}
                       className={`inline-flex items-center rounded-full px-4 py-2 text-sm font-semibold ${
                         isScrolled
-                          ? "border border-[rgba(var(--leaf-rgb),0.25)] text-[color:var(--leaf)] hover:text-[color:var(--secondary)]"
+                          ? "border border-[rgba(var(--leaf-rgb),0.25)] text-[color:var(--leaf)] hover:text-[#2E7D32]"
                           : "border border-white/40 text-white hover:text-white/80"
                       }`}
                     >
@@ -240,7 +240,7 @@ export default function Navbar() {
                       href="/register"
                       className={`inline-flex items-center rounded-full px-4 py-2 text-sm font-semibold ${
                         isScrolled
-                          ? "border border-[rgba(var(--leaf-rgb),0.25)] text-[color:var(--leaf)] hover:text-[color:var(--secondary)]"
+                          ? "border border-[rgba(var(--leaf-rgb),0.25)] text-[color:var(--leaf)] hover:text-[#2E7D32]"
                           : "border border-white/40 text-white hover:text-white/80"
                       }`}
                     >
@@ -299,12 +299,12 @@ export default function Navbar() {
         aria-hidden={!(hasMounted && isOpen)}
         ref={mobileNavRef}
       >
-          <div className="mx-auto flex w-full max-w-3xl flex-col items-center gap-3 rounded-3xl border border-accent/30 bg-base/95 px-6 py-6 text-primary shadow-xl shadow-primary/20 backdrop-blur supports-[backdrop-filter]:bg-base/90 max-h-[calc(100vh-96px)] overflow-y-auto">
+          <div className="mx-auto flex w-full max-w-3xl flex-col items-center gap-3 rounded-3xl border-2 border-[color:var(--accent)] bg-base/95 px-6 py-6 text-primary shadow-xl shadow-primary/20 backdrop-blur supports-[backdrop-filter]:bg-base/90 max-h-[calc(100vh-96px)] overflow-y-auto">
             {filteredNavItems.map(({ href, label }) => (
               <Link
                 key={`mobile-${href}-${label}`}
                 href={href}
-                className="w-full rounded-full px-5 py-3 text-center text-sm font-semibold transition-colors duration-200 hover:bg-accent/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 focus-visible:ring-offset-base"
+                className="w-full rounded-full px-5 py-3 text-center text-sm font-semibold transition-colors duration-200 hover:bg-accent/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-base"
                 onClick={() => {
                   returnFocusToToggle();
                   setIsOpen(false);
@@ -333,7 +333,7 @@ export default function Navbar() {
                     returnFocusToToggle();
                     setIsOpen(false);
                   }}
-                  className="w-full rounded-full border border-[rgba(var(--leaf-rgb),0.3)] px-5 py-3 text-center text-sm font-semibold text-[color:var(--leaf)] transition hover:text-[color:var(--secondary)]"
+                  className="w-full rounded-full border border-[rgba(var(--leaf-rgb),0.3)] px-5 py-3 text-center text-sm font-semibold text-[color:var(--leaf)] transition hover:text-[#2E7D32]"
                 >
                   Sign out
                 </button>
@@ -356,7 +356,7 @@ export default function Navbar() {
                     returnFocusToToggle();
                     setIsOpen(false);
                   }}
-                  className="w-full rounded-full border border-[rgba(var(--leaf-rgb),0.3)] px-5 py-3 text-center text-sm font-semibold text-[color:var(--leaf)] transition hover:text-[color:var(--secondary)]"
+                  className="w-full rounded-full border border-[rgba(var(--leaf-rgb),0.3)] px-5 py-3 text-center text-sm font-semibold text-[color:var(--leaf)] transition hover:text-[#2E7D32]"
                 >
                   Register
                 </Link>
